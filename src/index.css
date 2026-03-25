@@ -215,3 +215,10 @@ h1 {
 .upgrade-button:hover {
   background: #3f50ff;
 }
+.file-item {
+  cursor: grab;
+}
+
+.file-item:active {
+  cursor: grabbing;
+}
