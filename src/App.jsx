@@ -1,17 +1,18 @@
 import { useState } from "react";
 import "./index.css";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, degrees } from "pdf-lib";
 import UpgradeBanner from "./components/UpgradeBanner";
 
 export default function App() {
   const [files, setFiles] = useState([]);
 
+  const MAX_FREE_FILES = 3;
+  const isPremium = false;
+
   function handleFileChange(event) {
     const selectedFiles = Array.from(event.target.files || []);
 
     if (!selectedFiles.length) return;
-
-    const MAX_FREE_FILES = 3;
 
     setFiles((prev) => {
       const combined = [...prev, ...selectedFiles];
@@ -30,52 +31,81 @@ export default function App() {
   function removeFile(indexToRemove) {
     setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   }
-function moveFileUp(index) {
-  if (index === 0) return;
 
-  setFiles(prev => {
-    const newFiles = [...prev];
-    [newFiles[index - 1], newFiles[index]] =
-      [newFiles[index], newFiles[index - 1]];
-    return newFiles;
-  });
-}
+  function moveFileUp(index) {
+    if (index === 0) return;
 
-function moveFileDown(index) {
-  setFiles(prev => {
-    if (index === prev.length - 1) return prev;
-
-    const newFiles = [...prev];
-    [newFiles[index + 1], newFiles[index]] =
-      [newFiles[index], newFiles[index + 1]];
-    return newFiles;
-  });
-}
-async function mergePdfs() {
-  if (!files.length) return;
-
-  const mergedPdf = await PDFDocument.create();
-
-  for (const file of files) {
-    const bytes = await file.arrayBuffer();
-    const pdf = await PDFDocument.load(bytes);
-
-    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-    pages.forEach((page) => mergedPdf.addPage(page));
+    setFiles((prev) => {
+      const newFiles = [...prev];
+      [newFiles[index - 1], newFiles[index]] = [
+        newFiles[index],
+        newFiles[index - 1],
+      ];
+      return newFiles;
+    });
   }
 
-  const mergedBytes = await mergedPdf.save();
+  function moveFileDown(index) {
+    setFiles((prev) => {
+      if (index === prev.length - 1) return prev;
 
-  const blob = new Blob([mergedBytes], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
+      const newFiles = [...prev];
+      [newFiles[index + 1], newFiles[index]] = [
+        newFiles[index],
+        newFiles[index + 1],
+      ];
+      return newFiles;
+    });
+  }
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "merged.pdf";
-  a.click();
+  function addWatermark(page, font, text) {
+    const { width, height } = page.getSize();
 
-  URL.revokeObjectURL(url);
-}
+    page.drawText(text, {
+      x: width / 2 - 160,
+      y: height / 2,
+      size: 24,
+      font,
+      color: rgb(0.75, 0.75, 0.75),
+      rotate: degrees(45),
+      opacity: 0.4,
+    });
+  }
+
+  async function mergePdfs() {
+    if (!files.length) return;
+
+    const mergedPdf = await PDFDocument.create();
+    const watermarkFont = await mergedPdf.embedFont(StandardFonts.Helvetica);
+
+    for (const file of files) {
+      const bytes = await file.arrayBuffer();
+      const pdf = await PDFDocument.load(bytes);
+
+      const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+
+      for (const page of copiedPages) {
+        mergedPdf.addPage(page);
+
+        if (!isPremium) {
+          addWatermark(page, watermarkFont, "Merged with PDF Tool Suite");
+        }
+      }
+    }
+
+    const mergedBytes = await mergedPdf.save();
+
+    const blob = new Blob([mergedBytes], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "merged.pdf";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="app-shell">
       <div className="app-card">
@@ -116,9 +146,13 @@ async function mergePdfs() {
                   </div>
 
                   <div style={{ display: "flex", gap: "8px" }}>
-                    <button onClick={() => moveFileUp(index)}>↑</button>
+                    <button type="button" onClick={() => moveFileUp(index)}>
+                      ↑
+                    </button>
 
-                    <button onClick={() => moveFileDown(index)}>↓</button>
+                    <button type="button" onClick={() => moveFileDown(index)}>
+                      ↓
+                    </button>
 
                     <button
                       type="button"
