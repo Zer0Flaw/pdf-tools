@@ -10,9 +10,19 @@ export default function App() {
 
     if (!selectedFiles.length) return;
 
-    setFiles((prev) => [...prev, ...selectedFiles]);
+    const MAX_FREE_FILES = 3;
 
-    // reset input so the same file can be selected again later if needed
+    setFiles((prev) => {
+      const combined = [...prev, ...selectedFiles];
+
+      if (combined.length > MAX_FREE_FILES) {
+        alert("Free version allows up to 3 PDFs. Upgrade coming soon.");
+        return combined.slice(0, MAX_FREE_FILES);
+      }
+
+      return combined;
+    });
+
     event.target.value = "";
   }
 
