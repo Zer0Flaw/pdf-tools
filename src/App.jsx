@@ -18,7 +18,27 @@ export default function App() {
   function removeFile(indexToRemove) {
     setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   }
+function moveFileUp(index) {
+  if (index === 0) return;
 
+  setFiles(prev => {
+    const newFiles = [...prev];
+    [newFiles[index - 1], newFiles[index]] =
+      [newFiles[index], newFiles[index - 1]];
+    return newFiles;
+  });
+}
+
+function moveFileDown(index) {
+  setFiles(prev => {
+    if (index === prev.length - 1) return prev;
+
+    const newFiles = [...prev];
+    [newFiles[index + 1], newFiles[index]] =
+      [newFiles[index], newFiles[index + 1]];
+    return newFiles;
+  });
+}
   return (
     <div className="app-shell">
       <div className="app-card">
@@ -46,25 +66,32 @@ export default function App() {
           ) : (
             <ul className="file-list">
               {files.map((file, index) => (
-                <li
-                  key={`${file.name}-${file.size}-${index}`}
-                  className="file-item"
-                >
-                  <div className="file-meta">
-                    <p className="file-name">{file.name}</p>
-                    <p className="file-size">
-                      {(file.size / 1024).toFixed(1)} KB
-                    </p>
-                  </div>
+                <li key={`${file.name}-${file.size}-${index}`} className="file-item">
+  <div className="file-meta">
+    <p className="file-name">{file.name}</p>
+    <p className="file-size">
+      {(file.size / 1024).toFixed(1)} KB
+    </p>
+  </div>
 
-                  <button
-                    type="button"
-                    className="remove-btn"
-                    onClick={() => removeFile(index)}
-                  >
-                    Remove
-                  </button>
-                </li>
+  <div style={{display:"flex", gap:"8px"}}>
+    <button onClick={() => moveFileUp(index)}>
+      ↑
+    </button>
+
+    <button onClick={() => moveFileDown(index)}>
+      ↓
+    </button>
+
+    <button
+      type="button"
+      className="remove-btn"
+      onClick={() => removeFile(index)}
+    >
+      Remove
+    </button>
+  </div>
+</li>
               ))}
             </ul>
           )}
