@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./index.css";
+import { PDFDocument } from "pdf-lib";
 
 export default function App() {
   const [files, setFiles] = useState([]);
@@ -38,6 +39,31 @@ function moveFileDown(index) {
       [newFiles[index], newFiles[index + 1]];
     return newFiles;
   });
+}
+async function mergePdfs() {
+  if (!files.length) return;
+
+  const mergedPdf = await PDFDocument.create();
+
+  for (const file of files) {
+    const bytes = await file.arrayBuffer();
+    const pdf = await PDFDocument.load(bytes);
+
+    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+    pages.forEach((page) => mergedPdf.addPage(page));
+  }
+
+  const mergedBytes = await mergedPdf.save();
+
+  const blob = new Blob([mergedBytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "merged.pdf";
+  a.click();
+
+  URL.revokeObjectURL(url);
 }
   return (
     <div className="app-shell">
@@ -97,9 +123,14 @@ function moveFileDown(index) {
           )}
         </div>
 
-        <button type="button" className="merge-btn" disabled>
-          Merge PDFs
-        </button>
+        <button
+  type="button"
+  className="merge-btn"
+  disabled={!files.length}
+  onClick={mergePdfs}
+>
+  Merge PDFs
+</button>
       </div>
     </div>
   );
