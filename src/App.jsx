@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./index.css";
 import { PDFDocument } from "pdf-lib";
+import UpgradeBanner from "./components/UpgradeBanner";
 
 export default function App() {
   const [files, setFiles] = useState([]);
@@ -78,6 +79,7 @@ async function mergePdfs() {
   return (
     <div className="app-shell">
       <div className="app-card">
+        <UpgradeBanner />
         <p className="eyebrow">PDF Utility Suite</p>
         <h1>Merge PDF Files</h1>
         <p className="subtitle">
@@ -102,45 +104,44 @@ async function mergePdfs() {
           ) : (
             <ul className="file-list">
               {files.map((file, index) => (
-                <li key={`${file.name}-${file.size}-${index}`} className="file-item">
-  <div className="file-meta">
-    <p className="file-name">{file.name}</p>
-    <p className="file-size">
-      {(file.size / 1024).toFixed(1)} KB
-    </p>
-  </div>
+                <li
+                  key={`${file.name}-${file.size}-${index}`}
+                  className="file-item"
+                >
+                  <div className="file-meta">
+                    <p className="file-name">{file.name}</p>
+                    <p className="file-size">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
 
-  <div style={{display:"flex", gap:"8px"}}>
-    <button onClick={() => moveFileUp(index)}>
-      ↑
-    </button>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button onClick={() => moveFileUp(index)}>↑</button>
 
-    <button onClick={() => moveFileDown(index)}>
-      ↓
-    </button>
+                    <button onClick={() => moveFileDown(index)}>↓</button>
 
-    <button
-      type="button"
-      className="remove-btn"
-      onClick={() => removeFile(index)}
-    >
-      Remove
-    </button>
-  </div>
-</li>
+                    <button
+                      type="button"
+                      className="remove-btn"
+                      onClick={() => removeFile(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </li>
               ))}
             </ul>
           )}
         </div>
 
         <button
-  type="button"
-  className="merge-btn"
-  disabled={!files.length}
-  onClick={mergePdfs}
->
-  Merge PDFs
-</button>
+          type="button"
+          className="merge-btn"
+          disabled={!files.length}
+          onClick={mergePdfs}
+        >
+          Merge PDFs
+        </button>
       </div>
     </div>
   );
