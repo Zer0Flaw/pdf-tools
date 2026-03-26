@@ -281,3 +281,10 @@ h1 {
   gap: 8px;
   flex-shrink: 0;
 }
+
+.usage-indicator {
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}

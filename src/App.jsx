@@ -231,6 +231,13 @@ export default function App() {
           <div className="drop-zone-sub">Free plan allows up to 3 files</div>
         </div>
 
+        <div
+          className="usage-indicator"
+          style={{ color: files.length >= 3 ? "#dc2626" : "#374151" }}
+        >
+          {files.length} / 3 PDFs used
+        </div>
+
         {files.length > 0 && (
           <DndContext
             collisionDetection={closestCenter}
