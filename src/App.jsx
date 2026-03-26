@@ -67,12 +67,17 @@ function SortableFileItem({
 
 export default function App() {
   const [files, setFiles] = useState([]);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const MAX_FREE_FILES = 3;
   const isPremium = false;
 
-  function handleFileChange(event) {
-    const selectedFiles = Array.from(event.target.files || []);
+  function addFiles(newFiles) {
+    const selectedFiles = Array.from(newFiles || []).filter(
+      (file) =>
+        file.type === "application/pdf" ||
+        file.name.toLowerCase().endsWith(".pdf"),
+    );
 
     if (!selectedFiles.length) return;
 
@@ -86,24 +91,40 @@ export default function App() {
 
       return combined;
     });
+  }
 
-    event.target.value = "";
+  function handleFileChange(e) {
+    addFiles(e.target.files);
+    e.target.value = "";
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    setIsDragOver(true);
+  }
+
+  function handleDragLeave(e) {
+    e.preventDefault();
+    setIsDragOver(false);
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    setIsDragOver(false);
+    addFiles(e.dataTransfer.files);
   }
 
   function removeFile(indexToRemove) {
-    setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
+    setFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
   }
 
   function moveFileUp(index) {
     if (index === 0) return;
 
     setFiles((prev) => {
-      const newFiles = [...prev];
-      [newFiles[index - 1], newFiles[index]] = [
-        newFiles[index],
-        newFiles[index - 1],
-      ];
-      return newFiles;
+      const arr = [...prev];
+      [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
+      return arr;
     });
   }
 
@@ -111,12 +132,9 @@ export default function App() {
     setFiles((prev) => {
       if (index === prev.length - 1) return prev;
 
-      const newFiles = [...prev];
-      [newFiles[index + 1], newFiles[index]] = [
-        newFiles[index],
-        newFiles[index + 1],
-      ];
-      return newFiles;
+      const arr = [...prev];
+      [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
+      return arr;
     });
   }
 
@@ -127,14 +145,12 @@ export default function App() {
 
     setFiles((prev) => {
       const oldIndex = prev.findIndex(
-        (file, index) => `${file.name}-${file.size}-${index}` === active.id,
+        (file, i) => `${file.name}-${file.size}-${i}` === active.id,
       );
 
       const newIndex = prev.findIndex(
-        (file, index) => `${file.name}-${file.size}-${index}` === over.id,
+        (file, i) => `${file.name}-${file.size}-${i}` === over.id,
       );
-
-      if (oldIndex === -1 || newIndex === -1) return prev;
 
       return arrayMove(prev, oldIndex, newIndex);
     });
@@ -168,83 +184,72 @@ export default function App() {
 
       for (const page of copiedPages) {
         mergedPdf.addPage(page);
-
-        if (!isPremium) {
+        if (!isPremium)
           addWatermark(page, watermarkFont, "Merged with PDF Tool Suite");
-        }
       }
     }
 
     const mergedBytes = await mergedPdf.save();
-
     const blob = new Blob([mergedBytes], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
 
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "merged.pdf";
     a.click();
-
     URL.revokeObjectURL(url);
   }
 
   const sortableItems = files.map(
-    (file, index) => `${file.name}-${file.size}-${index}`,
+    (file, i) => `${file.name}-${file.size}-${i}`,
   );
 
   return (
     <div className="app-shell">
       <div className="app-card">
         <UpgradeBanner />
-        <p className="eyebrow">PDF Utility Suite</p>
-        <h1>Merge PDF Files</h1>
-        <p className="subtitle">
-          Upload multiple PDF files, arrange them, and prepare them for merging.
-        </p>
 
-        <label className="upload-box">
-          <span>Select PDF files</span>
+        <label
+          className={`upload-box ${isDragOver ? "drag-over" : ""}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <span>Click or drag PDFs here</span>
           <input
             type="file"
-            accept="application/pdf,.pdf"
             multiple
+            accept="application/pdf"
             onChange={handleFileChange}
           />
         </label>
 
-        <div className="file-section">
-          <h2>Selected Files</h2>
-
-          {files.length === 0 ? (
-            <div className="empty-state">No files selected yet.</div>
-          ) : (
-            <DndContext
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
+        {files.length > 0 && (
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={sortableItems}
+              strategy={verticalListSortingStrategy}
             >
-              <SortableContext
-                items={sortableItems}
-                strategy={verticalListSortingStrategy}
-              >
-                <ul className="file-list">
-                  {files.map((file, index) => (
-                    <SortableFileItem
-                      key={`${file.name}-${file.size}-${index}`}
-                      file={file}
-                      index={index}
-                      moveFileUp={moveFileUp}
-                      moveFileDown={moveFileDown}
-                      removeFile={removeFile}
-                    />
-                  ))}
-                </ul>
-              </SortableContext>
-            </DndContext>
-          )}
-        </div>
+              <ul className="file-list">
+                {files.map((file, index) => (
+                  <SortableFileItem
+                    key={`${file.name}-${file.size}-${index}`}
+                    file={file}
+                    index={index}
+                    moveFileUp={moveFileUp}
+                    moveFileDown={moveFileDown}
+                    removeFile={removeFile}
+                  />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
+        )}
 
         <button
-          type="button"
           className="merge-btn"
           disabled={!files.length}
           onClick={mergePdfs}
