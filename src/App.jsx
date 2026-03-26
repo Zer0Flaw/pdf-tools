@@ -2,6 +2,68 @@ import { useState } from "react";
 import "./index.css";
 import { PDFDocument, StandardFonts, rgb, degrees } from "pdf-lib";
 import UpgradeBanner from "./components/UpgradeBanner";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+function SortableFileItem({
+  file,
+  index,
+  moveFileUp,
+  moveFileDown,
+  removeFile,
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: `${file.name}-${file.size}-${index}`,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  return (
+    <li ref={setNodeRef} style={style} className="file-item">
+      <div className="file-item-main" {...attributes} {...listeners}>
+        <div className="file-meta">
+          <p className="file-name">{file.name}</p>
+          <p className="file-size">{(file.size / 1024).toFixed(1)} KB</p>
+        </div>
+      </div>
+
+      <div className="file-actions">
+        <button type="button" onClick={() => moveFileUp(index)}>
+          ↑
+        </button>
+
+        <button type="button" onClick={() => moveFileDown(index)}>
+          ↓
+        </button>
+
+        <button
+          type="button"
+          className="remove-btn"
+          onClick={() => removeFile(index)}
+        >
+          Remove
+        </button>
+      </div>
+    </li>
+  );
+}
 
 export default function App() {
   const [files, setFiles] = useState([]);
@@ -58,6 +120,26 @@ export default function App() {
     });
   }
 
+  function handleDragEnd(event) {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    setFiles((prev) => {
+      const oldIndex = prev.findIndex(
+        (file, index) => `${file.name}-${file.size}-${index}` === active.id,
+      );
+
+      const newIndex = prev.findIndex(
+        (file, index) => `${file.name}-${file.size}-${index}` === over.id,
+      );
+
+      if (oldIndex === -1 || newIndex === -1) return prev;
+
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  }
+
   function addWatermark(page, font, text) {
     const { width, height } = page.getSize();
 
@@ -106,6 +188,10 @@ export default function App() {
     URL.revokeObjectURL(url);
   }
 
+  const sortableItems = files.map(
+    (file, index) => `${file.name}-${file.size}-${index}`,
+  );
+
   return (
     <div className="app-shell">
       <div className="app-card">
@@ -132,39 +218,28 @@ export default function App() {
           {files.length === 0 ? (
             <div className="empty-state">No files selected yet.</div>
           ) : (
-            <ul className="file-list">
-              {files.map((file, index) => (
-                <li
-                  key={`${file.name}-${file.size}-${index}`}
-                  className="file-item"
-                >
-                  <div className="file-meta">
-                    <p className="file-name">{file.name}</p>
-                    <p className="file-size">
-                      {(file.size / 1024).toFixed(1)} KB
-                    </p>
-                  </div>
-
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <button type="button" onClick={() => moveFileUp(index)}>
-                      ↑
-                    </button>
-
-                    <button type="button" onClick={() => moveFileDown(index)}>
-                      ↓
-                    </button>
-
-                    <button
-                      type="button"
-                      className="remove-btn"
-                      onClick={() => removeFile(index)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={sortableItems}
+                strategy={verticalListSortingStrategy}
+              >
+                <ul className="file-list">
+                  {files.map((file, index) => (
+                    <SortableFileItem
+                      key={`${file.name}-${file.size}-${index}`}
+                      file={file}
+                      index={index}
+                      moveFileUp={moveFileUp}
+                      moveFileDown={moveFileDown}
+                      removeFile={removeFile}
+                    />
+                  ))}
+                </ul>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
 

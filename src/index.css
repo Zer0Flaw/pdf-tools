@@ -222,3 +222,25 @@ h1 {
 .file-item:active {
   cursor: grabbing;
 }
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-item-main {
+  flex: 1;
+  cursor: grab;
+  user-select: none;
+}
+
+.file-item-main:active {
+  cursor: grabbing;
+}
+
+.file-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
