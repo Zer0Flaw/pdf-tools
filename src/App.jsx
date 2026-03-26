@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "./index.css";
 import { PDFDocument, StandardFonts, rgb, degrees } from "pdf-lib";
 import UpgradeBanner from "./components/UpgradeBanner";
@@ -10,6 +10,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+
 
 function SortableFileItem({
   file,
@@ -68,7 +69,7 @@ function SortableFileItem({
 export default function App() {
   const [files, setFiles] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
-
+  const fileInputRef = useRef(null);
   const MAX_FREE_FILES = 3;
   const isPremium = false;
 
@@ -209,20 +210,26 @@ export default function App() {
       <div className="app-card">
         <UpgradeBanner />
 
-        <label
-          className={`upload-box ${isDragOver ? "drag-over" : ""}`}
+        <div
+          className={`drop-zone ${isDragOver ? "drag-over" : ""}`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
         >
-          <span>Click or drag PDFs here</span>
           <input
+            ref={fileInputRef}
             type="file"
-            multiple
             accept="application/pdf"
+            multiple
             onChange={handleFileChange}
+            hidden
           />
-        </label>
+
+          <div className="drop-zone-title">Select or Drop PDFs Here</div>
+
+          <div className="drop-zone-sub">Free plan allows up to 3 files</div>
+        </div>
 
         {files.length > 0 && (
           <DndContext

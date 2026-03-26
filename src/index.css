@@ -92,6 +92,43 @@ h1 {
   background: #f9fafb;
 }
 
+.drop-zone {
+  border: 2px dashed #d1d5db;
+  border-radius: 16px;
+  padding: 48px 24px;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  margin-bottom: 28px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.drop-zone:hover {
+  border-color: #9ca3af;
+  background: #f3f4f6;
+}
+
+.drop-zone.drag-over {
+  border-color: #111827;
+  background: #eef2ff;
+  transform: scale(1.01);
+}
+
+.drop-zone-title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.drop-zone-sub {
+  font-size: 14px;
+  color: #6b7280;
+}
+
 .file-list {
   list-style: none;
   padding: 0;
