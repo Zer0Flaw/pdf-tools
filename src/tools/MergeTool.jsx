@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { PDFDocument, StandardFonts, rgb, degrees } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import { DndContext, closestCenter } from "@dnd-kit/core";
@@ -72,6 +72,16 @@ export default function MergeTool() {
   const [message, setMessage] = useState(null);
   const fileInputRef = useRef(null);
   const isPremium = false;
+
+useEffect(() => {
+  if (!message) return;
+
+  const timer = setTimeout(() => {
+    setMessage(null);
+  }, 3500);
+
+  return () => clearTimeout(timer);
+}, [message]);
 
   function addFiles(newFiles) {
     const incomingFiles = Array.from(newFiles || []);
