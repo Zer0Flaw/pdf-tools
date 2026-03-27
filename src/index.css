@@ -288,3 +288,32 @@ h1 {
   font-weight: 600;
   color: #374151;
 }
+.tool-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.tool-tab {
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #111827;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-tab:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+.tool-tab.active {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
