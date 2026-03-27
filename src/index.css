@@ -317,3 +317,7 @@ h1 {
   color: white;
   border-color: #111827;
 }
+
+.tool-nav {
+  margin-bottom: 1.5rem;
+}

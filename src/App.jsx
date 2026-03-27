@@ -25,8 +25,10 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <ToolNav activeTool={activeTool} onChange={setActiveTool} />
-      {renderActiveTool()}
+      <div className="app-card">
+        <ToolNav activeTool={activeTool} onChange={setActiveTool} />
+        {renderActiveTool()}
+      </div>
     </div>
   );
 }

@@ -232,8 +232,8 @@ export default function MergeTool() {
   );
 
   return (
-    <div className="app-card">
-      <UpgradeBanner />
+  <>
+    <UpgradeBanner />
 
       <div
         className={`drop-zone ${isDragOver ? "drag-over" : ""}`}
@@ -296,6 +296,6 @@ export default function MergeTool() {
       >
         {isMerging ? "Merging..." : "Merge PDFs"}
       </button>
-    </div>
+    </>
   );
 }
