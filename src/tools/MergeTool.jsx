@@ -232,8 +232,19 @@ export default function MergeTool() {
   );
 
   return (
-  <>
-    <UpgradeBanner />
+    <>
+      <div className="tool-header">
+        <div>
+          <h2>Merge PDF</h2>
+          <p className="tool-sub">
+            Combine multiple PDFs into a single document.
+          </p>
+        </div>
+
+        {!isPremium && <div className="free-badge">Free</div>}
+      </div>
+
+      <UpgradeBanner />
 
       <div
         className={`drop-zone ${isDragOver ? "drag-over" : ""}`}

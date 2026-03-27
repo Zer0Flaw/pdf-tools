@@ -346,6 +346,11 @@ h1 {
 .locked-body {
   border-top: 1px solid #e5e7eb;
   padding-top: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* 👈 THIS CENTERS EVERYTHING */
+  text-align: center;    /* 👈 centers text */
 }
 
 .locked-muted {
@@ -366,4 +371,33 @@ h1 {
 
 .upgrade-cta:hover {
   opacity: 0.9;
+}
+
+.locked-body p {
+  margin: 0.25rem 0;
+}
+
+.upgrade-cta {
+  margin-top: 1.25rem;
+}
+
+.tool-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tool-sub {
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.free-badge {
+  background: #e5e7eb;
+  color: #111827;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
