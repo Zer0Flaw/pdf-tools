@@ -71,6 +71,7 @@ function SortableFileItem({
 export default function App() {
   const [files, setFiles] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isMerging, setIsMerging] = useState(false);
   const fileInputRef = useRef(null);
   const isPremium = false;
 
@@ -189,34 +190,44 @@ export default function App() {
   }
 
   async function mergePdfs() {
-    if (!files.length) return;
+    if (!files.length || isMerging) return;
 
-    const mergedPdf = await PDFDocument.create();
-    const watermarkFont = await mergedPdf.embedFont(StandardFonts.Helvetica);
+    setIsMerging(true);
 
-    for (const file of files) {
-      const bytes = await file.arrayBuffer();
-      const pdf = await PDFDocument.load(bytes);
+    try {
+      const mergedPdf = await PDFDocument.create();
+      const watermarkFont = await mergedPdf.embedFont(StandardFonts.Helvetica);
 
-      const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+      for (const file of files) {
+        const bytes = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(bytes);
 
-      for (const page of copiedPages) {
-        mergedPdf.addPage(page);
-        if (!isPremium) {
-          addWatermark(page, watermarkFont, "Merged with PDF Tool Suite");
+        const copiedPages = await mergedPdf.copyPages(
+          pdf,
+          pdf.getPageIndices(),
+        );
+
+        for (const page of copiedPages) {
+          mergedPdf.addPage(page);
+
+          if (!isPremium) {
+            addWatermark(page, watermarkFont, "Merged with PDF Tool Suite");
+          }
         }
       }
+
+      const mergedBytes = await mergedPdf.save();
+      const blob = new Blob([mergedBytes], { type: "application/pdf" });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "merged.pdf";
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsMerging(false);
     }
-
-    const mergedBytes = await mergedPdf.save();
-    const blob = new Blob([mergedBytes], { type: "application/pdf" });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "merged.pdf";
-    a.click();
-    URL.revokeObjectURL(url);
   }
 
   const sortableItems = files.map(
@@ -284,10 +295,10 @@ export default function App() {
 
         <button
           className="merge-btn"
-          disabled={!files.length}
+          disabled={!files.length || isMerging}
           onClick={mergePdfs}
         >
-          Merge PDFs
+          {isMerging ? "Merging..." : "Merge PDFs"}
         </button>
       </div>
     </div>
