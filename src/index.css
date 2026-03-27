@@ -416,3 +416,8 @@ h1 {
   border: 1px solid #fecaca;
   color: #b91c1c;
 }
+.drop-zone.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}

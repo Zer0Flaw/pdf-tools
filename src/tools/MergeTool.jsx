@@ -157,6 +157,7 @@ useEffect(() => {
   }
 
   function handleDragOver(e) {
+    if (isMerging) return;
     e.preventDefault();
     setIsDragOver(true);
   }
@@ -167,6 +168,7 @@ useEffect(() => {
   }
 
   function handleDrop(e) {
+    if (isMerging) return;
     e.preventDefault();
     setIsDragOver(false);
     addFiles(e.dataTransfer.files);
@@ -296,11 +298,16 @@ useEffect(() => {
       <UpgradeBanner />
 
       <div
-        className={`drop-zone ${isDragOver ? "drag-over" : ""}`}
+        className={`drop-zone 
+    ${isDragOver ? "drag-over" : ""} 
+    ${isMerging ? "disabled" : ""}
+  `}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
+        onClick={() => {
+          if (!isMerging) fileInputRef.current?.click();
+        }}
       >
         <input
           ref={fileInputRef}
