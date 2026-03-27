@@ -11,6 +11,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+const MAX_FREE_FILES = 3;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 function SortableFileItem({
   file,
@@ -70,22 +72,37 @@ export default function App() {
   const [files, setFiles] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef(null);
-  const MAX_FREE_FILES = 3;
   const isPremium = false;
 
   function addFiles(newFiles) {
-    const selectedFiles = Array.from(newFiles || []).filter(
+    const incomingFiles = Array.from(newFiles || []);
+
+    const pdfFiles = incomingFiles.filter(
       (file) =>
         file.type === "application/pdf" ||
         file.name.toLowerCase().endsWith(".pdf"),
     );
 
-    if (!selectedFiles.length) return;
+    if (!pdfFiles.length) return;
+
+    const oversizedFiles = pdfFiles.filter(
+      (file) => !isPremium && file.size > MAX_FILE_SIZE,
+    );
+
+    if (oversizedFiles.length > 0) {
+      alert("Some files exceeded the 5MB limit for free users.");
+    }
+
+    const acceptedFiles = pdfFiles.filter(
+      (file) => isPremium || file.size <= MAX_FILE_SIZE,
+    );
+
+    if (!acceptedFiles.length) return;
 
     setFiles((prev) => {
-      const combined = [...prev, ...selectedFiles];
+      const combined = [...prev, ...acceptedFiles];
 
-      if (combined.length > MAX_FREE_FILES) {
+      if (!isPremium && combined.length > MAX_FREE_FILES) {
         alert("Free version allows up to 3 PDFs. Upgrade coming soon.");
         return combined.slice(0, MAX_FREE_FILES);
       }
@@ -185,8 +202,9 @@ export default function App() {
 
       for (const page of copiedPages) {
         mergedPdf.addPage(page);
-        if (!isPremium)
+        if (!isPremium) {
           addWatermark(page, watermarkFont, "Merged with PDF Tool Suite");
+        }
       }
     }
 
@@ -227,15 +245,16 @@ export default function App() {
           />
 
           <div className="drop-zone-title">Select or Drop PDFs Here</div>
-
-          <div className="drop-zone-sub">Free plan allows up to 3 files</div>
+          <div className="drop-zone-sub">Free plan: max 3 files, 5MB each</div>
         </div>
 
         <div
           className="usage-indicator"
-          style={{ color: files.length >= 3 ? "#dc2626" : "#374151" }}
+          style={{
+            color: files.length >= MAX_FREE_FILES ? "#dc2626" : "#374151",
+          }}
         >
-          {files.length} / 3 PDFs used
+          {files.length} / {MAX_FREE_FILES} PDFs used
         </div>
 
         {files.length > 0 && (
