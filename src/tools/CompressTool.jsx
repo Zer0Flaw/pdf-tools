@@ -1,9 +1,10 @@
-// src/tools/CompressTool.jsx
+import LockedToolCard from "../components/LockedToolCard";
+
 export default function CompressTool() {
   return (
-    <div className="app-card">
-      <h2>Compress PDF</h2>
-      <p>This tool is coming soon.</p>
-    </div>
+    <LockedToolCard
+      title="Compress PDF"
+      description="Reduce file size while maintaining quality."
+    />
   );
 }

@@ -321,3 +321,49 @@ h1 {
 .tool-nav {
   margin-bottom: 1.5rem;
 }
+
+.locked-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.locked-sub {
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.locked-badge {
+  background: #111827;
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.locked-body {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.locked-muted {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.upgrade-cta {
+  margin-top: 1rem;
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.upgrade-cta:hover {
+  opacity: 0.9;
+}

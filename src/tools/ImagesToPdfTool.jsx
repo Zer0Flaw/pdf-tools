@@ -1,9 +1,10 @@
-// src/tools/ImagesToPdfTool.jsx
+import LockedToolCard from "../components/LockedToolCard";
+
 export default function ImagesToPdfTool() {
   return (
-    <div className="app-card">
-      <h2>Images to PDF</h2>
-      <p>This tool is coming soon.</p>
-    </div>
+    <LockedToolCard
+      title="Images to PDF"
+      description="Convert JPG, PNG, and more into a single PDF."
+    />
   );
 }
