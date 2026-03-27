@@ -69,11 +69,13 @@ export default function MergeTool() {
   const [files, setFiles] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isMerging, setIsMerging] = useState(false);
+  const [message, setMessage] = useState(null);
   const fileInputRef = useRef(null);
   const isPremium = false;
 
   function addFiles(newFiles) {
     const incomingFiles = Array.from(newFiles || []);
+    setMessage(null);
 
     const pdfFiles = incomingFiles.filter(
       (file) =>
@@ -81,28 +83,58 @@ export default function MergeTool() {
         file.name.toLowerCase().endsWith(".pdf"),
     );
 
-    if (!pdfFiles.length) return;
+    if (!pdfFiles.length) {
+      setMessage({
+        type: "error",
+        text: "Only PDF files are supported.",
+      });
+      return;
+    }
 
     const oversizedFiles = pdfFiles.filter(
       (file) => !isPremium && file.size > MAX_FILE_SIZE,
     );
 
-    if (oversizedFiles.length > 0) {
-      alert("Some files exceeded the 5MB limit for free users.");
-    }
-
     const acceptedFiles = pdfFiles.filter(
       (file) => isPremium || file.size <= MAX_FILE_SIZE,
     );
 
-    if (!acceptedFiles.length) return;
+    if (!acceptedFiles.length && oversizedFiles.length > 0) {
+      setMessage({
+        type: "error",
+        text: "Some files exceeded the 5MB limit for free users.",
+      });
+      return;
+    }
 
     setFiles((prev) => {
-      const combined = [...prev, ...acceptedFiles];
+      const remainingSlots = isPremium
+        ? Infinity
+        : MAX_FREE_FILES - prev.length;
+      const limitedAcceptedFiles = acceptedFiles.slice(0, remainingSlots);
+      const combined = [...prev, ...limitedAcceptedFiles];
 
-      if (!isPremium && combined.length > MAX_FREE_FILES) {
-        alert("Free version allows up to 3 PDFs. Upgrade coming soon.");
-        return combined.slice(0, MAX_FREE_FILES);
+      if (
+        !isPremium &&
+        oversizedFiles.length > 0 &&
+        acceptedFiles.length > remainingSlots
+      ) {
+        setMessage({
+          type: "error",
+          text: "Some files were skipped because of the 5MB limit and free plan file limit.",
+        });
+      } else if (!isPremium && oversizedFiles.length > 0) {
+        setMessage({
+          type: "error",
+          text: "Some files exceeded the 5MB limit for free users.",
+        });
+      } else if (!isPremium && acceptedFiles.length > remainingSlots) {
+        setMessage({
+          type: "error",
+          text: "Free plan allows up to 3 PDFs.",
+        });
+      } else {
+        setMessage(null);
       }
 
       return combined;
@@ -132,6 +164,7 @@ export default function MergeTool() {
 
   function removeFile(indexToRemove) {
     setFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
+    setMessage(null);
   }
 
   function moveFileUp(index) {
@@ -190,6 +223,7 @@ export default function MergeTool() {
     if (!files.length || isMerging) return;
 
     setIsMerging(true);
+    setMessage(null);
 
     try {
       const mergedPdf = await PDFDocument.create();
@@ -222,6 +256,11 @@ export default function MergeTool() {
       a.download = "merged.pdf";
       a.click();
       URL.revokeObjectURL(url);
+    } catch {
+      setMessage({
+        type: "error",
+        text: "Something went wrong while merging your PDFs. Please try again.",
+      });
     } finally {
       setIsMerging(false);
     }
@@ -274,6 +313,10 @@ export default function MergeTool() {
       >
         {files.length} / {MAX_FREE_FILES} PDFs used
       </div>
+
+      {message && (
+        <div className={`inline-message ${message.type}`}>{message.text}</div>
+      )}
 
       {files.length > 0 && (
         <DndContext

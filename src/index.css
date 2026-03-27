@@ -401,3 +401,18 @@ h1 {
   font-size: 0.75rem;
   font-weight: 600;
 }
+
+.inline-message {
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.inline-message.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
