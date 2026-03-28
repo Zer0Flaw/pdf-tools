@@ -335,14 +335,7 @@ useEffect(() => {
         <div className={`inline-message ${message.type}`}>{message.text}</div>
       )}
 
-      {files.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-title">Start by adding PDFs</p>
-          <p className="empty-sub">
-            Drag and drop files into the area above or click to select files.
-          </p>
-        </div>
-      ) : (
+      {files.length > 0 && (
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
@@ -366,7 +359,6 @@ useEffect(() => {
           </SortableContext>
         </DndContext>
       )}
-
       <button
         className="merge-btn"
         disabled={!files.length || isMerging}
