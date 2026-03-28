@@ -438,3 +438,8 @@ h1 {
   border-color: #9ca3af;
   background: #fcfcfc;
 }
+
+.merge-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
