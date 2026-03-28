@@ -114,8 +114,8 @@ h1 {
 }
 
 .drop-zone.drag-over {
-  border-color: #111827;
-  background: #eef2ff;
+  border-color: #6366f1;
+  background: #f3f4ff;
   transform: scale(1.01);
 }
 
