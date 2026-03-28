@@ -26,6 +26,9 @@ export default function App() {
   return (
     <div className="app-shell">
       <div className="app-card">
+        <div className="brand-bar">
+          <h1 className="brand-title">ProjectStack</h1>
+        </div>
         <ToolNav activeTool={activeTool} onChange={setActiveTool} />
         {renderActiveTool()}
       </div>

@@ -254,7 +254,7 @@ useEffect(() => {
           mergedPdf.addPage(page);
 
           if (!isPremium) {
-            addWatermark(page, watermarkFont, "Merged with PDF Tool Suite");
+            addWatermark(page, watermarkFont, "Merged with ProjectStack");
           }
         }
       }
