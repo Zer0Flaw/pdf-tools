@@ -335,7 +335,14 @@ useEffect(() => {
         <div className={`inline-message ${message.type}`}>{message.text}</div>
       )}
 
-      {files.length > 0 && (
+      {files.length === 0 ? (
+        <div className="empty-state">
+          <p className="empty-title">Start by adding PDFs</p>
+          <p className="empty-sub">
+            Drag and drop files into the area above or click to select files.
+          </p>
+        </div>
+      ) : (
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}

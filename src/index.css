@@ -421,3 +421,23 @@ h1 {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+.empty-state {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  text-align: center;
+  background: #f9fafb;
+}
+
+.empty-title {
+  font-weight: 600;
+  color: #111827;
+}
+
+.empty-sub {
+  margin-top: 0.25rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
