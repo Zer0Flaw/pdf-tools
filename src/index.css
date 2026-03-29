@@ -3,6 +3,10 @@
     sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  --brand-accent: #6366f1;
+  --brand-accent-soft: #eef2ff;
+  --brand-accent-border: #c7d2fe;
+  --brand-ink: #0f172a;
   color: #1f2937;
   background: #f3f4f6;
   font-synthesis: none;
@@ -33,12 +37,29 @@ input {
 }
 
 .app-card {
+  position: relative;
   width: 100%;
   max-width: 760px;
   background: #ffffff;
   border-radius: 20px;
   padding: 28px;
+  border: 1px solid #e5e7eb;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.app-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 28px;
+  right: 28px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(99, 102, 241, 0.65) 0%,
+    rgba(99, 102, 241, 0.14) 100%
+  );
 }
 
 .eyebrow {
@@ -532,13 +553,32 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-mark {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #818cf8 0%, #4f46e5 100%);
+  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.12);
+}
+
+.brand-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--brand-ink);
+}
+
 .brand-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
-  }
-  
-  .brand-title {
+  color: var(--brand-ink);
   letter-spacing: -0.02em;
 }
 
@@ -632,6 +672,11 @@ h1 {
   margin: 0 auto;
 }
 
+.hero-brand-lockup {
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
 .hero-eyebrow,
 .section-eyebrow {
   margin: 0 0 10px;
@@ -639,7 +684,7 @@ h1 {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: #4f46e5;
 }
 
 .hero-title {
@@ -647,7 +692,7 @@ h1 {
   font-size: 3rem;
   line-height: 1;
   letter-spacing: -0.03em;
-  color: #111827;
+  color: var(--brand-ink);
 }
 
 .hero-subtitle {
@@ -776,7 +821,8 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  background: linear-gradient(180deg, #fafafa 0%, #f3f4f6 100%);
+  background: linear-gradient(180deg, #fafafa 0%, #f6f8ff 100%);
+  border-color: var(--brand-accent-border);
 }
 
 .workspace-brand-bar {
@@ -784,6 +830,8 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eef2f7;
 }
 
 .back-home-btn {

@@ -5,6 +5,11 @@ export default function LandingPage({ onStart }) {
     <div className="landing-page">
       <section className="hero-section">
         <div className="hero-copy">
+          <div className="brand-lockup hero-brand-lockup">
+            <span className="brand-mark" aria-hidden="true" />
+            <span className="brand-name">ProjectStack</span>
+          </div>
+
           <p className="hero-eyebrow">
             Simple file tools. Built to get out of your way.
           </p>

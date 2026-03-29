@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./index.css";
 import ToolNav from "./components/ToolNav";
 import MergeTool from "./tools/MergeTool";
@@ -7,9 +7,23 @@ import CompressTool from "./tools/CompressTool";
 import ImagesToPdfTool from "./tools/ImagesToPdfTool";
 import LandingPage from "./components/LandingPage";
 
+const TOOL_TITLES = {
+  merge: "Merge PDF",
+  split: "Split PDF",
+  compress: "Compress Images",
+  images: "Images to PDF",
+};
+
 export default function App() {
   const [activeView, setActiveView] = useState("home");
   const [activeTool, setActiveTool] = useState("merge");
+
+  useEffect(() => {
+    document.title =
+      activeView === "home"
+        ? "ProjectStack | File Tools"
+        : `ProjectStack | ${TOOL_TITLES[activeTool]}`;
+  }, [activeTool, activeView]);
 
   function renderActiveTool() {
     switch (activeTool) {
@@ -47,7 +61,10 @@ export default function App() {
             ← Back to Home
           </button>
 
-          <h1 className="brand-title">ProjectStack</h1>
+          <div className="brand-lockup">
+            <span className="brand-mark" aria-hidden="true" />
+            <h1 className="brand-title">ProjectStack</h1>
+          </div>
         </div>
 
         <ToolNav activeTool={activeTool} onChange={setActiveTool} />
