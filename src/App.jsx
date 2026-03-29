@@ -42,7 +42,7 @@ export default function App() {
   if (activeView === "home") {
     return (
       <div className="app-shell">
-        <div className="app-card">
+        <div className="app-card app-card-home">
           <LandingPage onStart={() => setActiveView("workspace")} />
         </div>
       </div>
@@ -62,7 +62,12 @@ export default function App() {
           </button>
 
           <div className="brand-lockup">
-            <span className="brand-mark" aria-hidden="true" />
+            <img
+              className="brand-mark"
+              src="/branding/projectstack-mark.png"
+              alt=""
+              aria-hidden="true"
+            />
             <h1 className="brand-title">ProjectStack</h1>
           </div>
         </div>

@@ -6,14 +6,17 @@ export default function LandingPage({ onStart }) {
       <section className="hero-section">
         <div className="hero-copy">
           <div className="brand-lockup hero-brand-lockup">
-            <span className="brand-mark" aria-hidden="true" />
-            <span className="brand-name">ProjectStack</span>
+            <img
+              className="brand-logo"
+              src="/branding/projectstack-logo.png"
+              alt="ProjectStack"
+            />
           </div>
 
           <p className="hero-eyebrow">
             Simple file tools. Built to get out of your way.
           </p>
-          <h1 className="hero-title">ProjectStack</h1>
+          <h1 className="hero-title">Simple file tools for practical work</h1>
           <p className="hero-subtitle">
             Merge PDFs, split files, convert images to PDF, and compress images
             in one clean workspace.
