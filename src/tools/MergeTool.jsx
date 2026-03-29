@@ -10,6 +10,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { getDateStamp } from "../utils/fileNaming";
+import {
+  canUseDailyWatermarkRemoval,
+  consumeDailyWatermarkRemoval,
+} from "../utils/freeTier";
 
 const MAX_FREE_FILES = 3;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -71,18 +75,34 @@ export default function MergeTool() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isMerging, setIsMerging] = useState(false);
   const [message, setMessage] = useState(null);
+  const [useFreeWatermarkRemoval, setUseFreeWatermarkRemoval] = useState(false);
+  const [canRemoveWatermarkToday, setCanRemoveWatermarkToday] = useState(true);
   const fileInputRef = useRef(null);
   const isPremium = false;
 
-useEffect(() => {
-  if (!message) return;
+  useEffect(() => {
+    setCanRemoveWatermarkToday(canUseDailyWatermarkRemoval());
+  }, []);
 
-  const timer = setTimeout(() => {
-    setMessage(null);
-  }, 3500);
+  useEffect(() => {
+    if (!message) return;
 
-  return () => clearTimeout(timer);
-}, [message]);
+    const timer = setTimeout(() => {
+      setMessage(null);
+    }, 3500);
+
+    return () => clearTimeout(timer);
+  }, [message]);
+
+  function activateFreeWatermarkRemoval() {
+    if (!canRemoveWatermarkToday) return;
+
+    setUseFreeWatermarkRemoval(true);
+    setMessage({
+      type: "success",
+      text: "Watermark-free export enabled. Your next merge will download without a watermark.",
+    });
+  }
 
   function addFiles(newFiles) {
     const incomingFiles = Array.from(newFiles || []);
@@ -237,6 +257,7 @@ useEffect(() => {
 
     setIsMerging(true);
     setMessage(null);
+    const skipWatermark = useFreeWatermarkRemoval;
 
     try {
       const mergedPdf = await PDFDocument.create();
@@ -254,7 +275,7 @@ useEffect(() => {
         for (const page of copiedPages) {
           mergedPdf.addPage(page);
 
-          if (!isPremium) {
+          if (!isPremium && !skipWatermark) {
             addWatermark(page, watermarkFont, "Merged with ProjectStack");
           }
         }
@@ -269,9 +290,18 @@ useEffect(() => {
       a.download = `merged-${getDateStamp()}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+
+      if (skipWatermark) {
+        consumeDailyWatermarkRemoval();
+        setUseFreeWatermarkRemoval(false);
+        setCanRemoveWatermarkToday(false);
+      }
+
       setMessage({
         type: "success",
-        text: "Merged PDF downloaded successfully.",
+        text: skipWatermark
+          ? "Merged PDF downloaded without a watermark. Your free watermark-free export for today has been used."
+          : "Merged PDF downloaded successfully.",
       });
     } catch {
       setMessage({
@@ -302,11 +332,27 @@ useEffect(() => {
 
       <UpgradeBanner
         title="Free plan: merge up to 3 PDFs"
+        subtitle="Upgrade to ProjectStack Pro for larger uploads, unlimited merges, and always-on watermark-free exports."
         features={[
           "Unlimited PDF merges",
           "Upload larger files",
-          "No watermark",
+          "Always remove watermarks",
         ]}
+        ctaText="See Pro benefits"
+        secondaryCtaText={
+          useFreeWatermarkRemoval
+            ? "Watermark-free export enabled"
+            : "Remove watermark free today"
+        }
+        onSecondaryCta={activateFreeWatermarkRemoval}
+        secondaryDisabled={!canRemoveWatermarkToday || useFreeWatermarkRemoval}
+        secondaryHint={
+          useFreeWatermarkRemoval
+            ? "Your next merge export is set to download without a watermark."
+            : canRemoveWatermarkToday
+              ? "Free users can unlock one watermark-free export per day."
+              : "Today's free watermark-free export has already been used. Upgrade to remove watermarks anytime."
+        }
       />
 
       <div
@@ -342,6 +388,16 @@ useEffect(() => {
       >
         {files.length} / {MAX_FREE_FILES} PDFs used
       </div>
+
+      {(useFreeWatermarkRemoval || !canRemoveWatermarkToday) && (
+        <div
+          className={`usage-indicator watermark-status ${useFreeWatermarkRemoval ? "armed" : "consumed"}`}
+        >
+          {useFreeWatermarkRemoval
+            ? "Next export: watermark-free"
+            : "Free watermark-free export used today"}
+        </div>
+      )}
 
       {message && (
         <div className={`inline-message ${message.type}`}>{message.text}</div>

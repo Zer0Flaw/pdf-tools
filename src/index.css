@@ -253,6 +253,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   padding: 16px;
   margin-bottom: 20px;
   background: #f4f6ff;
@@ -260,9 +261,34 @@ h1 {
   border-radius: 8px;
 }
 
+.upgrade-banner-content {
+  flex: 1;
+}
+
+.upgrade-banner-sub {
+  margin: 8px 0 0;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
 .upgrade-banner-content ul {
   margin: 8px 0 0 16px;
   padding: 0;
+}
+
+.upgrade-banner-hint {
+  margin: 10px 0 0;
+  color: #4338ca;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.upgrade-banner-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  flex-shrink: 0;
 }
 
 .upgrade-button {
@@ -277,6 +303,22 @@ h1 {
 
 .upgrade-button:hover {
   background: #3f50ff;
+}
+
+.upgrade-button:disabled {
+  background: #c7d2fe;
+  color: #eef2ff;
+  cursor: not-allowed;
+}
+
+.upgrade-button-secondary {
+  background: #ffffff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.upgrade-button-secondary:hover {
+  background: #eef2ff;
 }
 .file-item {
   cursor: grab;
@@ -313,6 +355,26 @@ h1 {
   font-size: 14px;
   font-weight: 600;
   color: #374151;
+}
+
+.watermark-status {
+  margin-top: -10px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #dbe1ff;
+  background: #f8faff;
+}
+
+.watermark-status.armed {
+  color: #4338ca;
+  border-color: #c7d2fe;
+  background: #eef2ff;
+}
+
+.watermark-status.consumed {
+  color: #6b7280;
+  border-color: #e5e7eb;
+  background: #f9fafb;
 }
 
 .compress-slider-block {

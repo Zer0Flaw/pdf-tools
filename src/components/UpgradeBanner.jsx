@@ -2,8 +2,13 @@ import { useState } from "react";
 
 export default function UpgradeBanner({
   title = "Unlock Pro",
+  subtitle = "",
   features = [],
   ctaText = "Upgrade",
+  secondaryCtaText = "",
+  onSecondaryCta,
+  secondaryDisabled = false,
+  secondaryHint = "",
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -15,6 +20,8 @@ export default function UpgradeBanner({
             <strong>{title}</strong>
           </div>
 
+          {subtitle && <p className="upgrade-banner-sub">{subtitle}</p>}
+
           {features.length > 0 && (
             <ul>
               {features.map((feature, index) => (
@@ -22,15 +29,32 @@ export default function UpgradeBanner({
               ))}
             </ul>
           )}
+
+          {secondaryHint && (
+            <p className="upgrade-banner-hint">{secondaryHint}</p>
+          )}
         </div>
 
-        <button
-          type="button"
-          className="upgrade-button"
-          onClick={() => setIsOpen(true)}
-        >
-          {ctaText}
-        </button>
+        <div className="upgrade-banner-actions">
+          {secondaryCtaText && onSecondaryCta && (
+            <button
+              type="button"
+              className="upgrade-button upgrade-button-secondary"
+              onClick={onSecondaryCta}
+              disabled={secondaryDisabled}
+            >
+              {secondaryCtaText}
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="upgrade-button"
+            onClick={() => setIsOpen(true)}
+          >
+            {ctaText}
+          </button>
+        </div>
       </div>
 
       {isOpen && (

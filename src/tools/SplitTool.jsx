@@ -101,11 +101,13 @@ export default function SplitTool() {
 
       <UpgradeBanner
         title="Free plan: 5MB max file"
+        subtitle="Upgrade to ProjectStack Pro for larger PDFs, less friction, and more export flexibility as new workflows roll out."
         features={[
           "Split large PDFs",
           "Faster processing",
           "Future export options",
         ]}
+        ctaText="See Pro benefits"
       />
 
       <div className="drop-zone" onClick={() => fileInputRef.current?.click()}>

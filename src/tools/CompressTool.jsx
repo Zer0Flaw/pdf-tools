@@ -353,11 +353,13 @@ export default function CompressTool() {
 
       <UpgradeBanner
         title="Free plan: 5 images, 5MB each"
+        subtitle="Upgrade to ProjectStack Pro for larger batches, higher limits, and upcoming PDF compression workflows."
         features={[
           "Batch compress unlimited images",
           "Higher file size limits",
           "Future PDF compression tools",
         ]}
+        ctaText="See Pro benefits"
       />
 
       <div

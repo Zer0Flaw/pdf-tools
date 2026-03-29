@@ -10,6 +10,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { getDateStamp } from "../utils/fileNaming";
+import {
+  canUseDailyWatermarkRemoval,
+  consumeDailyWatermarkRemoval,
+} from "../utils/freeTier";
 
 const MAX_FREE_IMAGES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -71,8 +75,14 @@ export default function ImagesToPdfTool() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
   const [message, setMessage] = useState(null);
+  const [useFreeWatermarkRemoval, setUseFreeWatermarkRemoval] = useState(false);
+  const [canRemoveWatermarkToday, setCanRemoveWatermarkToday] = useState(true);
   const fileInputRef = useRef(null);
   const isPremium = false;
+
+  useEffect(() => {
+    setCanRemoveWatermarkToday(canUseDailyWatermarkRemoval());
+  }, []);
 
   useEffect(() => {
     if (!message) return;
@@ -83,6 +93,16 @@ export default function ImagesToPdfTool() {
 
     return () => clearTimeout(timer);
   }, [message]);
+
+  function activateFreeWatermarkRemoval() {
+    if (!canRemoveWatermarkToday) return;
+
+    setUseFreeWatermarkRemoval(true);
+    setMessage({
+      type: "success",
+      text: "Watermark-free export enabled. Your next PDF conversion will download without a watermark.",
+    });
+  }
 
   function addFiles(newFiles) {
     const incomingFiles = Array.from(newFiles || []);
@@ -228,6 +248,7 @@ export default function ImagesToPdfTool() {
 
     setIsConverting(true);
     setMessage(null);
+    const skipWatermark = useFreeWatermarkRemoval;
 
     try {
       const pdfDoc = await PDFDocument.create();
@@ -252,7 +273,7 @@ export default function ImagesToPdfTool() {
           height,
         });
 
-        if (!isPremium) {
+        if (!isPremium && !skipWatermark) {
           page.drawText("Created with ProjectStack", {
             x: 16,
             y: 16,
@@ -273,9 +294,18 @@ export default function ImagesToPdfTool() {
       a.download = `images-to-pdf-${getDateStamp()}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+
+      if (skipWatermark) {
+        consumeDailyWatermarkRemoval();
+        setUseFreeWatermarkRemoval(false);
+        setCanRemoveWatermarkToday(false);
+      }
+
       setMessage({
         type: "success",
-        text: "PDF downloaded successfully.",
+        text: skipWatermark
+          ? "PDF downloaded without a watermark. Your free watermark-free export for today has been used."
+          : "PDF downloaded successfully.",
       });
     } catch {
       setMessage({
@@ -306,11 +336,27 @@ export default function ImagesToPdfTool() {
 
       <UpgradeBanner
         title="Free plan: up to 5 images"
+        subtitle="Upgrade to ProjectStack Pro for larger uploads, unlimited image sets, and watermark-free PDF exports whenever you need them."
         features={[
           "Unlimited image uploads",
           "Larger file sizes",
-          "No watermark",
+          "Always remove watermarks",
         ]}
+        ctaText="See Pro benefits"
+        secondaryCtaText={
+          useFreeWatermarkRemoval
+            ? "Watermark-free export enabled"
+            : "Remove watermark free today"
+        }
+        onSecondaryCta={activateFreeWatermarkRemoval}
+        secondaryDisabled={!canRemoveWatermarkToday || useFreeWatermarkRemoval}
+        secondaryHint={
+          useFreeWatermarkRemoval
+            ? "Your next PDF export is set to download without a watermark."
+            : canRemoveWatermarkToday
+              ? "Free users can unlock one watermark-free export per day."
+              : "Today's free watermark-free export has already been used. Upgrade to remove watermarks anytime."
+        }
       />
 
       <div
@@ -343,6 +389,16 @@ export default function ImagesToPdfTool() {
       >
         {files.length} / {MAX_FREE_IMAGES} images used
       </div>
+
+      {(useFreeWatermarkRemoval || !canRemoveWatermarkToday) && (
+        <div
+          className={`usage-indicator watermark-status ${useFreeWatermarkRemoval ? "armed" : "consumed"}`}
+        >
+          {useFreeWatermarkRemoval
+            ? "Next export: watermark-free"
+            : "Free watermark-free export used today"}
+        </div>
+      )}
 
       {message && (
         <div className={`inline-message ${message.type}`}>{message.text}</div>
