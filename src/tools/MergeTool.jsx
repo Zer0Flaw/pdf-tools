@@ -295,7 +295,14 @@ useEffect(() => {
         {!isPremium && <div className="free-badge">Free</div>}
       </div>
 
-      <UpgradeBanner />
+      <UpgradeBanner
+        title="Free plan: merge up to 3 PDFs"
+        features={[
+          "Unlimited PDF merges",
+          "Upload larger files",
+          "No watermark",
+        ]}
+      />
 
       <div
         className={`drop-zone 

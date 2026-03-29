@@ -299,7 +299,14 @@ export default function ImagesToPdfTool() {
         {!isPremium && <div className="free-badge">Free</div>}
       </div>
 
-      <UpgradeBanner />
+      <UpgradeBanner
+        title="Free plan: up to 5 images"
+        features={[
+          "Unlimited image uploads",
+          "Larger file sizes",
+          "No watermark",
+        ]}
+      />
 
       <div
         className={`drop-zone ${isDragOver ? "drag-over" : ""} ${isConverting ? "disabled" : ""}`}

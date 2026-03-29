@@ -89,7 +89,14 @@ export default function SplitTool() {
         {!isPremium && <div className="free-badge">Free</div>}
       </div>
 
-      <UpgradeBanner />
+      <UpgradeBanner
+        title="Free plan: 5MB max file"
+        features={[
+          "Split large PDFs",
+          "Faster processing",
+          "Future export options",
+        ]}
+      />
 
       <div className="drop-zone" onClick={() => fileInputRef.current?.click()}>
         <input
