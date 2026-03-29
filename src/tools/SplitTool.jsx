@@ -107,11 +107,11 @@ export default function SplitTool() {
           hidden
         />
 
-        <div className="drop-zone-title">Select a PDF to Split</div>
-        <div className="drop-zone-sub">Max 5MB (free plan)</div>
+        <div className="drop-zone-title">Select or Drop PDF Here</div>
+        <div className="drop-zone-sub">Free plan: max 5MB</div>
       </div>
 
-      {file && <div className="usage-indicator">Selected: {file.name}</div>}
+      {file && <div className="usage-indicator">1 / 1 PDF selected</div>}
 
       {message && (
         <div className={`inline-message ${message.type}`}>{message.text}</div>

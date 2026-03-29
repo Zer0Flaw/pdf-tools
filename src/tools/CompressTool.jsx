@@ -385,20 +385,23 @@ export default function CompressTool() {
         {files.length} / {MAX_FREE_IMAGES} images used
       </div>
 
-      <div className="usage-indicator" style={{ marginTop: "-10px" }}>
-        Compression quality: {Math.round(quality * 100)}%
-      </div>
+      <div className="compress-slider-block">
+        <div className="usage-indicator compress-slider-label">
+          Compression quality: {Math.round(quality * 100)}%
+        </div>
 
-      <input
-        type="range"
-        min="0.3"
-        max="0.95"
-        step="0.05"
-        value={quality}
-        onChange={(e) => setQuality(Number(e.target.value))}
-        disabled={isCompressing}
-        style={{ width: "100%", marginBottom: "20px" }}
-      />
+        <input
+          className="compress-slider"
+          type="range"
+          min="0.3"
+          max="0.95"
+          step="0.05"
+          value={quality}
+          onChange={(e) => setQuality(Number(e.target.value))}
+          disabled={isCompressing}
+          aria-label="Compression quality"
+        />
+      </div>
 
       {message && (
         <div className={`inline-message ${message.type}`}>{message.text}</div>

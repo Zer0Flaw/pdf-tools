@@ -373,7 +373,7 @@ export default function ImagesToPdfTool() {
         disabled={!files.length || isConverting}
         onClick={convertImagesToPdf}
       >
-        {isConverting ? "Converting..." : "Create PDF"}
+        {isConverting ? "Converting..." : "Convert to PDF"}
       </button>
     </>
   );
