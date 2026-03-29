@@ -9,6 +9,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { getDateStamp } from "../utils/fileNaming";
 
 const MAX_FREE_FILES = 3;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -265,9 +266,13 @@ useEffect(() => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "merged.pdf";
+      a.download = `merged-${getDateStamp()}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+      setMessage({
+        type: "success",
+        text: "Merged PDF downloaded successfully.",
+      });
     } catch {
       setMessage({
         type: "error",

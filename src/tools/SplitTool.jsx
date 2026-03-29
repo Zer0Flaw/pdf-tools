@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { PDFDocument } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
+import { getBaseFileName } from "../utils/fileNaming";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -41,6 +42,10 @@ export default function SplitTool() {
     setMessage(null);
   }
 
+  function getSplitFileName(selectedFile, pageNumber) {
+    return `${getBaseFileName(selectedFile.name)}-page-${pageNumber}.pdf`;
+  }
+
   async function splitPdf() {
     if (!file || isProcessing) return;
 
@@ -64,10 +69,15 @@ export default function SplitTool() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `page-${i + 1}.pdf`;
+        a.download = getSplitFileName(file, i + 1);
         a.click();
         URL.revokeObjectURL(url);
       }
+
+      setMessage({
+        type: "success",
+        text: `Downloaded ${pageCount} split PDF${pageCount === 1 ? "" : "s"}.`,
+      });
     } catch {
       setMessage({
         type: "error",

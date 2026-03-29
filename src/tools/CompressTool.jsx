@@ -8,6 +8,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { getBaseFileName } from "../utils/fileNaming";
 
 const MAX_FREE_IMAGES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -239,7 +240,7 @@ export default function CompressTool() {
   }
 
   function getCompressedFileName(file) {
-    const baseName = file.name.replace(/\.[^/.]+$/, "");
+    const baseName = getBaseFileName(file.name);
     return `${baseName}-compressed.${getOutputExtension(file)}`;
   }
 
@@ -318,6 +319,11 @@ export default function CompressTool() {
         a.click();
         URL.revokeObjectURL(url);
       }
+
+      setMessage({
+        type: "success",
+        text: `Downloaded ${files.length} compressed image${files.length === 1 ? "" : "s"}.`,
+      });
     } catch {
       setMessage({
         type: "error",

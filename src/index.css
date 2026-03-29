@@ -494,6 +494,12 @@ h1 {
   border: 1px solid #fecaca;
   color: #b91c1c;
 }
+
+.inline-message.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
 .drop-zone.disabled {
   opacity: 0.5;
   cursor: not-allowed;

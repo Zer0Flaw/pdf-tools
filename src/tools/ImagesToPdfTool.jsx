@@ -9,6 +9,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { getDateStamp } from "../utils/fileNaming";
 
 const MAX_FREE_IMAGES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -269,9 +270,13 @@ export default function ImagesToPdfTool() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "images-to-pdf.pdf";
+      a.download = `images-to-pdf-${getDateStamp()}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+      setMessage({
+        type: "success",
+        text: "PDF downloaded successfully.",
+      });
     } catch {
       setMessage({
         type: "error",
