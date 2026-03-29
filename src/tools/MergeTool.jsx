@@ -332,11 +332,11 @@ export default function MergeTool() {
 
       <UpgradeBanner
         title="Free plan: merge up to 3 PDFs"
-        subtitle="Upgrade to ProjectStack Pro for larger uploads, unlimited merges, and always-on watermark-free exports."
+        subtitle="ProjectStack Pro gives you more room to work with larger files, longer merge sessions, and cleaner final documents."
         features={[
-          "Unlimited PDF merges",
-          "Upload larger files",
-          "Always remove watermarks",
+          "Keep multi-file merge workflows moving without low limits",
+          "Handle larger uploads with less friction",
+          "Export polished PDFs without watermarks every time",
         ]}
         ctaText="See Pro benefits"
         secondaryCtaText={
@@ -348,10 +348,10 @@ export default function MergeTool() {
         secondaryDisabled={!canRemoveWatermarkToday || useFreeWatermarkRemoval}
         secondaryHint={
           useFreeWatermarkRemoval
-            ? "Your next merge export is set to download without a watermark."
+            ? "Your next merge export will be watermark-free."
             : canRemoveWatermarkToday
-              ? "Free users can unlock one watermark-free export per day."
-              : "Today's free watermark-free export has already been used. Upgrade to remove watermarks anytime."
+              ? "Free plan includes one watermark-free merge export each day."
+              : "You have already used today's free watermark-free merge. Upgrade for watermark-free exports anytime."
         }
       />
 
@@ -377,7 +377,7 @@ export default function MergeTool() {
         />
 
         <div className="drop-zone-title">Select or Drop PDFs Here</div>
-        <div className="drop-zone-sub">Free plan: max 3 files, 5MB each</div>
+        <div className="drop-zone-sub">Free plan includes up to 3 PDFs, 5MB each</div>
       </div>
 
       <div
@@ -386,7 +386,7 @@ export default function MergeTool() {
           color: files.length >= MAX_FREE_FILES ? "#dc2626" : "#374151",
         }}
       >
-        {files.length} / {MAX_FREE_FILES} PDFs used
+        {files.length} of {MAX_FREE_FILES} free PDFs selected
       </div>
 
       {(useFreeWatermarkRemoval || !canRemoveWatermarkToday) && (
@@ -395,7 +395,7 @@ export default function MergeTool() {
         >
           {useFreeWatermarkRemoval
             ? "Next export: watermark-free"
-            : "Free watermark-free export used today"}
+            : "Today's free watermark-free export has been used"}
         </div>
       )}
 

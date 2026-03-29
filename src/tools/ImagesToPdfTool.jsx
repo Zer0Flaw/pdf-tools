@@ -336,11 +336,11 @@ export default function ImagesToPdfTool() {
 
       <UpgradeBanner
         title="Free plan: up to 5 images"
-        subtitle="Upgrade to ProjectStack Pro for larger uploads, unlimited image sets, and watermark-free PDF exports whenever you need them."
+        subtitle="ProjectStack Pro helps you move from quick image batches to cleaner, more flexible PDF creation without the usual free-plan friction."
         features={[
-          "Unlimited image uploads",
-          "Larger file sizes",
-          "Always remove watermarks",
+          "Convert larger image sets in a smoother flow",
+          "Work with bigger uploads more comfortably",
+          "Export clean PDFs without watermarks whenever you need to",
         ]}
         ctaText="See Pro benefits"
         secondaryCtaText={
@@ -352,10 +352,10 @@ export default function ImagesToPdfTool() {
         secondaryDisabled={!canRemoveWatermarkToday || useFreeWatermarkRemoval}
         secondaryHint={
           useFreeWatermarkRemoval
-            ? "Your next PDF export is set to download without a watermark."
+            ? "Your next PDF export will be watermark-free."
             : canRemoveWatermarkToday
-              ? "Free users can unlock one watermark-free export per day."
-              : "Today's free watermark-free export has already been used. Upgrade to remove watermarks anytime."
+              ? "Free plan includes one watermark-free PDF export each day."
+              : "You have already used today's free watermark-free PDF export. Upgrade for watermark-free exports anytime."
         }
       />
 
@@ -378,7 +378,7 @@ export default function ImagesToPdfTool() {
         />
 
         <div className="drop-zone-title">Select or Drop Images Here</div>
-        <div className="drop-zone-sub">Free plan: max 5 images, 5MB each</div>
+        <div className="drop-zone-sub">Free plan includes up to 5 images, 5MB each</div>
       </div>
 
       <div
@@ -387,7 +387,7 @@ export default function ImagesToPdfTool() {
           color: files.length >= MAX_FREE_IMAGES ? "#dc2626" : "#374151",
         }}
       >
-        {files.length} / {MAX_FREE_IMAGES} images used
+        {files.length} of {MAX_FREE_IMAGES} free images selected
       </div>
 
       {(useFreeWatermarkRemoval || !canRemoveWatermarkToday) && (
@@ -396,7 +396,7 @@ export default function ImagesToPdfTool() {
         >
           {useFreeWatermarkRemoval
             ? "Next export: watermark-free"
-            : "Free watermark-free export used today"}
+            : "Today's free watermark-free export has been used"}
         </div>
       )}
 

@@ -353,11 +353,11 @@ export default function CompressTool() {
 
       <UpgradeBanner
         title="Free plan: 5 images, 5MB each"
-        subtitle="Upgrade to ProjectStack Pro for larger batches, higher limits, and upcoming PDF compression workflows."
+        subtitle="ProjectStack Pro is designed for larger cleanup jobs, higher limits, and a more capable compression workflow over time."
         features={[
-          "Batch compress unlimited images",
-          "Higher file size limits",
-          "Future PDF compression tools",
+          "Run larger compression batches with less interruption",
+          "Handle bigger files more confidently",
+          "Get access to upcoming PDF compression improvements",
         ]}
         ctaText="See Pro benefits"
       />
@@ -381,7 +381,7 @@ export default function CompressTool() {
         />
 
         <div className="drop-zone-title">Select or Drop Images Here</div>
-        <div className="drop-zone-sub">Free plan: max 5 images, 5MB each</div>
+        <div className="drop-zone-sub">Free plan includes up to 5 images, 5MB each</div>
       </div>
 
       <div
@@ -390,7 +390,7 @@ export default function CompressTool() {
           color: files.length >= MAX_FREE_IMAGES ? "#dc2626" : "#374151",
         }}
       >
-        {files.length} / {MAX_FREE_IMAGES} images used
+        {files.length} of {MAX_FREE_IMAGES} free images selected
       </div>
 
       <div className="compress-slider-block">

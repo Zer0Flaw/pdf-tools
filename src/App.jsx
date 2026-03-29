@@ -7,6 +7,11 @@ import CompressTool from "./tools/CompressTool";
 import ImagesToPdfTool from "./tools/ImagesToPdfTool";
 import LandingPage from "./components/LandingPage";
 
+const APP_VIEW_KEY = "projectstack-active-view";
+const APP_TOOL_KEY = "projectstack-active-tool";
+const VALID_VIEWS = ["home", "workspace"];
+const VALID_TOOLS = ["merge", "split", "compress", "images"];
+
 const TOOL_TITLES = {
   merge: "Merge PDF",
   split: "Split PDF",
@@ -14,9 +19,40 @@ const TOOL_TITLES = {
   images: "Images to PDF",
 };
 
+function readStoredValue(key, validValues, fallbackValue) {
+  if (typeof window === "undefined") return fallbackValue;
+
+  try {
+    const value = window.localStorage.getItem(key);
+    return value && validValues.includes(value) ? value : fallbackValue;
+  } catch {
+    return fallbackValue;
+  }
+}
+
 export default function App() {
-  const [activeView, setActiveView] = useState("home");
-  const [activeTool, setActiveTool] = useState("merge");
+  const [activeView, setActiveView] = useState(() =>
+    readStoredValue(APP_VIEW_KEY, VALID_VIEWS, "home"),
+  );
+  const [activeTool, setActiveTool] = useState(() =>
+    readStoredValue(APP_TOOL_KEY, VALID_TOOLS, "merge"),
+  );
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(APP_VIEW_KEY, activeView);
+    } catch {
+      // Ignore storage failures and keep the app usable.
+    }
+  }, [activeView]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(APP_TOOL_KEY, activeTool);
+    } catch {
+      // Ignore storage failures and keep the app usable.
+    }
+  }, [activeTool]);
 
   useEffect(() => {
     document.title =

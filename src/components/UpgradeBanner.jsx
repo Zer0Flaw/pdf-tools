@@ -79,12 +79,12 @@ export default function UpgradeBanner({
             </div>
 
             <p className="upgrade-modal-sub">
-              Premium features are coming soon. ProjectStack Pro will unlock a
-              smoother, faster workflow with fewer free-tier limits.
+              ProjectStack Pro is designed to make repeat file work feel
+              faster, cleaner, and less constrained as your workflow grows.
             </p>
 
             <div className="upgrade-modal-section">
-              <strong>Planned Pro benefits</strong>
+              <strong>Why upgrade</strong>
               <ul>
                 {features.length > 0 ? (
                   features.map((feature, index) => (
@@ -103,9 +103,9 @@ export default function UpgradeBanner({
             <div className="upgrade-modal-section">
               <strong>What’s coming later</strong>
               <ul>
-                <li>Premium workflow options</li>
-                <li>More file operations beyond PDFs</li>
-                <li>Smarter export and naming controls</li>
+                <li>Less friction when you handle larger files and repeat tasks</li>
+                <li>More polished export workflows across the full toolset</li>
+                <li>Expanded utility features beyond today&apos;s core PDF tools</li>
               </ul>
             </div>
 
@@ -115,7 +115,7 @@ export default function UpgradeBanner({
                 className="upgrade-button"
                 onClick={() => setIsOpen(false)}
               >
-                Got it
+                Continue with free plan
               </button>
             </div>
           </div>
