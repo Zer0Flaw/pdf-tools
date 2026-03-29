@@ -668,7 +668,7 @@ h1 {
 }
 
 .hero-section {
-  padding: 24px 12px 12px;
+  padding: 34px 16px 28px;
 }
 
 .hero-copy {
@@ -679,7 +679,7 @@ h1 {
 
 .hero-brand-lockup {
   justify-content: center;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
 }
 
 .brand-logo {
@@ -698,23 +698,28 @@ h1 {
   color: #4f46e5;
 }
 
+.hero-eyebrow {
+  margin-bottom: 16px;
+}
+
 .hero-title {
   margin: 0;
-  font-size: 3.35rem;
-  line-height: 1;
-  letter-spacing: -0.03em;
+  font-size: 3.65rem;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
   color: var(--brand-ink);
 }
 
 .hero-subtitle {
-  margin: 16px auto 0;
+  margin: 22px auto 0;
   max-width: 640px;
   font-size: 1.1rem;
+  line-height: 1.7;
   color: #4b5563;
 }
 
 .hero-actions {
-  margin-top: 28px;
+  margin-top: 34px;
   display: flex;
   gap: 12px;
   justify-content: center;
@@ -734,12 +739,14 @@ h1 {
 }
 
 .hero-primary-btn {
-  background: #111827;
+  background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
   color: #ffffff;
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.16);
 }
 
 .hero-primary-btn:hover {
-  background: #000000;
+  background: linear-gradient(180deg, #111827 0%, #030712 100%);
+  transform: translateY(-1px);
 }
 
 .hero-secondary-btn {
@@ -753,19 +760,21 @@ h1 {
 }
 
 .hero-trust {
-  margin-top: 22px;
+  margin-top: 28px;
   display: flex;
-  gap: 10px;
+  gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
+  max-width: 720px;
+  margin-inline: auto;
 }
 
 .hero-trust span {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: #fbfcff;
+  border: 1px solid #e8ecfb;
   color: #374151;
   border-radius: 999px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   font-size: 0.88rem;
   font-weight: 600;
 }
@@ -774,6 +783,11 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 22px;
+}
+
+.landing-section:first-of-type {
+  padding-top: 8px;
+  border-top: 1px solid #eef2f7;
 }
 
 .section-heading {
@@ -857,7 +871,7 @@ h1 {
 
 @media (max-width: 640px) {
   .hero-title {
-    font-size: 2.25rem;
+    font-size: 2.55rem;
   }
 
   .feature-grid,
