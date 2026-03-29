@@ -11,6 +11,7 @@ const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
 const VALID_VIEWS = ["home", "workspace"];
 const VALID_TOOLS = ["merge", "split", "compress", "images"];
+const HOME_TITLE = "ProjectStack | Simple File Tools for Practical Work";
 
 const TOOL_TITLES = {
   merge: "Merge PDF",
@@ -57,7 +58,7 @@ export default function App() {
   useEffect(() => {
     document.title =
       activeView === "home"
-        ? "ProjectStack | File Tools"
+        ? HOME_TITLE
         : `ProjectStack | ${TOOL_TITLES[activeTool]}`;
   }, [activeTool, activeView]);
 

@@ -932,8 +932,29 @@ h1 {
 }
 
 @media (max-width: 640px) {
+  .hero-section {
+    padding: 28px 6px 22px;
+  }
+
+  .hero-brand-lockup {
+    margin-bottom: 16px;
+  }
+
+  .brand-logo {
+    width: min(220px, 100%);
+  }
+
   .hero-title {
     font-size: 2.55rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .hero-trust {
+    gap: 10px;
   }
 
   .feature-grid,
