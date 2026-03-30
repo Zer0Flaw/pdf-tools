@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { PDFDocument, StandardFonts, rgb, degrees } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
+import AdSlot from "../components/AdSlot";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -10,13 +11,17 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { getDateStamp } from "../utils/fileNaming";
+import { formatBytes } from "../utils/formatting";
+import { getFeatureGate } from "../utils/features";
+import { trackEvent } from "../utils/analytics";
 import {
   canUseDailyWatermarkRemoval,
   consumeDailyWatermarkRemoval,
 } from "../utils/freeTier";
 
-const MAX_FREE_FILES = 3;
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MERGE_FEATURE = getFeatureGate("merge");
+const MAX_FREE_FILES = MERGE_FEATURE.maxFiles;
+const MAX_FILE_SIZE = MERGE_FEATURE.maxFileSize;
 
 function SortableFileItem({
   file,
@@ -77,6 +82,7 @@ export default function MergeTool() {
   const [message, setMessage] = useState(null);
   const [useFreeWatermarkRemoval, setUseFreeWatermarkRemoval] = useState(false);
   const [canRemoveWatermarkToday, setCanRemoveWatermarkToday] = useState(true);
+  const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
   const isPremium = false;
 
@@ -98,6 +104,7 @@ export default function MergeTool() {
     if (!canRemoveWatermarkToday) return;
 
     setUseFreeWatermarkRemoval(true);
+    setShowExportAd(false);
     setMessage({
       type: "success",
       text: "Watermark-free export enabled. Your next merge will download without a watermark.",
@@ -106,6 +113,7 @@ export default function MergeTool() {
 
   function addFiles(newFiles) {
     const incomingFiles = Array.from(newFiles || []);
+    setShowExportAd(false);
     setMessage(null);
 
     const pdfFiles = incomingFiles.filter(
@@ -197,6 +205,7 @@ export default function MergeTool() {
 
   function removeFile(indexToRemove) {
     setFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
+    setShowExportAd(false);
     setMessage(null);
   }
 
@@ -256,6 +265,7 @@ export default function MergeTool() {
     if (!files.length || isMerging) return;
 
     setIsMerging(true);
+    setShowExportAd(false);
     setMessage(null);
     const skipWatermark = useFreeWatermarkRemoval;
 
@@ -295,13 +305,23 @@ export default function MergeTool() {
         consumeDailyWatermarkRemoval();
         setUseFreeWatermarkRemoval(false);
         setCanRemoveWatermarkToday(false);
+        trackEvent("watermark_free_used", {
+          tool: "merge",
+        });
       }
 
+      setShowExportAd(true);
+      trackEvent("export_completed", {
+        tool: "merge",
+        file_count: files.length,
+        size_bytes: blob.size,
+        watermark_free: skipWatermark,
+      });
       setMessage({
         type: "success",
         text: skipWatermark
-          ? "Merged PDF downloaded without a watermark. Your free watermark-free export for today has been used."
-          : "Merged PDF downloaded successfully.",
+          ? `Merged PDF downloaded without a watermark (${formatBytes(blob.size)}). Your free watermark-free export for today has been used.`
+          : `Merged PDF downloaded successfully (${formatBytes(blob.size)}).`,
       });
     } catch {
       setMessage({
@@ -321,7 +341,7 @@ export default function MergeTool() {
     <>
       <div className="tool-header">
         <div>
-          <h2>Merge PDF</h2>
+          <h1>Merge PDF</h1>
           <p className="tool-sub">
             Combine multiple PDFs into a single document.
           </p>
@@ -339,6 +359,7 @@ export default function MergeTool() {
           "Export polished PDFs without watermarks every time",
         ]}
         ctaText="See Pro benefits"
+        upgradeReason={MERGE_FEATURE.upgradeReason}
         secondaryCtaText={
           useFreeWatermarkRemoval
             ? "Watermark-free export enabled"
@@ -389,6 +410,10 @@ export default function MergeTool() {
         {files.length} of {MAX_FREE_FILES} free PDFs selected
       </div>
 
+      <div className="usage-indicator trust-indicator">
+        {MERGE_FEATURE.privacyMessage}
+      </div>
+
       {(useFreeWatermarkRemoval || !canRemoveWatermarkToday) && (
         <div
           className={`usage-indicator watermark-status ${useFreeWatermarkRemoval ? "armed" : "consumed"}`}
@@ -399,9 +424,20 @@ export default function MergeTool() {
         </div>
       )}
 
+      {isMerging && (
+        <div className="usage-indicator processing-indicator">
+          {MERGE_FEATURE.processingMessage}
+        </div>
+      )}
+
       {message && (
         <div className={`inline-message ${message.type}`}>{message.text}</div>
       )}
+
+      <AdSlot
+        placementId={MERGE_FEATURE.adPlacement}
+        isVisible={showExportAd}
+      />
 
       {files.length > 0 && (
         <DndContext

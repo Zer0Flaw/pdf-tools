@@ -1,16 +1,23 @@
 import { useState } from "react";
+import { trackUpgradeIntent } from "../utils/upgradeReasons";
 
 export default function UpgradeBanner({
   title = "Unlock Pro",
   subtitle = "",
   features = [],
   ctaText = "Upgrade",
+  upgradeReason = "",
   secondaryCtaText = "",
   onSecondaryCta,
   secondaryDisabled = false,
   secondaryHint = "",
 }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  function handleUpgradeClick() {
+    trackUpgradeIntent(upgradeReason);
+    setIsOpen(true);
+  }
 
   return (
     <>
@@ -50,7 +57,7 @@ export default function UpgradeBanner({
           <button
             type="button"
             className="upgrade-button"
-            onClick={() => setIsOpen(true)}
+            onClick={handleUpgradeClick}
           >
             {ctaText}
           </button>

@@ -554,6 +554,13 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.tool-header h1 {
+  margin: 0;
+  font-size: 1.85rem;
+  line-height: 1.1;
+  color: #111827;
+}
+
 .tool-sub {
   color: #6b7280;
   margin-top: 0.25rem;
@@ -587,6 +594,40 @@ h1 {
   background: #ecfdf5;
   border: 1px solid #a7f3d0;
   color: #065f46;
+}
+
+.trust-indicator {
+  margin-top: -10px;
+  color: #4b5563;
+}
+
+.processing-indicator {
+  margin-top: -10px;
+  color: #4338ca;
+}
+
+.ad-slot {
+  margin-top: 14px;
+  margin-bottom: 4px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px dashed #d1d5db;
+  background: #fafafa;
+}
+
+.ad-slot-label {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.ad-slot-copy {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.95rem;
 }
 .drop-zone.disabled {
   opacity: 0.5;
@@ -932,6 +973,10 @@ h1 {
 }
 
 @media (max-width: 640px) {
+  .tool-header h1 {
+    font-size: 1.55rem;
+  }
+
   .hero-section {
     padding: 28px 6px 22px;
   }

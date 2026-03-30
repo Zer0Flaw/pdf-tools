@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import UpgradeBanner from "../components/UpgradeBanner";
+import AdSlot from "../components/AdSlot";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -9,9 +10,13 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { getBaseFileName } from "../utils/fileNaming";
+import { formatBytes } from "../utils/formatting";
+import { getFeatureGate } from "../utils/features";
+import { trackEvent } from "../utils/analytics";
 
-const MAX_FREE_IMAGES = 5;
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const COMPRESS_FEATURE = getFeatureGate("compress");
+const MAX_FREE_IMAGES = COMPRESS_FEATURE.maxFiles;
+const MAX_FILE_SIZE = COMPRESS_FEATURE.maxFileSize;
 
 function SortableCompressItem({
   file,
@@ -71,6 +76,7 @@ export default function CompressTool() {
   const [isCompressing, setIsCompressing] = useState(false);
   const [message, setMessage] = useState(null);
   const [quality, setQuality] = useState(0.7);
+  const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
   const isPremium = false;
 
@@ -86,6 +92,7 @@ export default function CompressTool() {
 
   function addFiles(newFiles) {
     const incomingFiles = Array.from(newFiles || []);
+    setShowExportAd(false);
     setMessage(null);
 
     const imageFiles = incomingFiles.filter((file) => {
@@ -184,6 +191,7 @@ export default function CompressTool() {
 
   function removeFile(indexToRemove) {
     setFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
+    setShowExportAd(false);
     setMessage(null);
   }
 
@@ -306,11 +314,16 @@ export default function CompressTool() {
     if (!files.length || isCompressing) return;
 
     setIsCompressing(true);
+    setShowExportAd(false);
     setMessage(null);
 
     try {
+      const originalBytes = files.reduce((total, file) => total + file.size, 0);
+      let compressedBytes = 0;
+
       for (const file of files) {
         const compressed = await compressImage(file);
+        compressedBytes += compressed.blob.size;
         const url = URL.createObjectURL(compressed.blob);
 
         const a = document.createElement("a");
@@ -320,9 +333,24 @@ export default function CompressTool() {
         URL.revokeObjectURL(url);
       }
 
+      const savedPercent =
+        originalBytes > 0
+          ? Math.max(
+              0,
+              Math.round(((originalBytes - compressedBytes) / originalBytes) * 100),
+            )
+          : 0;
+
+      setShowExportAd(true);
+      trackEvent("export_completed", {
+        tool: "compress",
+        file_count: files.length,
+        size_bytes_before: originalBytes,
+        size_bytes_after: compressedBytes,
+      });
       setMessage({
         type: "success",
-        text: `Downloaded ${files.length} compressed image${files.length === 1 ? "" : "s"}.`,
+        text: `Downloaded ${files.length} compressed image${files.length === 1 ? "" : "s"}. ${formatBytes(originalBytes)} -> ${formatBytes(compressedBytes)} (${savedPercent}% smaller).`,
       });
     } catch {
       setMessage({
@@ -342,7 +370,7 @@ export default function CompressTool() {
     <>
       <div className="tool-header">
         <div>
-          <h2>Compress Images</h2>
+          <h1>Compress Images</h1>
           <p className="tool-sub">
             Reduce image file size while maintaining usable quality.
           </p>
@@ -360,6 +388,7 @@ export default function CompressTool() {
           "Get access to upcoming PDF compression improvements",
         ]}
         ctaText="See Pro benefits"
+        upgradeReason={COMPRESS_FEATURE.upgradeReason}
       />
 
       <div
@@ -393,6 +422,10 @@ export default function CompressTool() {
         {files.length} of {MAX_FREE_IMAGES} free images selected
       </div>
 
+      <div className="usage-indicator trust-indicator">
+        {COMPRESS_FEATURE.privacyMessage}
+      </div>
+
       <div className="compress-slider-block">
         <div className="usage-indicator compress-slider-label">
           Compression quality: {Math.round(quality * 100)}%
@@ -411,9 +444,20 @@ export default function CompressTool() {
         />
       </div>
 
+      {isCompressing && (
+        <div className="usage-indicator processing-indicator">
+          {COMPRESS_FEATURE.processingMessage}
+        </div>
+      )}
+
       {message && (
         <div className={`inline-message ${message.type}`}>{message.text}</div>
       )}
+
+      <AdSlot
+        placementId={COMPRESS_FEATURE.adPlacement}
+        isVisible={showExportAd}
+      />
 
       {files.length > 0 && (
         <DndContext

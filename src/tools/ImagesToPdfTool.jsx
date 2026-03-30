@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
+import AdSlot from "../components/AdSlot";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -10,13 +11,17 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { getDateStamp } from "../utils/fileNaming";
+import { formatBytes } from "../utils/formatting";
+import { getFeatureGate } from "../utils/features";
+import { trackEvent } from "../utils/analytics";
 import {
   canUseDailyWatermarkRemoval,
   consumeDailyWatermarkRemoval,
 } from "../utils/freeTier";
 
-const MAX_FREE_IMAGES = 5;
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const IMAGES_FEATURE = getFeatureGate("images");
+const MAX_FREE_IMAGES = IMAGES_FEATURE.maxFiles;
+const MAX_FILE_SIZE = IMAGES_FEATURE.maxFileSize;
 
 function SortableImageItem({
   file,
@@ -77,6 +82,7 @@ export default function ImagesToPdfTool() {
   const [message, setMessage] = useState(null);
   const [useFreeWatermarkRemoval, setUseFreeWatermarkRemoval] = useState(false);
   const [canRemoveWatermarkToday, setCanRemoveWatermarkToday] = useState(true);
+  const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
   const isPremium = false;
 
@@ -98,6 +104,7 @@ export default function ImagesToPdfTool() {
     if (!canRemoveWatermarkToday) return;
 
     setUseFreeWatermarkRemoval(true);
+    setShowExportAd(false);
     setMessage({
       type: "success",
       text: "Watermark-free export enabled. Your next PDF conversion will download without a watermark.",
@@ -106,6 +113,7 @@ export default function ImagesToPdfTool() {
 
   function addFiles(newFiles) {
     const incomingFiles = Array.from(newFiles || []);
+    setShowExportAd(false);
     setMessage(null);
 
     const imageFiles = incomingFiles.filter((file) => {
@@ -202,6 +210,7 @@ export default function ImagesToPdfTool() {
 
   function removeFile(indexToRemove) {
     setFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
+    setShowExportAd(false);
     setMessage(null);
   }
 
@@ -247,6 +256,7 @@ export default function ImagesToPdfTool() {
     if (!files.length || isConverting) return;
 
     setIsConverting(true);
+    setShowExportAd(false);
     setMessage(null);
     const skipWatermark = useFreeWatermarkRemoval;
 
@@ -299,13 +309,23 @@ export default function ImagesToPdfTool() {
         consumeDailyWatermarkRemoval();
         setUseFreeWatermarkRemoval(false);
         setCanRemoveWatermarkToday(false);
+        trackEvent("watermark_free_used", {
+          tool: "images",
+        });
       }
 
+      setShowExportAd(true);
+      trackEvent("export_completed", {
+        tool: "images",
+        file_count: files.length,
+        size_bytes: blob.size,
+        watermark_free: skipWatermark,
+      });
       setMessage({
         type: "success",
         text: skipWatermark
-          ? "PDF downloaded without a watermark. Your free watermark-free export for today has been used."
-          : "PDF downloaded successfully.",
+          ? `PDF downloaded without a watermark (${formatBytes(blob.size)}). Your free watermark-free export for today has been used.`
+          : `PDF downloaded successfully (${formatBytes(blob.size)}).`,
       });
     } catch {
       setMessage({
@@ -325,7 +345,7 @@ export default function ImagesToPdfTool() {
     <>
       <div className="tool-header">
         <div>
-          <h2>Images to PDF</h2>
+          <h1>Images to PDF</h1>
           <p className="tool-sub">
             Convert JPG and PNG images into a single PDF document.
           </p>
@@ -343,6 +363,7 @@ export default function ImagesToPdfTool() {
           "Export clean PDFs without watermarks whenever you need to",
         ]}
         ctaText="See Pro benefits"
+        upgradeReason={IMAGES_FEATURE.upgradeReason}
         secondaryCtaText={
           useFreeWatermarkRemoval
             ? "Watermark-free export enabled"
@@ -390,6 +411,10 @@ export default function ImagesToPdfTool() {
         {files.length} of {MAX_FREE_IMAGES} free images selected
       </div>
 
+      <div className="usage-indicator trust-indicator">
+        {IMAGES_FEATURE.privacyMessage}
+      </div>
+
       {(useFreeWatermarkRemoval || !canRemoveWatermarkToday) && (
         <div
           className={`usage-indicator watermark-status ${useFreeWatermarkRemoval ? "armed" : "consumed"}`}
@@ -400,9 +425,20 @@ export default function ImagesToPdfTool() {
         </div>
       )}
 
+      {isConverting && (
+        <div className="usage-indicator processing-indicator">
+          {IMAGES_FEATURE.processingMessage}
+        </div>
+      )}
+
       {message && (
         <div className={`inline-message ${message.type}`}>{message.text}</div>
       )}
+
+      <AdSlot
+        placementId={IMAGES_FEATURE.adPlacement}
+        isVisible={showExportAd}
+      />
 
       {files.length > 0 && (
         <DndContext
