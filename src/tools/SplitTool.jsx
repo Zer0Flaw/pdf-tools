@@ -157,7 +157,7 @@ export default function SplitTool() {
       )}
 
       <AdSlot
-        placementId={SPLIT_FEATURE.adPlacement}
+        placement={SPLIT_FEATURE.adPlacement}
         isVisible={showExportAd}
       />
 

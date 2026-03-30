@@ -436,7 +436,7 @@ export default function ImagesToPdfTool() {
       )}
 
       <AdSlot
-        placementId={IMAGES_FEATURE.adPlacement}
+        placement={IMAGES_FEATURE.adPlacement}
         isVisible={showExportAd}
       />
 

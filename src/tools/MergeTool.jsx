@@ -435,7 +435,7 @@ export default function MergeTool() {
       )}
 
       <AdSlot
-        placementId={MERGE_FEATURE.adPlacement}
+        placement={MERGE_FEATURE.adPlacement}
         isVisible={showExportAd}
       />
 

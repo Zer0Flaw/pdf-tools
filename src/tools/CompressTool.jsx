@@ -455,7 +455,7 @@ export default function CompressTool() {
       )}
 
       <AdSlot
-        placementId={COMPRESS_FEATURE.adPlacement}
+        placement={COMPRESS_FEATURE.adPlacement}
         isVisible={showExportAd}
       />
 

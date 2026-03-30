@@ -24,34 +24,34 @@ const TOOL_ROUTES = {
 
 const TOOL_METADATA = {
   merge: {
-    title: "ProjectStack | Merge PDF Online",
+    title: "Merge PDF | ProjectStack",
     description:
-      "Merge multiple PDFs into one clean document in a browser-based workspace.",
-    heading: "Merge PDF files online",
+      "Merge multiple PDFs into one clean document in your browser with ProjectStack.",
+    heading: "Merge PDF",
     intro:
       "Combine multiple PDF files into one organized document in a clean browser-based workspace.",
   },
   split: {
-    title: "ProjectStack | Split PDF Online",
+    title: "Split PDF | ProjectStack",
     description:
-      "Split a PDF into separate page files in a clean browser-based workspace.",
-    heading: "Split PDF pages online",
+      "Split a PDF into separate page files directly in your browser with ProjectStack.",
+    heading: "Split PDF",
     intro:
       "Break a PDF into separate page files quickly while keeping the workflow simple and predictable.",
   },
   compress: {
-    title: "ProjectStack | Compress Images Online",
+    title: "Compress Images | ProjectStack",
     description:
-      "Compress JPG, PNG, and WEBP images locally in your browser for easier sharing.",
-    heading: "Compress images online",
+      "Compress JPG, PNG, and WEBP images locally in your browser for easier sharing with ProjectStack.",
+    heading: "Compress Images",
     intro:
       "Reduce image file size for easier sharing and storage with simple browser-based compression.",
   },
   images: {
-    title: "ProjectStack | Images to PDF Online",
+    title: "Convert Images to PDF | ProjectStack",
     description:
-      "Convert JPG and PNG images into a single PDF in one clean browser-based workspace.",
-    heading: "Convert images to PDF online",
+      "Convert JPG and PNG images into a single PDF directly in your browser with ProjectStack.",
+    heading: "Convert Images to PDF",
     intro:
       "Turn JPG and PNG images into a single PDF in one clean workspace designed for practical file tasks.",
   },
@@ -236,6 +236,10 @@ export default function App() {
         <div className="route-intro">
           <h1>{activeToolMetadata.heading}</h1>
           <p>{activeToolMetadata.intro}</p>
+          <p className="route-trust-note">
+            Files are processed locally in your browser, so they never need to
+            leave your device.
+          </p>
         </div>
 
         <ToolNav activeTool={activeTool} onChange={openWorkspace} />
