@@ -3,12 +3,14 @@ import { PDFDocument } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import { getBaseFileName } from "../utils/fileNaming";
 import { formatBytes } from "../utils/formatting";
-import { getFeatureGate } from "../utils/features";
+import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import AdSlot from "../components/AdSlot";
 import { trackEvent } from "../utils/analytics";
 
 const SPLIT_FEATURE = getFeatureGate("split");
 const MAX_FILE_SIZE = SPLIT_FEATURE.maxFileSize;
+const MAX_FILES = SPLIT_FEATURE.maxFiles;
+const FILE_SIZE_LIMIT_LABEL = formatFeatureFileSize(MAX_FILE_SIZE);
 
 export default function SplitTool() {
   const [file, setFile] = useState(null);
@@ -40,7 +42,7 @@ export default function SplitTool() {
     if (!isPremium && selected.size > MAX_FILE_SIZE) {
       setMessage({
         type: "error",
-        text: "File exceeds 5MB limit for free users.",
+        text: `File exceeds ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
       });
       return;
     }
@@ -116,7 +118,7 @@ export default function SplitTool() {
       </div>
 
       <UpgradeBanner
-        title="Free plan: 5MB max file"
+        title={`Free plan: ${FILE_SIZE_LIMIT_LABEL} max file`}
         subtitle="ProjectStack Pro is built for bigger documents and a smoother split workflow when you need more than the basics."
         features={[
           "Split larger PDFs without hitting the free cap",
@@ -137,10 +139,16 @@ export default function SplitTool() {
         />
 
         <div className="drop-zone-title">Select or Drop PDF Here</div>
-        <div className="drop-zone-sub">Free plan includes one PDF up to 5MB</div>
+        <div className="drop-zone-sub">
+          Free plan includes one PDF up to {FILE_SIZE_LIMIT_LABEL}
+        </div>
       </div>
 
-      {file && <div className="usage-indicator">1 / 1 PDF selected</div>}
+      {file && (
+        <div className="usage-indicator">
+          {MAX_FILES} / {MAX_FILES} PDF selected
+        </div>
+      )}
 
       <div className="usage-indicator trust-indicator">
         {SPLIT_FEATURE.privacyMessage}

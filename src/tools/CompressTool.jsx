@@ -11,12 +11,13 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { getBaseFileName } from "../utils/fileNaming";
 import { formatBytes } from "../utils/formatting";
-import { getFeatureGate } from "../utils/features";
+import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 
 const COMPRESS_FEATURE = getFeatureGate("compress");
 const MAX_FREE_IMAGES = COMPRESS_FEATURE.maxFiles;
 const MAX_FILE_SIZE = COMPRESS_FEATURE.maxFileSize;
+const FILE_SIZE_LIMIT_LABEL = formatFeatureFileSize(MAX_FILE_SIZE);
 
 function SortableCompressItem({
   file,
@@ -127,7 +128,7 @@ export default function CompressTool() {
     if (!acceptedFiles.length && oversizedFiles.length > 0) {
       setMessage({
         type: "error",
-        text: "Some files exceeded the 5MB limit for free users.",
+        text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
       });
       return;
     }
@@ -146,12 +147,12 @@ export default function CompressTool() {
       ) {
         setMessage({
           type: "error",
-          text: "Some files were skipped because of the 5MB limit and free plan image limit.",
+          text: `Some files were skipped because of the ${FILE_SIZE_LIMIT_LABEL} limit and free plan image limit.`,
         });
       } else if (!isPremium && oversizedFiles.length > 0) {
         setMessage({
           type: "error",
-          text: "Some files exceeded the 5MB limit for free users.",
+          text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
         });
       } else if (!isPremium && acceptedFiles.length > remainingSlots) {
         setMessage({
@@ -380,7 +381,7 @@ export default function CompressTool() {
       </div>
 
       <UpgradeBanner
-        title="Free plan: 5 images, 5MB each"
+        title={`Free plan: ${MAX_FREE_IMAGES} images, ${FILE_SIZE_LIMIT_LABEL} each`}
         subtitle="ProjectStack Pro is designed for larger cleanup jobs, higher limits, and a more capable compression workflow over time."
         features={[
           "Run larger compression batches with less interruption",
@@ -410,7 +411,9 @@ export default function CompressTool() {
         />
 
         <div className="drop-zone-title">Select or Drop Images Here</div>
-        <div className="drop-zone-sub">Free plan includes up to 5 images, 5MB each</div>
+        <div className="drop-zone-sub">
+          Free plan includes up to {MAX_FREE_IMAGES} images, {FILE_SIZE_LIMIT_LABEL} each
+        </div>
       </div>
 
       <div

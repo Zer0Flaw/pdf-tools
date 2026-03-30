@@ -7,6 +7,12 @@ export const FEATURE_GATES = {
     id: "merge",
     maxFiles: 3,
     maxFileSize: 5 * MB,
+    premiumFlags: {
+      unlimitedMerges: true,
+      unlimitedImages: false,
+      watermarkFree: true,
+      largerFiles: true,
+    },
     privacyMessage: "Files are processed locally in your browser.",
     processingMessage: "Merging locally in your browser...",
     adPlacement: "postExport",
@@ -17,6 +23,12 @@ export const FEATURE_GATES = {
     id: "split",
     maxFiles: 1,
     maxFileSize: 5 * MB,
+    premiumFlags: {
+      unlimitedMerges: false,
+      unlimitedImages: false,
+      watermarkFree: false,
+      largerFiles: true,
+    },
     privacyMessage: "Files are processed locally in your browser.",
     processingMessage: "Splitting locally in your browser...",
     adPlacement: "postExport",
@@ -26,6 +38,12 @@ export const FEATURE_GATES = {
     id: "images",
     maxFiles: 5,
     maxFileSize: 5 * MB,
+    premiumFlags: {
+      unlimitedMerges: false,
+      unlimitedImages: true,
+      watermarkFree: true,
+      largerFiles: true,
+    },
     privacyMessage: "Files are processed locally in your browser.",
     processingMessage: "Converting locally in your browser...",
     adPlacement: "postExport",
@@ -36,6 +54,12 @@ export const FEATURE_GATES = {
     id: "compress",
     maxFiles: 5,
     maxFileSize: 5 * MB,
+    premiumFlags: {
+      unlimitedMerges: false,
+      unlimitedImages: true,
+      watermarkFree: false,
+      largerFiles: true,
+    },
     privacyMessage: "Files are processed locally in your browser.",
     processingMessage: "Compressing locally in your browser...",
     adPlacement: "postExport",
@@ -45,4 +69,8 @@ export const FEATURE_GATES = {
 
 export function getFeatureGate(toolId) {
   return FEATURE_GATES[toolId];
+}
+
+export function formatFeatureFileSize(bytes) {
+  return `${Math.round(bytes / MB)}MB`;
 }

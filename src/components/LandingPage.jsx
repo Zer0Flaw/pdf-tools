@@ -4,24 +4,28 @@ import AdSlot from "./AdSlot";
 const TOOL_PREVIEWS = [
   {
     id: "merge",
+    route: "/merge-pdf",
     title: "Merge PDF",
     description: "Combine multiple PDFs into a single finished document.",
     cta: "Open Merge PDF",
   },
   {
     id: "split",
+    route: "/split-pdf",
     title: "Split PDF",
     description: "Break a PDF into separate page files in seconds.",
     cta: "Open Split PDF",
   },
   {
     id: "images",
+    route: "/images-to-pdf",
     title: "Images to PDF",
     description: "Turn JPG and PNG images into one organized PDF.",
     cta: "Open Images to PDF",
   },
   {
     id: "compress",
+    route: "/compress-images",
     title: "Compress Images",
     description: "Reduce file size for easier sharing and storage.",
     cta: "Open Compress Images",
@@ -152,17 +156,21 @@ export default function LandingPage({ onStart, onOpenTool }) {
 
       <section className="landing-section">
         <div className="section-heading">
-          <p className="section-eyebrow">Open a tool</p>
-          <h2>Jump straight into the workflow you need</h2>
+          <p className="section-eyebrow">Tool Hub</p>
+          <h2>Open the right tool without extra clicks</h2>
           <p>
-            Each tool opens in its own focused workspace with the same clean
-            ProjectStack experience.
+            Explore every ProjectStack tool from one clean starting point, then
+            jump straight into the workflow you need.
           </p>
         </div>
 
         <div className="tool-preview-grid">
           {TOOL_PREVIEWS.map((tool) => (
-            <div key={tool.id} className="tool-preview-card">
+            <div
+              key={tool.route}
+              className="tool-preview-card"
+              data-route={tool.route}
+            >
               <h3>{tool.title}</h3>
               <p>{tool.description}</p>
               <button

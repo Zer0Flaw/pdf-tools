@@ -12,7 +12,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { getDateStamp } from "../utils/fileNaming";
 import { formatBytes } from "../utils/formatting";
-import { getFeatureGate } from "../utils/features";
+import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import {
   canUseDailyWatermarkRemoval,
@@ -22,6 +22,7 @@ import {
 const IMAGES_FEATURE = getFeatureGate("images");
 const MAX_FREE_IMAGES = IMAGES_FEATURE.maxFiles;
 const MAX_FILE_SIZE = IMAGES_FEATURE.maxFileSize;
+const FILE_SIZE_LIMIT_LABEL = formatFeatureFileSize(MAX_FILE_SIZE);
 
 function SortableImageItem({
   file,
@@ -146,7 +147,7 @@ export default function ImagesToPdfTool() {
     if (!acceptedFiles.length && oversizedFiles.length > 0) {
       setMessage({
         type: "error",
-        text: "Some files exceeded the 5MB limit for free users.",
+        text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
       });
       return;
     }
@@ -165,12 +166,12 @@ export default function ImagesToPdfTool() {
       ) {
         setMessage({
           type: "error",
-          text: "Some images were skipped because of the 5MB limit and free plan image limit.",
+          text: `Some images were skipped because of the ${FILE_SIZE_LIMIT_LABEL} limit and free plan image limit.`,
         });
       } else if (!isPremium && oversizedFiles.length > 0) {
         setMessage({
           type: "error",
-          text: "Some files exceeded the 5MB limit for free users.",
+          text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
         });
       } else if (!isPremium && acceptedFiles.length > remainingSlots) {
         setMessage({
@@ -355,7 +356,7 @@ export default function ImagesToPdfTool() {
       </div>
 
       <UpgradeBanner
-        title="Free plan: up to 5 images"
+        title={`Free plan: up to ${MAX_FREE_IMAGES} images`}
         subtitle="ProjectStack Pro helps you move from quick image batches to cleaner, more flexible PDF creation without the usual free-plan friction."
         features={[
           "Convert larger image sets in a smoother flow",
@@ -399,7 +400,9 @@ export default function ImagesToPdfTool() {
         />
 
         <div className="drop-zone-title">Select or Drop Images Here</div>
-        <div className="drop-zone-sub">Free plan includes up to 5 images, 5MB each</div>
+        <div className="drop-zone-sub">
+          Free plan includes up to {MAX_FREE_IMAGES} images, {FILE_SIZE_LIMIT_LABEL} each
+        </div>
       </div>
 
       <div

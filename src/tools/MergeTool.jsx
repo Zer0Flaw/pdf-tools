@@ -12,7 +12,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { getDateStamp } from "../utils/fileNaming";
 import { formatBytes } from "../utils/formatting";
-import { getFeatureGate } from "../utils/features";
+import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import {
   canUseDailyWatermarkRemoval,
@@ -22,6 +22,7 @@ import {
 const MERGE_FEATURE = getFeatureGate("merge");
 const MAX_FREE_FILES = MERGE_FEATURE.maxFiles;
 const MAX_FILE_SIZE = MERGE_FEATURE.maxFileSize;
+const FILE_SIZE_LIMIT_LABEL = formatFeatureFileSize(MAX_FILE_SIZE);
 
 function SortableFileItem({
   file,
@@ -141,7 +142,7 @@ export default function MergeTool() {
     if (!acceptedFiles.length && oversizedFiles.length > 0) {
       setMessage({
         type: "error",
-        text: "Some files exceeded the 5MB limit for free users.",
+        text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
       });
       return;
     }
@@ -160,17 +161,17 @@ export default function MergeTool() {
       ) {
         setMessage({
           type: "error",
-          text: "Some files were skipped because of the 5MB limit and free plan file limit.",
+          text: `Some files were skipped because of the ${FILE_SIZE_LIMIT_LABEL} limit and free plan file limit.`,
         });
       } else if (!isPremium && oversizedFiles.length > 0) {
         setMessage({
           type: "error",
-          text: "Some files exceeded the 5MB limit for free users.",
+          text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
         });
       } else if (!isPremium && acceptedFiles.length > remainingSlots) {
         setMessage({
           type: "error",
-          text: "Free plan allows up to 3 PDFs.",
+          text: `Free plan allows up to ${MAX_FREE_FILES} PDFs.`,
         });
       } else {
         setMessage(null);
@@ -351,7 +352,7 @@ export default function MergeTool() {
       </div>
 
       <UpgradeBanner
-        title="Free plan: merge up to 3 PDFs"
+        title={`Free plan: merge up to ${MAX_FREE_FILES} PDFs`}
         subtitle="ProjectStack Pro gives you more room to work with larger files, longer merge sessions, and cleaner final documents."
         features={[
           "Keep multi-file merge workflows moving without low limits",
@@ -398,7 +399,9 @@ export default function MergeTool() {
         />
 
         <div className="drop-zone-title">Select or Drop PDFs Here</div>
-        <div className="drop-zone-sub">Free plan includes up to 3 PDFs, 5MB each</div>
+        <div className="drop-zone-sub">
+          Free plan includes up to {MAX_FREE_FILES} PDFs, {FILE_SIZE_LIMIT_LABEL} each
+        </div>
       </div>
 
       <div
