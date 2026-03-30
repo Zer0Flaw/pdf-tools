@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AdSlot from "./AdSlot";
+import { SUPPORT_PAGES } from "./SupportPage";
 
 const TOOL_PREVIEWS = [
   {
@@ -32,7 +33,7 @@ const TOOL_PREVIEWS = [
   },
 ];
 
-export default function LandingPage({ onStart, onOpenTool }) {
+export default function LandingPage({ onStart, onOpenTool, onOpenSupportPage }) {
   const [showFooterAd, setShowFooterAd] = useState(false);
 
   return (
@@ -236,6 +237,24 @@ export default function LandingPage({ onStart, onOpenTool }) {
 
         <AdSlot placement="landingFooter" isVisible={showFooterAd} />
       </section>
+
+      <footer className="site-footer">
+        <div className="site-footer-links">
+          {Object.entries(SUPPORT_PAGES).map(([id, page]) => (
+            <a
+              key={page.route}
+              href={page.route}
+              className="site-footer-link"
+              onClick={(event) => {
+                event.preventDefault();
+                onOpenSupportPage?.(id);
+              }}
+            >
+              {page.heading}
+            </a>
+          ))}
+        </div>
+      </footer>
     </div>
   );
 }

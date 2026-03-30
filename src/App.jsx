@@ -6,11 +6,12 @@ import SplitTool from "./tools/SplitTool";
 import CompressTool from "./tools/CompressTool";
 import ImagesToPdfTool from "./tools/ImagesToPdfTool";
 import LandingPage from "./components/LandingPage";
+import SupportPage, { SUPPORT_PAGES } from "./components/SupportPage";
 import { trackEvent } from "./utils/analytics";
 
 const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
-const VALID_VIEWS = ["home", "workspace"];
+const VALID_VIEWS = ["home", "workspace", "support"];
 const VALID_TOOLS = ["merge", "split", "compress", "images"];
 const HOME_TITLE = "ProjectStack | Simple File Tools";
 const HOME_DESCRIPTION =
@@ -64,6 +65,13 @@ function getToolFromPath(pathname) {
   );
 }
 
+function getSupportPageFromPath(pathname) {
+  return (
+    Object.entries(SUPPORT_PAGES).find(([, page]) => page.route === pathname)?.[0] ||
+    null
+  );
+}
+
 function updateBrowserPath(pathname) {
   if (typeof window === "undefined") return;
   if (window.location.pathname === pathname) return;
@@ -106,9 +114,19 @@ export default function App() {
     if (typeof window !== "undefined") {
       const toolFromPath = getToolFromPath(window.location.pathname);
       if (toolFromPath) return "workspace";
+      const supportPageFromPath = getSupportPageFromPath(window.location.pathname);
+      if (supportPageFromPath) return "support";
     }
 
     return readStoredValue(APP_VIEW_KEY, VALID_VIEWS, "home");
+  });
+  const [activeSupportPage, setActiveSupportPage] = useState(() => {
+    if (typeof window !== "undefined") {
+      const supportPageFromPath = getSupportPageFromPath(window.location.pathname);
+      if (supportPageFromPath) return supportPageFromPath;
+    }
+
+    return "privacy";
   });
 
   useEffect(() => {
@@ -116,10 +134,17 @@ export default function App() {
 
     const handlePopState = () => {
       const toolFromPath = getToolFromPath(window.location.pathname);
+      const supportPageFromPath = getSupportPageFromPath(window.location.pathname);
 
       if (toolFromPath) {
         setActiveTool(toolFromPath);
         setActiveView("workspace");
+        return;
+      }
+
+      if (supportPageFromPath) {
+        setActiveSupportPage(supportPageFromPath);
+        setActiveView("support");
         return;
       }
 
@@ -149,16 +174,20 @@ export default function App() {
   useEffect(() => {
     if (activeView === "workspace") {
       updateBrowserPath(TOOL_ROUTES[activeTool]);
+    } else if (activeView === "support") {
+      updateBrowserPath(SUPPORT_PAGES[activeSupportPage].route);
     } else {
       updateBrowserPath("/");
     }
-  }, [activeTool, activeView]);
+  }, [activeSupportPage, activeTool, activeView]);
 
   useEffect(() => {
     const metadata =
       activeView === "home"
         ? { title: HOME_TITLE, description: HOME_DESCRIPTION }
-        : TOOL_METADATA[activeTool];
+        : activeView === "support"
+          ? SUPPORT_PAGES[activeSupportPage]
+          : TOOL_METADATA[activeTool];
 
     document.title = metadata.title;
     updateMetaTag("name", "description", metadata.description);
@@ -166,7 +195,7 @@ export default function App() {
     updateMetaTag("property", "og:description", metadata.description);
     updateMetaTag("name", "twitter:title", metadata.title);
     updateMetaTag("name", "twitter:description", metadata.description);
-  }, [activeTool, activeView]);
+  }, [activeSupportPage, activeTool, activeView]);
 
   useEffect(() => {
     if (activeView !== "workspace") return;
@@ -179,6 +208,11 @@ export default function App() {
   function openWorkspace(tool = activeTool) {
     setActiveTool(tool);
     setActiveView("workspace");
+  }
+
+  function openSupportPage(pageId) {
+    setActiveSupportPage(pageId);
+    setActiveView("support");
   }
 
   function renderActiveTool() {
@@ -202,6 +236,21 @@ export default function App() {
           <LandingPage
             onStart={() => openWorkspace("merge")}
             onOpenTool={openWorkspace}
+            onOpenSupportPage={openSupportPage}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (activeView === "support") {
+    return (
+      <div className="app-shell">
+        <div className="app-card app-card-home">
+          <SupportPage
+            pageId={activeSupportPage}
+            onBackHome={() => setActiveView("home")}
+            onOpenSupportPage={openSupportPage}
           />
         </div>
       </div>
