@@ -108,7 +108,7 @@ export default function SplitTool() {
     <>
       <div className="tool-header">
         <div>
-          <h1>Split PDF</h1>
+          <h2>Split PDF</h2>
           <p className="tool-sub">Extract each page into separate PDF files.</p>
         </div>
 

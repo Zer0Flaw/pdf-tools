@@ -561,6 +561,32 @@ h1 {
   color: #111827;
 }
 
+.tool-header h2 {
+  margin: 0;
+  font-size: 1.85rem;
+  line-height: 1.1;
+  color: #111827;
+}
+
+.route-intro {
+  margin-bottom: 1.5rem;
+}
+
+.route-intro h1 {
+  margin: 0;
+  font-size: 2.15rem;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: #111827;
+}
+
+.route-intro p {
+  margin: 0.75rem 0 0;
+  max-width: 680px;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
 .tool-sub {
   color: #6b7280;
   margin-top: 0.25rem;
@@ -918,8 +944,15 @@ h1 {
   gap: 16px;
 }
 
+.tool-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
 .feature-card,
 .benefit-card,
+.tool-preview-card,
 .landing-cta-card {
   border: 1px solid #e5e7eb;
   background: #fafafa;
@@ -928,16 +961,28 @@ h1 {
 }
 
 .feature-card h3,
-.benefit-card h3 {
+.benefit-card h3,
+.tool-preview-card h3 {
   margin: 0 0 10px;
   color: #111827;
 }
 
 .feature-card p,
 .benefit-card p,
+.tool-preview-card p,
 .landing-cta-card p {
   margin: 0;
   color: #4b5563;
+}
+
+.tool-preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tool-preview-btn {
+  align-self: flex-start;
 }
 
 .landing-cta {
@@ -977,6 +1022,14 @@ h1 {
     font-size: 1.55rem;
   }
 
+  .tool-header h2 {
+    font-size: 1.55rem;
+  }
+
+  .route-intro h1 {
+    font-size: 1.9rem;
+  }
+
   .hero-section {
     padding: 28px 6px 22px;
   }
@@ -1003,7 +1056,8 @@ h1 {
   }
 
   .feature-grid,
-  .benefit-grid {
+  .benefit-grid,
+  .tool-preview-grid {
     grid-template-columns: 1fr;
   }
 

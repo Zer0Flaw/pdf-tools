@@ -341,7 +341,7 @@ export default function MergeTool() {
     <>
       <div className="tool-header">
         <div>
-          <h1>Merge PDF</h1>
+          <h2>Merge PDF</h2>
           <p className="tool-sub">
             Combine multiple PDFs into a single document.
           </p>

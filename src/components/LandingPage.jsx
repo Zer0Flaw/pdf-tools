@@ -1,6 +1,33 @@
 import React from "react";
 
-export default function LandingPage({ onStart }) {
+const TOOL_PREVIEWS = [
+  {
+    id: "merge",
+    title: "Merge PDF",
+    description: "Combine multiple PDFs into a single finished document.",
+    cta: "Open Merge PDF",
+  },
+  {
+    id: "split",
+    title: "Split PDF",
+    description: "Break a PDF into separate page files in seconds.",
+    cta: "Open Split PDF",
+  },
+  {
+    id: "images",
+    title: "Images to PDF",
+    description: "Turn JPG and PNG images into one organized PDF.",
+    cta: "Open Images to PDF",
+  },
+  {
+    id: "compress",
+    title: "Compress Images",
+    description: "Reduce file size for easier sharing and storage.",
+    cta: "Open Compress Images",
+  },
+];
+
+export default function LandingPage({ onStart, onOpenTool }) {
   return (
     <div className="landing-page">
       <section className="hero-section">
@@ -45,6 +72,47 @@ export default function LandingPage({ onStart }) {
         </div>
       </section>
 
+      <section className="landing-section">
+        <div className="section-heading">
+          <p className="section-eyebrow">Why ProjectStack?</p>
+          <h2>Built to feel safe, simple, and fast from the first click</h2>
+          <p>
+            ProjectStack keeps file work practical by prioritizing privacy,
+            speed, and a friction-free experience.
+          </p>
+        </div>
+
+        <div className="benefit-grid">
+          <div className="benefit-card">
+            <h3>Files processed locally</h3>
+            <p>
+              Your files never leave your browser. Everything runs securely on
+              your device.
+            </p>
+          </div>
+
+          <div className="benefit-card">
+            <h3>No uploads required</h3>
+            <p>
+              ProjectStack works entirely in your browser, so you keep full
+              control of your files.
+            </p>
+          </div>
+
+          <div className="benefit-card">
+            <h3>No sign-in required</h3>
+            <p>Use the tools instantly with no accounts or setup.</p>
+          </div>
+
+          <div className="benefit-card">
+            <h3>Fast processing</h3>
+            <p>
+              Operations run directly in your browser for quick results.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section id="features" className="landing-section">
         <div className="section-heading">
           <p className="section-eyebrow">Core tools</p>
@@ -80,7 +148,34 @@ export default function LandingPage({ onStart }) {
 
       <section className="landing-section">
         <div className="section-heading">
-          <p className="section-eyebrow">Why ProjectStack</p>
+          <p className="section-eyebrow">Open a tool</p>
+          <h2>Jump straight into the workflow you need</h2>
+          <p>
+            Each tool opens in its own focused workspace with the same clean
+            ProjectStack experience.
+          </p>
+        </div>
+
+        <div className="tool-preview-grid">
+          {TOOL_PREVIEWS.map((tool) => (
+            <div key={tool.id} className="tool-preview-card">
+              <h3>{tool.title}</h3>
+              <p>{tool.description}</p>
+              <button
+                type="button"
+                className="hero-secondary-btn tool-preview-btn"
+                onClick={() => onOpenTool?.(tool.id)}
+              >
+                {tool.cta}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-section">
+        <div className="section-heading">
+          <p className="section-eyebrow">Product design</p>
           <h2>Built like a product, not a throwaway utility</h2>
         </div>
 

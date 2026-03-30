@@ -345,7 +345,7 @@ export default function ImagesToPdfTool() {
     <>
       <div className="tool-header">
         <div>
-          <h1>Images to PDF</h1>
+          <h2>Images to PDF</h2>
           <p className="tool-sub">
             Convert JPG and PNG images into a single PDF document.
           </p>

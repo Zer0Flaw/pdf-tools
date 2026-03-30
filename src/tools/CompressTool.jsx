@@ -370,7 +370,7 @@ export default function CompressTool() {
     <>
       <div className="tool-header">
         <div>
-          <h1>Compress Images</h1>
+          <h2>Compress Images</h2>
           <p className="tool-sub">
             Reduce image file size while maintaining usable quality.
           </p>

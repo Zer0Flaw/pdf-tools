@@ -15,29 +15,61 @@ const VALID_TOOLS = ["merge", "split", "compress", "images"];
 const HOME_TITLE = "ProjectStack | Simple File Tools";
 const HOME_DESCRIPTION =
   "Merge PDFs, split files, convert images to PDF, and compress images in one clean workspace.";
+const TOOL_ROUTES = {
+  merge: "/merge-pdf",
+  split: "/split-pdf",
+  images: "/images-to-pdf",
+  compress: "/compress-images",
+};
 
 const TOOL_METADATA = {
   merge: {
-    title: "ProjectStack | Merge PDF",
+    title: "ProjectStack | Merge PDF Online",
     description:
       "Merge multiple PDFs into one clean document in a browser-based workspace.",
+    heading: "Merge PDF files online",
+    intro:
+      "Combine multiple PDF files into one organized document in a clean browser-based workspace.",
   },
   split: {
-    title: "ProjectStack | Split PDF",
+    title: "ProjectStack | Split PDF Online",
     description:
       "Split a PDF into separate page files in a clean browser-based workspace.",
+    heading: "Split PDF pages online",
+    intro:
+      "Break a PDF into separate page files quickly while keeping the workflow simple and predictable.",
   },
   compress: {
-    title: "ProjectStack | Compress Images",
+    title: "ProjectStack | Compress Images Online",
     description:
       "Compress JPG, PNG, and WEBP images locally in your browser for easier sharing.",
+    heading: "Compress images online",
+    intro:
+      "Reduce image file size for easier sharing and storage with simple browser-based compression.",
   },
   images: {
-    title: "ProjectStack | Images to PDF",
+    title: "ProjectStack | Images to PDF Online",
     description:
       "Convert JPG and PNG images into a single PDF in one clean browser-based workspace.",
+    heading: "Convert images to PDF online",
+    intro:
+      "Turn JPG and PNG images into a single PDF in one clean workspace designed for practical file tasks.",
   },
 };
+
+function getToolFromPath(pathname) {
+  return (
+    Object.entries(TOOL_ROUTES).find(([, route]) => route === pathname)?.[0] ||
+    null
+  );
+}
+
+function updateBrowserPath(pathname) {
+  if (typeof window === "undefined") return;
+  if (window.location.pathname === pathname) return;
+
+  window.history.pushState({}, "", pathname);
+}
 
 function readStoredValue(key, validValues, fallbackValue) {
   if (typeof window === "undefined") return fallbackValue;
@@ -62,12 +94,41 @@ function updateMetaTag(attributeName, attributeValue, content) {
 }
 
 export default function App() {
-  const [activeView, setActiveView] = useState(() =>
-    readStoredValue(APP_VIEW_KEY, VALID_VIEWS, "home"),
-  );
-  const [activeTool, setActiveTool] = useState(() =>
-    readStoredValue(APP_TOOL_KEY, VALID_TOOLS, "merge"),
-  );
+  const [activeTool, setActiveTool] = useState(() => {
+    if (typeof window !== "undefined") {
+      const toolFromPath = getToolFromPath(window.location.pathname);
+      if (toolFromPath) return toolFromPath;
+    }
+
+    return readStoredValue(APP_TOOL_KEY, VALID_TOOLS, "merge");
+  });
+  const [activeView, setActiveView] = useState(() => {
+    if (typeof window !== "undefined") {
+      const toolFromPath = getToolFromPath(window.location.pathname);
+      if (toolFromPath) return "workspace";
+    }
+
+    return readStoredValue(APP_VIEW_KEY, VALID_VIEWS, "home");
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handlePopState = () => {
+      const toolFromPath = getToolFromPath(window.location.pathname);
+
+      if (toolFromPath) {
+        setActiveTool(toolFromPath);
+        setActiveView("workspace");
+        return;
+      }
+
+      setActiveView("home");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   useEffect(() => {
     try {
@@ -84,6 +145,14 @@ export default function App() {
       // Ignore storage failures and keep the app usable.
     }
   }, [activeTool]);
+
+  useEffect(() => {
+    if (activeView === "workspace") {
+      updateBrowserPath(TOOL_ROUTES[activeTool]);
+    } else {
+      updateBrowserPath("/");
+    }
+  }, [activeTool, activeView]);
 
   useEffect(() => {
     const metadata =
@@ -107,6 +176,11 @@ export default function App() {
     });
   }, [activeTool, activeView]);
 
+  function openWorkspace(tool = activeTool) {
+    setActiveTool(tool);
+    setActiveView("workspace");
+  }
+
   function renderActiveTool() {
     switch (activeTool) {
       case "split":
@@ -125,11 +199,16 @@ export default function App() {
     return (
       <div className="app-shell">
         <div className="app-card app-card-home">
-          <LandingPage onStart={() => setActiveView("workspace")} />
+          <LandingPage
+            onStart={() => openWorkspace("merge")}
+            onOpenTool={openWorkspace}
+          />
         </div>
       </div>
     );
   }
+
+  const activeToolMetadata = TOOL_METADATA[activeTool];
 
   return (
     <div className="app-shell">
@@ -140,7 +219,7 @@ export default function App() {
             className="back-home-btn"
             onClick={() => setActiveView("home")}
           >
-            ← Back to Home
+            Back to Home
           </button>
 
           <div className="brand-lockup">
@@ -154,7 +233,12 @@ export default function App() {
           </div>
         </div>
 
-        <ToolNav activeTool={activeTool} onChange={setActiveTool} />
+        <div className="route-intro">
+          <h1>{activeToolMetadata.heading}</h1>
+          <p>{activeToolMetadata.intro}</p>
+        </div>
+
+        <ToolNav activeTool={activeTool} onChange={openWorkspace} />
         {renderActiveTool()}
       </div>
     </div>
