@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import AdSlot from "./AdSlot";
 
 const TOOL_PREVIEWS = [
   {
@@ -28,6 +29,8 @@ const TOOL_PREVIEWS = [
 ];
 
 export default function LandingPage({ onStart, onOpenTool }) {
+  const [showFooterAd, setShowFooterAd] = useState(false);
+
   return (
     <div className="landing-page">
       <section className="hero-section">
@@ -56,6 +59,7 @@ export default function LandingPage({ onStart, onOpenTool }) {
             <button
               className="hero-secondary-btn"
               onClick={() => {
+                setShowFooterAd(true);
                 const section = document.getElementById("features");
                 section?.scrollIntoView({ behavior: "smooth" });
               }}
@@ -221,6 +225,8 @@ export default function LandingPage({ onStart, onOpenTool }) {
             Launch ProjectStack
           </button>
         </div>
+
+        <AdSlot placement="landingFooter" isVisible={showFooterAd} />
       </section>
     </div>
   );

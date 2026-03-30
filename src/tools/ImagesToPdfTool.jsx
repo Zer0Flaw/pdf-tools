@@ -309,13 +309,13 @@ export default function ImagesToPdfTool() {
         consumeDailyWatermarkRemoval();
         setUseFreeWatermarkRemoval(false);
         setCanRemoveWatermarkToday(false);
-        trackEvent("watermark_free_used", {
+        trackEvent("watermark_removed", {
           tool: "images",
         });
       }
 
       setShowExportAd(true);
-      trackEvent("export_completed", {
+      trackEvent("export_success", {
         tool: "images",
         file_count: files.length,
         size_bytes: blob.size,

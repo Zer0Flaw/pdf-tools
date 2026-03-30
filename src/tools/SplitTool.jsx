@@ -85,7 +85,7 @@ export default function SplitTool() {
       }
 
       setShowExportAd(true);
-      trackEvent("export_completed", {
+      trackEvent("export_success", {
         tool: "split",
         file_count: pageCount,
         size_bytes: totalBytes,

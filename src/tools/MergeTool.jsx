@@ -305,13 +305,13 @@ export default function MergeTool() {
         consumeDailyWatermarkRemoval();
         setUseFreeWatermarkRemoval(false);
         setCanRemoveWatermarkToday(false);
-        trackEvent("watermark_free_used", {
+        trackEvent("watermark_removed", {
           tool: "merge",
         });
       }
 
       setShowExportAd(true);
-      trackEvent("export_completed", {
+      trackEvent("export_success", {
         tool: "merge",
         file_count: files.length,
         size_bytes: blob.size,

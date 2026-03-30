@@ -342,7 +342,7 @@ export default function CompressTool() {
           : 0;
 
       setShowExportAd(true);
-      trackEvent("export_completed", {
+      trackEvent("export_success", {
         tool: "compress",
         file_count: files.length,
         size_bytes_before: originalBytes,

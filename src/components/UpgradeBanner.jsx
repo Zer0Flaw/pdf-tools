@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trackUpgradeIntent } from "../utils/upgradeReasons";
+import AdSlot from "./AdSlot";
 
 export default function UpgradeBanner({
   title = "Unlock Pro",
@@ -125,6 +126,8 @@ export default function UpgradeBanner({
                 Continue with free plan
               </button>
             </div>
+
+            <AdSlot placement="upgradeModal" isVisible={isOpen} />
           </div>
         </div>
       )}

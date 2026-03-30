@@ -1,7 +1,8 @@
 const IS_DEV = import.meta.env.DEV;
+const ADSENSE_CLIENT = "ca-pub-XXXXXXXXXXXXXXXX";
 
 export const AD_CONFIG = {
-  defaultProvider: "placeholder",
+  defaultProvider: "adsense",
   providers: {
     placeholder: {
       enabled: true,
@@ -10,9 +11,11 @@ export const AD_CONFIG = {
         "Reserved for a launch partner. No ad network is active yet.",
     },
     adsense: {
-      enabled: false,
-      label: "AdSense slot",
-      placeholderCopy: "AdSense integration is configured but not enabled yet.",
+      enabled: true,
+      label: "Sponsored placement",
+      placeholderCopy:
+        "AdSense is ready to connect. Replace the placeholder client and slot ids to go live.",
+      client: ADSENSE_CLIENT,
     },
     carbon: {
       enabled: false,
@@ -23,21 +26,30 @@ export const AD_CONFIG = {
   placements: {
     postExport: {
       enabled: true,
-      provider: "placeholder",
+      provider: "adsense",
       renderPlaceholderWhenDisabled: true,
       devOnly: false,
+      format: "auto",
+      responsive: true,
+      slot: "0000000001",
     },
     upgradeModal: {
-      enabled: false,
-      provider: "placeholder",
+      enabled: true,
+      provider: "adsense",
       renderPlaceholderWhenDisabled: true,
       devOnly: false,
+      format: "auto",
+      responsive: true,
+      slot: "0000000002",
     },
-    footer: {
-      enabled: false,
-      provider: "placeholder",
+    landingFooter: {
+      enabled: true,
+      provider: "adsense",
       renderPlaceholderWhenDisabled: true,
       devOnly: false,
+      format: "auto",
+      responsive: true,
+      slot: "0000000003",
     },
   },
 };
@@ -54,6 +66,24 @@ export function shouldRenderAdPlacement(placement) {
   const placementConfig = getAdPlacementConfig(placement);
   if (!placementConfig) return false;
   if (placementConfig.devOnly && !IS_DEV) return false;
+
+  return true;
+}
+
+export function isAdProviderReady(providerName, placement) {
+  const provider = getAdProviderConfig(providerName);
+  const placementConfig = getAdPlacementConfig(placement);
+
+  if (!provider || !placementConfig || !provider.enabled) return false;
+
+  if (providerName === "adsense") {
+    return (
+      Boolean(provider.client) &&
+      provider.client !== ADSENSE_CLIENT &&
+      Boolean(placementConfig.slot) &&
+      !placementConfig.slot.startsWith("000000000")
+    );
+  }
 
   return true;
 }
