@@ -16,9 +16,9 @@ const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
 const VALID_VIEWS = ["home", "workspace", "support"];
 const VALID_TOOLS = ["merge", "split", "compress", "images"];
-const HOME_TITLE = "ProjectStack | Simple File Tools";
+const HOME_TITLE = "ProjectStack | Browser-Based PDF and Image Tools";
 const HOME_DESCRIPTION =
-  "Merge PDFs, split files, convert images to PDF, and compress images in one clean workspace.";
+  "Use browser-based PDF and image tools with ProjectStack. Merge PDFs, split files, convert images to PDF, and compress images in one clean workspace.";
 const TOOL_ROUTES = {
   merge: "/merge-pdf",
   split: "/split-pdf",
@@ -36,7 +36,7 @@ const TOOL_METADATA = {
       "Combine multiple PDF files into one organized document with fast browser-based processing, local file handling, and simple order control before export.",
   },
   split: {
-    title: "Split PDF Online | ProjectStack",
+    title: "Split PDF Files Online | ProjectStack",
     description:
       "Split PDF files online in your browser with ProjectStack. Extract pages into smaller PDF downloads without a server upload for core processing.",
     heading: "Split PDF Online",
@@ -52,7 +52,7 @@ const TOOL_METADATA = {
       "Reduce image file size for sharing, uploads, and storage with a simple browser-based compression workflow that keeps the core process on your device.",
   },
   images: {
-    title: "Images to PDF Online | ProjectStack",
+    title: "Convert Images to PDF Online | ProjectStack",
     description:
       "Convert images to PDF online in your browser with ProjectStack. Turn JPG and PNG files into one clean downloadable PDF.",
     heading: "Images to PDF Online",
@@ -274,6 +274,8 @@ export default function App() {
             <SupportPage
               pageId={activeSupportPage}
               onBackHome={() => setActiveView("home")}
+              onOpenSupportPage={openSupportPage}
+              onOpenTool={openWorkspace}
             />
             <SiteFooter onOpenSupportPage={openSupportPage} />
           </div>

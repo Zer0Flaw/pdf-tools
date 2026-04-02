@@ -33,6 +33,10 @@ export const SUPPORT_PAGES = {
         ],
       },
     ],
+    relatedLinks: [
+      { type: "tool", id: "merge", label: "Merge PDF" },
+      { type: "support", id: "privacy", label: "Privacy Policy" },
+    ],
   },
   privacy: {
     route: "/privacy",
@@ -82,6 +86,10 @@ export const SUPPORT_PAGES = {
           </>,
         ],
       },
+    ],
+    relatedLinks: [
+      { type: "support", id: "contact", label: "Contact ProjectStack" },
+      { type: "support", id: "faq", label: "FAQ" },
     ],
   },
   terms: {
@@ -133,6 +141,10 @@ export const SUPPORT_PAGES = {
         ],
       },
     ],
+    relatedLinks: [
+      { type: "support", id: "contact", label: "Contact ProjectStack" },
+      { type: "support", id: "about", label: "About ProjectStack" },
+    ],
   },
   contact: {
     route: "/contact",
@@ -168,6 +180,10 @@ export const SUPPORT_PAGES = {
           "If you are reporting a privacy concern or product issue, avoid sending sensitive files unless it is truly necessary. In many cases, a short written description is enough because ProjectStack's core tools run locally in the browser.",
         ],
       },
+    ],
+    relatedLinks: [
+      { type: "support", id: "faq", label: "FAQ" },
+      { type: "tool", id: "merge", label: "Merge PDF" },
     ],
   },
   faq: {
@@ -205,12 +221,18 @@ export const SUPPORT_PAGES = {
         ],
       },
     ],
+    relatedLinks: [
+      { type: "tool", id: "images", label: "Images to PDF" },
+      { type: "support", id: "privacy", label: "Privacy Policy" },
+    ],
   },
 };
 
 export default function SupportPage({
   pageId,
   onBackHome,
+  onOpenSupportPage,
+  onOpenTool,
 }) {
   const page = SUPPORT_PAGES[pageId];
 
@@ -253,6 +275,37 @@ export default function SupportPage({
           </section>
         ))}
       </div>
+
+      {page.relatedLinks?.length > 0 && (
+        <section className="landing-section support-links-section">
+          <div className="section-heading">
+            <p className="section-eyebrow">Helpful pages</p>
+            <h2>Keep exploring ProjectStack</h2>
+          </div>
+
+          <div className="tool-preview-grid">
+            {page.relatedLinks.map((link) => (
+              <div key={`${pageId}-${link.type}-${link.id}`} className="tool-preview-card">
+                <h3>{link.label}</h3>
+                <button
+                  type="button"
+                  className="hero-secondary-btn tool-preview-btn"
+                  onClick={() => {
+                    if (link.type === "tool") {
+                      onOpenTool?.(link.id);
+                      return;
+                    }
+
+                    onOpenSupportPage?.(link.id);
+                  }}
+                >
+                  Open {link.label}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <AdSlot
         placement="supportFooter"
