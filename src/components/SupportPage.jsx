@@ -1,3 +1,5 @@
+import AdSlot from "./AdSlot";
+
 export const SUPPORT_PAGES = {
   about: {
     route: "/about",
@@ -13,7 +15,7 @@ export const SUPPORT_PAGES = {
         title: "What ProjectStack is",
         paragraphs: [
           "ProjectStack brings together useful file workflows like merging PDFs, splitting documents, converting images to PDF, and compressing images in one clean workspace.",
-          "It is designed as a real product, not a throwaway utility page, so consistency, clarity, and trust matter as much as the features themselves.",
+          "It is designed to feel clear, dependable, and useful from the start, with consistency and trust treated as part of the product rather than an afterthought.",
         ],
       },
       {
@@ -26,8 +28,8 @@ export const SUPPORT_PAGES = {
       {
         title: "How the platform is supported",
         paragraphs: [
-          "ProjectStack is being built with a freemium model. Free tools help people get value quickly, while premium features and carefully placed ads are intended to support ongoing development over time.",
-          "The product direction is to keep core workflows useful and low-friction while building a business that can support better tools in the future.",
+          "ProjectStack uses a freemium model. Free core tools are meant to stay practical, while premium features and carefully placed advertising can help support the product when enabled.",
+          "The goal is to keep core workflows useful and low-friction while supporting continued improvement over time.",
         ],
       },
     ],
@@ -37,10 +39,10 @@ export const SUPPORT_PAGES = {
     linkLabel: "Privacy",
     title: "Privacy Policy | ProjectStack",
     description:
-      "Learn how ProjectStack handles browser-based file processing, local storage, and lightweight analytics.",
+      "Learn how ProjectStack handles browser-based file processing, local storage, lightweight analytics, and future advertising changes.",
     heading: "Privacy Policy",
     intro:
-      "ProjectStack is built so practical file work can stay on your device. This page explains what the current browser-based product does, what limited data may be stored locally, and how lightweight site analytics may be used.",
+      "ProjectStack is built so practical file work can stay on your device. This page explains what the current browser-based product does, what limited information may be stored locally, and how analytics or future advertising changes may affect the site.",
     sections: [
       {
         title: "Local browser-based processing",
@@ -52,7 +54,7 @@ export const SUPPORT_PAGES = {
       {
         title: "Analytics and basic usage data",
         paragraphs: [
-          "ProjectStack may use lightweight analytics to understand site traffic and product usage patterns. This may include privacy-friendly website analytics available through the current Cloudflare Pages setup, as well as lightweight product event tracking used to understand which tools and flows are being used.",
+          "ProjectStack uses lightweight analytics to understand site traffic and product usage patterns. This may include privacy-friendly website analytics available through the current Cloudflare Pages setup, as well as lightweight product event tracking used to understand which tools and flows are being used.",
           "These analytics are intended to measure adoption, improve usability, and support product decisions. They are not used to inspect the contents of files processed in the browser.",
         ],
       },
@@ -66,8 +68,8 @@ export const SUPPORT_PAGES = {
       {
         title: "Ads and future monetization",
         paragraphs: [
-          "ProjectStack may use advertising placements to support the free product experience. Ad integrations may change over time as the product evolves.",
-          "If ad technology is enabled later, ProjectStack may work with advertising providers that use their own policies or browser technologies. This page will be updated so the wording stays aligned with the live product.",
+          "ProjectStack includes ad scaffolding, but advertising may not be active at all times. If ads are enabled later, they are intended to support the free product experience without interrupting the core file workflow.",
+          "If third-party advertising technology is added in the future, providers may use their own cookies, policies, or browser technologies. This page will be updated so the disclosures remain aligned with the live product.",
         ],
       },
       {
@@ -75,7 +77,7 @@ export const SUPPORT_PAGES = {
         paragraphs: [
           "ProjectStack may update this policy as the service evolves. Material changes should be reflected here before or when they go live.",
           <>
-            If you have a privacy question, contact{" "}
+            For privacy questions, contact{" "}
             <a href="mailto:hello@projectstack.cc">hello@projectstack.cc</a>.
           </>,
         ],
@@ -96,7 +98,7 @@ export const SUPPORT_PAGES = {
         title: "Using ProjectStack",
         paragraphs: [
           "ProjectStack is provided as a browser-based file utility workspace. You may use the service for lawful personal or business purposes.",
-          "You are responsible for the files you choose to process and for confirming that downloaded results meet your needs before sharing or relying on them.",
+          "You are responsible for the files and content you choose to process and for confirming that downloaded results meet your needs before sharing or relying on them.",
         ],
       },
       {
@@ -125,7 +127,7 @@ export const SUPPORT_PAGES = {
         paragraphs: [
           "ProjectStack, its branding, site content, and product experience remain the property of the ProjectStack operator unless stated otherwise.",
           <>
-            If you have a question about these terms, contact{" "}
+            For questions about these terms, contact{" "}
             <a href="mailto:hello@projectstack.cc">hello@projectstack.cc</a>.
           </>,
         ],
@@ -140,7 +142,7 @@ export const SUPPORT_PAGES = {
       "Get in touch with ProjectStack for support, business questions, or product feedback.",
     heading: "Contact ProjectStack",
     intro:
-      "ProjectStack is a lightweight product, so the contact experience is intentionally simple. Use this page for support questions, privacy questions, business inquiries, or general feedback.",
+      "ProjectStack keeps contact simple and direct. Use this page for support questions, privacy questions, business inquiries, or general feedback.",
     sections: [
       {
         title: "Get in touch",
@@ -150,7 +152,7 @@ export const SUPPORT_PAGES = {
             <a href="mailto:hello@projectstack.cc">hello@projectstack.cc</a>{" "}
             for support, product questions, business inquiries, or feedback.
           </>,
-          "A simple email channel keeps the product easy to maintain while ProjectStack is still in its early launch stage.",
+          "Messages sent there are the current contact path for the site and product.",
         ],
       },
       {
@@ -193,7 +195,7 @@ export const SUPPORT_PAGES = {
       {
         title: "Why are there free limits or watermarks?",
         paragraphs: [
-          "ProjectStack is being built as a real product, so the free plan includes intentional limits and upgrade messaging. The goal is to keep the free experience useful while making room for future premium workflows.",
+          "ProjectStack includes intentional free-plan limits and upgrade messaging so the free experience stays useful while still leaving room for premium features over time.",
         ],
       },
       {
@@ -252,6 +254,12 @@ export default function SupportPage({
           </section>
         ))}
       </div>
+
+      <AdSlot
+        placement="supportFooter"
+        className="support-page-ad"
+        minHeight={140}
+      />
 
       <footer className="site-footer">
         <div className="site-footer-links">

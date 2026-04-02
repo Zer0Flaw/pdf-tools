@@ -649,6 +649,10 @@ h1 {
   color: #4338ca;
 }
 
+.ad-slot-shell {
+  width: 100%;
+}
+
 .ad-slot {
   margin-top: 14px;
   margin-bottom: 4px;
@@ -656,6 +660,9 @@ h1 {
   border-radius: 12px;
   border: 1px dashed #d1d5db;
   background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .ad-slot-label {
@@ -671,6 +678,15 @@ h1 {
   margin: 0;
   color: #4b5563;
   font-size: 0.95rem;
+}
+
+.ad-slot-placeholder {
+  background: linear-gradient(180deg, #fafafa 0%, #f6f7fb 100%);
+}
+
+.support-page-ad,
+.tool-seo-ad {
+  margin-top: -6px;
 }
 .drop-zone.disabled {
   opacity: 0.5;

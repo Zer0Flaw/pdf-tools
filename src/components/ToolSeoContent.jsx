@@ -1,3 +1,5 @@
+import AdSlot from "./AdSlot";
+
 const TOOL_SEO_CONTENT = {
   merge: {
     benefits: [
@@ -247,6 +249,12 @@ export default function ToolSeoContent({
           ))}
         </div>
       </section>
+
+      <AdSlot
+        placement="toolSeoFooter"
+        className="tool-seo-ad"
+        minHeight={140}
+      />
 
       <section className="landing-cta tool-seo-section">
         <div className="landing-cta-card">

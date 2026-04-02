@@ -1,20 +1,35 @@
 const IS_DEV = import.meta.env.DEV;
-const ADSENSE_CLIENT = "ca-pub-XXXXXXXXXXXXXXXX";
+const ADSENSE_CLIENT_PLACEHOLDER = "ca-pub-XXXXXXXXXXXXXXXX";
+
+function readBooleanEnv(value, fallback = false) {
+  if (typeof value !== "string") return fallback;
+
+  return value.toLowerCase() === "true";
+}
+
+const ADS_ENABLED = readBooleanEnv(import.meta.env.VITE_ADS_ENABLED, false);
+const ADSENSE_CLIENT =
+  import.meta.env.VITE_ADSENSE_CLIENT || ADSENSE_CLIENT_PLACEHOLDER;
+
+function getPlacementSlot(envKey) {
+  return import.meta.env[envKey] || "";
+}
 
 export const AD_CONFIG = {
+  enabled: ADS_ENABLED,
   defaultProvider: "adsense",
   providers: {
     placeholder: {
       enabled: true,
       label: "Sponsored placement",
       placeholderCopy:
-        "Reserved for a launch partner. No ad network is active yet.",
+        "Reserved sponsored area. No ad network is active right now.",
     },
     adsense: {
-      enabled: true,
+      enabled: ADS_ENABLED,
       label: "Sponsored placement",
       placeholderCopy:
-        "AdSense is ready to connect. Replace the placeholder client and slot ids to go live.",
+        "Sponsored placement is configured for future activation, but live ads are currently disabled.",
       client: ADSENSE_CLIENT,
     },
     carbon: {
@@ -31,7 +46,8 @@ export const AD_CONFIG = {
       devOnly: false,
       format: "auto",
       responsive: true,
-      slot: "0000000001",
+      slot: getPlacementSlot("VITE_ADSENSE_SLOT_POST_EXPORT"),
+      minHeight: 120,
     },
     upgradeModal: {
       enabled: true,
@@ -40,7 +56,8 @@ export const AD_CONFIG = {
       devOnly: false,
       format: "auto",
       responsive: true,
-      slot: "0000000002",
+      slot: getPlacementSlot("VITE_ADSENSE_SLOT_UPGRADE_MODAL"),
+      minHeight: 110,
     },
     landingFooter: {
       enabled: true,
@@ -49,7 +66,28 @@ export const AD_CONFIG = {
       devOnly: false,
       format: "auto",
       responsive: true,
-      slot: "0000000003",
+      slot: getPlacementSlot("VITE_ADSENSE_SLOT_LANDING_FOOTER"),
+      minHeight: 140,
+    },
+    toolSeoFooter: {
+      enabled: true,
+      provider: "adsense",
+      renderPlaceholderWhenDisabled: true,
+      devOnly: false,
+      format: "auto",
+      responsive: true,
+      slot: getPlacementSlot("VITE_ADSENSE_SLOT_TOOL_SEO_FOOTER"),
+      minHeight: 140,
+    },
+    supportFooter: {
+      enabled: true,
+      provider: "adsense",
+      renderPlaceholderWhenDisabled: true,
+      devOnly: false,
+      format: "auto",
+      responsive: true,
+      slot: getPlacementSlot("VITE_ADSENSE_SLOT_SUPPORT_FOOTER"),
+      minHeight: 140,
     },
   },
 };
@@ -78,10 +116,10 @@ export function isAdProviderReady(providerName, placement) {
 
   if (providerName === "adsense") {
     return (
+      AD_CONFIG.enabled &&
       Boolean(provider.client) &&
-      provider.client !== ADSENSE_CLIENT &&
-      Boolean(placementConfig.slot) &&
-      !placementConfig.slot.startsWith("000000000")
+      provider.client !== ADSENSE_CLIENT_PLACEHOLDER &&
+      Boolean(placementConfig.slot)
     );
   }
 

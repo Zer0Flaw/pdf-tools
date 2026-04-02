@@ -11,9 +11,9 @@ import { trackEvent } from "../utils/analytics";
 function renderPlaceholder(placement, providerName, provider) {
   return (
     <div
-      className="ad-slot"
+      className="ad-slot ad-slot-placeholder"
       role="complementary"
-      aria-label="Future sponsored placement"
+      aria-label="Reserved sponsored placement"
       data-placement={placement}
       data-provider={providerName}
     >
@@ -23,15 +23,29 @@ function renderPlaceholder(placement, providerName, provider) {
   );
 }
 
-export default function AdSlot({ placement, isVisible = true }) {
+export default function AdSlot({
+  placement,
+  isVisible = true,
+  className = "",
+  minHeight,
+  hideForPremium = false,
+  isPremium = false,
+  showPlaceholderWhenDisabled,
+}) {
   const adRef = useRef(null);
   const hasTrackedViewRef = useRef(false);
   const instanceId = useId();
   const placementConfig = getAdPlacementConfig(placement);
   const providerName = placementConfig?.provider || AD_CONFIG.defaultProvider;
   const provider = getAdProviderConfig(providerName);
+  const resolvedMinHeight = minHeight || placementConfig?.minHeight;
+  const shouldShowPlaceholder =
+    typeof showPlaceholderWhenDisabled === "boolean"
+      ? showPlaceholderWhenDisabled
+      : placementConfig?.renderPlaceholderWhenDisabled;
   const shouldRender =
     Boolean(isVisible) &&
+    !(hideForPremium && isPremium) &&
     shouldRenderAdPlacement(placement) &&
     Boolean(placementConfig) &&
     Boolean(provider);
@@ -66,36 +80,52 @@ export default function AdSlot({ placement, isVisible = true }) {
 
   if (!shouldRender) return null;
 
+  const slotClassName = ["ad-slot-shell", className].filter(Boolean).join(" ");
+  const slotStyle = resolvedMinHeight ? { minHeight: resolvedMinHeight } : undefined;
+
   if (!canRenderLiveAd) {
-    return placementConfig.renderPlaceholderWhenDisabled
-      ? renderPlaceholder(placement, providerName, provider)
-      : null;
+    if (!shouldShowPlaceholder) return null;
+
+    return (
+      <div className={slotClassName} style={slotStyle}>
+        {renderPlaceholder(placement, providerName, provider)}
+      </div>
+    );
   }
 
   if (providerName === "adsense") {
     return (
       <div
-        className="ad-slot ad-slot-live"
-        role="complementary"
-        aria-label="Sponsored placement"
-        data-placement={placement}
-        data-provider={providerName}
+        className={slotClassName}
+        style={slotStyle}
       >
-        <ins
-          key={`${placement}-${instanceId}`}
-          ref={adRef}
-          className="adsbygoogle"
-          style={{ display: "block" }}
-          data-ad-client={provider.client}
-          data-ad-slot={placementConfig.slot}
-          data-ad-format={placementConfig.format || "auto"}
-          data-full-width-responsive={
-            placementConfig.responsive ? "true" : "false"
-          }
-        />
+        <div
+          className="ad-slot ad-slot-live"
+          role="complementary"
+          aria-label="Sponsored placement"
+          data-placement={placement}
+          data-provider={providerName}
+        >
+          <ins
+            key={`${placement}-${instanceId}`}
+            ref={adRef}
+            className="adsbygoogle"
+            style={{ display: "block" }}
+            data-ad-client={provider.client}
+            data-ad-slot={placementConfig.slot}
+            data-ad-format={placementConfig.format || "auto"}
+            data-full-width-responsive={
+              placementConfig.responsive ? "true" : "false"
+            }
+          />
+        </div>
       </div>
     );
   }
 
-  return renderPlaceholder(placement, providerName, provider);
+  return (
+    <div className={slotClassName} style={slotStyle}>
+      {renderPlaceholder(placement, providerName, provider)}
+    </div>
+  );
 }

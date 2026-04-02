@@ -189,7 +189,7 @@ export default function LandingPage({ onStart, onOpenTool, onOpenSupportPage }) 
       <section className="landing-section">
         <div className="section-heading">
           <p className="section-eyebrow">Product design</p>
-          <h2>Built like a product, not a throwaway utility</h2>
+          <h2>Built like a dependable product, not a quick utility page</h2>
         </div>
 
         <div className="benefit-grid">
@@ -225,8 +225,9 @@ export default function LandingPage({ onStart, onOpenTool, onOpenSupportPage }) 
             <p className="section-eyebrow">Get started</p>
             <h2>Open the workspace and try the tools</h2>
             <p>
-              Start with the free tools now. Premium workflows and expanded
-              features are planned next.
+              Start with the free tools now. ProjectStack is designed to grow
+              with more capable workflows over time while keeping the current
+              experience simple.
             </p>
           </div>
 
