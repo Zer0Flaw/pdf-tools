@@ -1,96 +1,156 @@
 export const SUPPORT_PAGES = {
-  privacy: {
-    route: "/privacy-policy",
-    title: "Privacy Policy | ProjectStack",
+  about: {
+    route: "/about",
+    linkLabel: "About",
+    title: "About ProjectStack | ProjectStack",
     description:
-      "Learn how ProjectStack handles privacy, browser-based file processing, and lightweight product analytics.",
-    heading: "Privacy Policy",
+      "Learn what ProjectStack is, how it works in the browser, and why it focuses on practical privacy-respecting file tools.",
+    heading: "About ProjectStack",
     intro:
-      "ProjectStack is built so practical file work can stay on your device. This policy explains what is processed locally in the browser and what limited product information may be stored in your browser.",
+      "ProjectStack is a browser-based file utility platform built for practical work. The goal is simple: give people fast, privacy-respecting tools that feel trustworthy from the first click.",
     sections: [
       {
-        title: "Files stay in your browser",
+        title: "What ProjectStack is",
         paragraphs: [
-          "ProjectStack processes files locally in your browser whenever you use the core tools. Your PDFs and images are not uploaded to a ProjectStack server as part of normal tool use.",
-          "Because processing happens client-side, your files remain under your control on your device during merge, split, conversion, and compression workflows.",
+          "ProjectStack brings together useful file workflows like merging PDFs, splitting documents, converting images to PDF, and compressing images in one clean workspace.",
+          "It is designed as a real product, not a throwaway utility page, so consistency, clarity, and trust matter as much as the features themselves.",
         ],
       },
       {
-        title: "What ProjectStack may store locally",
+        title: "Built to run in your browser",
         paragraphs: [
-          "ProjectStack may store lightweight product state in your browser, such as the last tool you used, upgrade intent events, analytics event logs, and free-tier usage markers like the daily watermark-free export state.",
-          "This local storage is used to keep the app predictable and improve the product experience without requiring an account.",
+          "ProjectStack's current core tools process files locally in the browser. That means common workflows can be completed on your device without sending your files to a ProjectStack backend.",
+          "This browser-first model keeps the experience fast while respecting the fact that many file tasks involve private or sensitive documents.",
         ],
       },
       {
-        title: "Analytics and product signals",
+        title: "How the platform is supported",
         paragraphs: [
-          "ProjectStack may use lightweight analytics to understand page views and product usage patterns, such as tool selection, upgrade clicks, export success events, watermark-free usage, and ad views.",
-          "These signals are intended to improve the product and measure adoption, not to inspect the contents of your files.",
+          "ProjectStack is being built with a freemium model. Free tools help people get value quickly, while premium features and carefully placed ads are intended to support ongoing development over time.",
+          "The product direction is to keep core workflows useful and low-friction while building a business that can support better tools in the future.",
+        ],
+      },
+    ],
+  },
+  privacy: {
+    route: "/privacy",
+    linkLabel: "Privacy",
+    title: "Privacy Policy | ProjectStack",
+    description:
+      "Learn how ProjectStack handles browser-based file processing, local storage, and lightweight analytics.",
+    heading: "Privacy Policy",
+    intro:
+      "ProjectStack is built so practical file work can stay on your device. This page explains what the current browser-based product does, what limited data may be stored locally, and how lightweight site analytics may be used.",
+    sections: [
+      {
+        title: "Local browser-based processing",
+        paragraphs: [
+          "ProjectStack's current core tools process files locally in your browser. During normal use of merge, split, conversion, and compression workflows, your PDFs and images are not uploaded to a ProjectStack server for processing.",
+          "Because these workflows run client-side, your files stay under your control on your device while the tool is being used.",
         ],
       },
       {
-        title: "Changes and contact",
+        title: "Analytics and basic usage data",
         paragraphs: [
-          "ProjectStack may update this policy as the product evolves. Material changes should be reflected on this page before or when they go live.",
-          "If you have a privacy question about the product, use the Contact page for the current support channel.",
+          "ProjectStack may use lightweight analytics to understand site traffic and product usage patterns. This may include privacy-friendly website analytics available through the current Cloudflare Pages setup, as well as lightweight product event tracking used to understand which tools and flows are being used.",
+          "These analytics are intended to measure adoption, improve usability, and support product decisions. They are not used to inspect the contents of files processed in the browser.",
+        ],
+      },
+      {
+        title: "Local storage and similar browser persistence",
+        paragraphs: [
+          "ProjectStack may store lightweight product state in your browser, such as the last tool you used, the last view you opened, upgrade intent markers, analytics event logs, and free-tier usage markers like the daily watermark-free export state.",
+          "This local browser storage helps keep the app predictable and usable without requiring an account or a backend profile.",
+        ],
+      },
+      {
+        title: "Ads and future monetization",
+        paragraphs: [
+          "ProjectStack may use advertising placements to support the free product experience. Ad integrations may change over time as the product evolves.",
+          "If ad technology is enabled later, ProjectStack may work with advertising providers that use their own policies or browser technologies. This page will be updated so the wording stays aligned with the live product.",
+        ],
+      },
+      {
+        title: "Questions and updates",
+        paragraphs: [
+          "ProjectStack may update this policy as the service evolves. Material changes should be reflected here before or when they go live.",
+          <>
+            If you have a privacy question, contact{" "}
+            <a href="mailto:hello@projectstack.cc">hello@projectstack.cc</a>.
+          </>,
         ],
       },
     ],
   },
   terms: {
-    route: "/terms-of-use",
-    title: "Terms of Use | ProjectStack",
+    route: "/terms",
+    linkLabel: "Terms",
+    title: "Terms of Service | ProjectStack",
     description:
-      "Read the basic terms for using ProjectStack's browser-based file tools.",
-    heading: "Terms of Use",
+      "Read the basic terms for using ProjectStack's browser-based file tools and website.",
+    heading: "Terms of Service",
     intro:
-      "These terms describe the practical rules for using ProjectStack. They are meant to be clear, simple, and appropriate for a lightweight browser-based utility product.",
+      "These terms describe the practical rules for using ProjectStack. They are written to be simple, readable, and appropriate for a lightweight browser-based utility product.",
     sections: [
       {
-        title: "Using the service",
+        title: "Using ProjectStack",
         paragraphs: [
           "ProjectStack is provided as a browser-based file utility workspace. You may use the service for lawful personal or business purposes.",
           "You are responsible for the files you choose to process and for confirming that downloaded results meet your needs before sharing or relying on them.",
         ],
       },
       {
-        title: "Free and future premium usage",
+        title: "Use at your own risk",
         paragraphs: [
-          "Some tools include free-tier limits, watermarking, or promotional upgrade messaging. ProjectStack may expand premium capabilities over time without changing the basic client-side nature of the current tools.",
-          "Until paid features are introduced, any upgrade messaging is informational product UI and not a payment commitment.",
+          "ProjectStack is provided on an as-is basis. While the product is built to be useful and reliable, no guarantee is made that every workflow will be uninterrupted, error-free, or suitable for every purpose.",
+          "You should review processed files before using them in any personal, business, legal, or operational context.",
         ],
       },
       {
-        title: "Availability and changes",
+        title: "Availability and service changes",
         paragraphs: [
           "ProjectStack may update, improve, pause, or remove features at any time in order to maintain the product, improve reliability, or support future launches.",
-          "The service is provided on an as-is basis, and no guarantee is made that every workflow will be uninterrupted or error-free.",
+          "ProjectStack may also update these terms over time. Continued use of the service after changes are published means you accept the updated terms.",
         ],
       },
       {
-        title: "Reasonable use",
+        title: "Prohibited and unlawful use",
         paragraphs: [
-          "You may not use ProjectStack in a way that harms the service, attempts to bypass product limits, or violates applicable law.",
-          "If premium functionality is added later, additional commercial terms may apply and will be published clearly before launch.",
+          "You may not use ProjectStack in a way that harms the service, attempts to bypass product limits, interferes with other users, or violates applicable law.",
+          "You are responsible for ensuring that you have the right to process the files you use with the service and that your use does not infringe the rights of others.",
+        ],
+      },
+      {
+        title: "Ownership and contact",
+        paragraphs: [
+          "ProjectStack, its branding, site content, and product experience remain the property of the ProjectStack operator unless stated otherwise.",
+          <>
+            If you have a question about these terms, contact{" "}
+            <a href="mailto:hello@projectstack.cc">hello@projectstack.cc</a>.
+          </>,
         ],
       },
     ],
   },
   contact: {
     route: "/contact",
-    title: "Contact | ProjectStack",
+    linkLabel: "Contact",
+    title: "Contact ProjectStack | ProjectStack",
     description:
-      "Get in touch with ProjectStack for product questions, launch support, or feedback.",
-    heading: "Contact",
+      "Get in touch with ProjectStack for support, business questions, or product feedback.",
+    heading: "Contact ProjectStack",
     intro:
-      "ProjectStack is a lightweight product, so the contact experience is intentionally simple. Use this page for product questions, launch support, privacy questions, or feedback.",
+      "ProjectStack is a lightweight product, so the contact experience is intentionally simple. Use this page for support questions, privacy questions, business inquiries, or general feedback.",
     sections: [
       {
-        title: "Support and product questions",
+        title: "Get in touch",
         paragraphs: [
-          "For help with the product, privacy questions, launch support, or general feedback, use the published ProjectStack support channel for your release.",
-          "If you are preparing for launch, this page is the right place to publish your preferred support email, form link, or company contact details.",
+          <>
+            Email{" "}
+            <a href="mailto:hello@projectstack.cc">hello@projectstack.cc</a>{" "}
+            for support, product questions, business inquiries, or feedback.
+          </>,
+          "A simple email channel keeps the product easy to maintain while ProjectStack is still in its early launch stage.",
         ],
       },
       {
@@ -101,15 +161,16 @@ export const SUPPORT_PAGES = {
         ],
       },
       {
-        title: "Product trust note",
+        title: "Privacy and support note",
         paragraphs: [
-          "ProjectStack's core file tools run in the browser, which helps reduce the need to upload private files just to complete common utility tasks.",
+          "If you are reporting a privacy concern or product issue, avoid sending sensitive files unless it is truly necessary. In many cases, a short written description is enough because ProjectStack's core tools run locally in the browser.",
         ],
       },
     ],
   },
   faq: {
     route: "/faq",
+    linkLabel: "FAQ",
     title: "FAQ | ProjectStack",
     description:
       "Read common questions about ProjectStack, including browser-based processing, privacy, and free-tier usage.",
@@ -185,8 +246,8 @@ export default function SupportPage({
         {page.sections.map((section) => (
           <section key={section.title} className="support-card">
             <h2>{section.title}</h2>
-            {section.paragraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
+            {section.paragraphs.map((paragraph, index) => (
+              <p key={`${section.title}-${index}`}>{paragraph}</p>
             ))}
           </section>
         ))}
@@ -204,7 +265,7 @@ export default function SupportPage({
                 onOpenSupportPage?.(id);
               }}
             >
-              {supportPage.heading}
+              {supportPage.linkLabel || supportPage.heading}
             </a>
           ))}
         </div>

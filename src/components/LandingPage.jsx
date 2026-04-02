@@ -250,7 +250,7 @@ export default function LandingPage({ onStart, onOpenTool, onOpenSupportPage }) 
                 onOpenSupportPage?.(id);
               }}
             >
-              {page.heading}
+              {page.linkLabel || page.heading}
             </a>
           ))}
         </div>
