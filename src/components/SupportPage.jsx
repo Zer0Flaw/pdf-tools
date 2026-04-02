@@ -69,7 +69,7 @@ export const SUPPORT_PAGES = {
         title: "Ads and future monetization",
         paragraphs: [
           "ProjectStack includes ad scaffolding, but advertising may not be active at all times. If ads are enabled later, they are intended to support the free product experience without interrupting the core file workflow.",
-          "If third-party advertising technology is added in the future, providers may use their own cookies, policies, or browser technologies. This page will be updated so the disclosures remain aligned with the live product.",
+          "If third-party advertising technology is added in the future, third-party vendors including Google may use cookies, web beacons, or IP-based signals where applicable to serve, personalize, or measure ads. This page will be updated so the disclosures remain aligned with the live product.",
         ],
       },
       {
