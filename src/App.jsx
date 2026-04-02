@@ -7,6 +7,7 @@ import CompressTool from "./tools/CompressTool";
 import ImagesToPdfTool from "./tools/ImagesToPdfTool";
 import LandingPage from "./components/LandingPage";
 import SupportPage, { SUPPORT_PAGES } from "./components/SupportPage";
+import ToolSeoContent from "./components/ToolSeoContent";
 import { trackEvent } from "./utils/analytics";
 
 const APP_VIEW_KEY = "projectstack-active-view";
@@ -25,36 +26,36 @@ const TOOL_ROUTES = {
 
 const TOOL_METADATA = {
   merge: {
-    title: "Merge PDF | ProjectStack",
+    title: "Merge PDF Files Online | ProjectStack",
     description:
-      "Merge multiple PDFs into one clean document in your browser with ProjectStack.",
-    heading: "Merge PDF",
+      "Merge PDF files online in your browser with ProjectStack. Reorder pages, keep files local, and download one clean combined PDF.",
+    heading: "Merge PDF Files Online",
     intro:
-      "Combine multiple PDF files into one organized document in a clean browser-based workspace.",
+      "Combine multiple PDF files into one organized document with fast browser-based processing, local file handling, and simple order control before export.",
   },
   split: {
-    title: "Split PDF | ProjectStack",
+    title: "Split PDF Online | ProjectStack",
     description:
-      "Split a PDF into separate page files directly in your browser with ProjectStack.",
-    heading: "Split PDF",
+      "Split PDF files online in your browser with ProjectStack. Extract pages into smaller PDF downloads without a server upload for core processing.",
+    heading: "Split PDF Online",
     intro:
-      "Break a PDF into separate page files quickly while keeping the workflow simple and predictable.",
+      "Break a PDF into smaller page files in a clean browser-based workspace designed for quick extraction, simpler sharing, and predictable downloads.",
   },
   compress: {
-    title: "Compress Images | ProjectStack",
+    title: "Compress Images Online | ProjectStack",
     description:
-      "Compress JPG, PNG, and WEBP images locally in your browser for easier sharing with ProjectStack.",
-    heading: "Compress Images",
+      "Compress images online in your browser with ProjectStack. Reduce JPG, PNG, and WEBP file sizes for easier sharing and uploads.",
+    heading: "Compress Images Online",
     intro:
-      "Reduce image file size for easier sharing and storage with simple browser-based compression.",
+      "Reduce image file size for sharing, uploads, and storage with a simple browser-based compression workflow that keeps the core process on your device.",
   },
   images: {
-    title: "Convert Images to PDF | ProjectStack",
+    title: "Images to PDF Online | ProjectStack",
     description:
-      "Convert JPG and PNG images into a single PDF directly in your browser with ProjectStack.",
-    heading: "Convert Images to PDF",
+      "Convert images to PDF online in your browser with ProjectStack. Turn JPG and PNG files into one clean downloadable PDF.",
+    heading: "Images to PDF Online",
     intro:
-      "Turn JPG and PNG images into a single PDF in one clean workspace designed for practical file tasks.",
+      "Turn JPG and PNG images into one clean PDF with a browser-based workflow built for fast conversion, simple reordering, and privacy-respecting processing.",
   },
 };
 
@@ -215,6 +216,15 @@ export default function App() {
     setActiveView("support");
   }
 
+  function scrollToToolWorkspace() {
+    if (typeof document === "undefined") return;
+
+    document.getElementById("tool-workspace")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
   function renderActiveTool() {
     switch (activeTool) {
       case "split":
@@ -289,10 +299,27 @@ export default function App() {
             Files are processed locally in your browser, so they never need to
             leave your device.
           </p>
+          <div className="tool-hero-actions">
+            <button
+              type="button"
+              className="hero-primary-btn"
+              onClick={scrollToToolWorkspace}
+            >
+              Use {activeToolMetadata.heading.replace(" Online", "")}
+            </button>
+          </div>
         </div>
 
-        <ToolNav activeTool={activeTool} onChange={openWorkspace} />
-        {renderActiveTool()}
+        <div id="tool-workspace" className="tool-workspace">
+          <ToolNav activeTool={activeTool} onChange={openWorkspace} />
+          {renderActiveTool()}
+        </div>
+
+        <ToolSeoContent
+          tool={activeTool}
+          onOpenTool={openWorkspace}
+          onUseTool={scrollToToolWorkspace}
+        />
       </div>
     </div>
   );

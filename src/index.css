@@ -587,6 +587,10 @@ h1 {
   font-size: 1rem;
 }
 
+.tool-hero-actions {
+  margin-top: 18px;
+}
+
 .route-trust-note {
   display: inline-flex;
   align-items: center;
@@ -846,6 +850,41 @@ h1 {
 
 .support-card p + p {
   margin-top: 12px;
+}
+
+.tool-workspace {
+  scroll-margin-top: 18px;
+}
+
+.tool-seo-content {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.tool-seo-section {
+  gap: 18px;
+}
+
+.tool-seo-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.tool-seo-step-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tool-seo-step-number {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f46e5;
 }
 
 .hero-section {
@@ -1133,7 +1172,8 @@ h1 {
 
   .feature-grid,
   .benefit-grid,
-  .tool-preview-grid {
+  .tool-preview-grid,
+  .tool-seo-steps {
     grid-template-columns: 1fr;
   }
 
