@@ -211,7 +211,6 @@ export const SUPPORT_PAGES = {
 export default function SupportPage({
   pageId,
   onBackHome,
-  onOpenSupportPage,
 }) {
   const page = SUPPORT_PAGES[pageId];
 
@@ -260,24 +259,6 @@ export default function SupportPage({
         className="support-page-ad"
         minHeight={140}
       />
-
-      <footer className="site-footer">
-        <div className="site-footer-links">
-          {Object.entries(SUPPORT_PAGES).map(([id, supportPage]) => (
-            <a
-              key={supportPage.route}
-              href={supportPage.route}
-              className="site-footer-link"
-              onClick={(event) => {
-                event.preventDefault();
-                onOpenSupportPage?.(id);
-              }}
-            >
-              {supportPage.linkLabel || supportPage.heading}
-            </a>
-          ))}
-        </div>
-      </footer>
     </div>
   );
 }

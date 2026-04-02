@@ -8,6 +8,8 @@ import ImagesToPdfTool from "./tools/ImagesToPdfTool";
 import LandingPage from "./components/LandingPage";
 import SupportPage, { SUPPORT_PAGES } from "./components/SupportPage";
 import ToolSeoContent from "./components/ToolSeoContent";
+import SiteFooter from "./components/SiteFooter";
+import ScrollToTop from "./components/ScrollToTop";
 import { trackEvent } from "./utils/analytics";
 
 const APP_VIEW_KEY = "projectstack-active-view";
@@ -239,88 +241,105 @@ export default function App() {
     }
   }
 
+  const currentPath =
+    activeView === "workspace"
+      ? TOOL_ROUTES[activeTool]
+      : activeView === "support"
+        ? SUPPORT_PAGES[activeSupportPage].route
+        : "/";
+
   if (activeView === "home") {
     return (
-      <div className="app-shell">
-        <div className="app-card app-card-home">
-          <LandingPage
-            onStart={() => openWorkspace("merge")}
-            onOpenTool={openWorkspace}
-            onOpenSupportPage={openSupportPage}
-          />
+      <>
+        <ScrollToTop pathname={currentPath} />
+        <div className="app-shell">
+          <div className="app-card app-card-home">
+            <LandingPage
+              onStart={() => openWorkspace("merge")}
+              onOpenTool={openWorkspace}
+            />
+            <SiteFooter onOpenSupportPage={openSupportPage} />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (activeView === "support") {
     return (
-      <div className="app-shell">
-        <div className="app-card app-card-home">
-          <SupportPage
-            pageId={activeSupportPage}
-            onBackHome={() => setActiveView("home")}
-            onOpenSupportPage={openSupportPage}
-          />
+      <>
+        <ScrollToTop pathname={currentPath} />
+        <div className="app-shell">
+          <div className="app-card app-card-home">
+            <SupportPage
+              pageId={activeSupportPage}
+              onBackHome={() => setActiveView("home")}
+            />
+            <SiteFooter onOpenSupportPage={openSupportPage} />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   const activeToolMetadata = TOOL_METADATA[activeTool];
 
   return (
-    <div className="app-shell">
-      <div className="app-card">
-        <div className="brand-bar workspace-brand-bar">
-          <button
-            type="button"
-            className="back-home-btn"
-            onClick={() => setActiveView("home")}
-          >
-            Back to Home
-          </button>
-
-          <div className="brand-lockup">
-            <img
-              className="brand-mark"
-              src="/branding/projectstack-mark.png"
-              alt=""
-              aria-hidden="true"
-            />
-            <div className="brand-title">ProjectStack</div>
-          </div>
-        </div>
-
-        <div className="route-intro">
-          <h1>{activeToolMetadata.heading}</h1>
-          <p>{activeToolMetadata.intro}</p>
-          <p className="route-trust-note">
-            Files are processed locally in your browser, so they never need to
-            leave your device.
-          </p>
-          <div className="tool-hero-actions">
+    <>
+      <ScrollToTop pathname={currentPath} />
+      <div className="app-shell">
+        <div className="app-card">
+          <div className="brand-bar workspace-brand-bar">
             <button
               type="button"
-              className="hero-primary-btn"
-              onClick={scrollToToolWorkspace}
+              className="back-home-btn"
+              onClick={() => setActiveView("home")}
             >
-              Use {activeToolMetadata.heading.replace(" Online", "")}
+              Back to Home
             </button>
+
+            <div className="brand-lockup">
+              <img
+                className="brand-mark"
+                src="/branding/projectstack-mark.png"
+                alt=""
+                aria-hidden="true"
+              />
+              <div className="brand-title">ProjectStack</div>
+            </div>
           </div>
-        </div>
 
-        <div id="tool-workspace" className="tool-workspace">
-          <ToolNav activeTool={activeTool} onChange={openWorkspace} />
-          {renderActiveTool()}
-        </div>
+          <div className="route-intro">
+            <h1>{activeToolMetadata.heading}</h1>
+            <p>{activeToolMetadata.intro}</p>
+            <p className="route-trust-note">
+              Files are processed locally in your browser, so they never need to
+              leave your device.
+            </p>
+            <div className="tool-hero-actions">
+              <button
+                type="button"
+                className="hero-primary-btn"
+                onClick={scrollToToolWorkspace}
+              >
+                Use {activeToolMetadata.heading.replace(" Online", "")}
+              </button>
+            </div>
+          </div>
 
-        <ToolSeoContent
-          tool={activeTool}
-          onOpenTool={openWorkspace}
-          onUseTool={scrollToToolWorkspace}
-        />
+          <div id="tool-workspace" className="tool-workspace">
+            <ToolNav activeTool={activeTool} onChange={openWorkspace} />
+            {renderActiveTool()}
+          </div>
+
+          <ToolSeoContent
+            tool={activeTool}
+            onOpenTool={openWorkspace}
+            onUseTool={scrollToToolWorkspace}
+          />
+          <SiteFooter onOpenSupportPage={openSupportPage} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
