@@ -7,6 +7,7 @@ const TOOL_GROUPS = [
     tools: [
       { id: "merge", label: "Merge PDF" },
       { id: "split", label: "Split PDF" },
+      { id: "rotate", label: "Rotate PDF Pages" },
     ],
   },
   {

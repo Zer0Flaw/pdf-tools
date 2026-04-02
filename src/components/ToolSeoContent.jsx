@@ -36,10 +36,50 @@ const TOOL_SEO_CONTENT = {
           "It works well for combining invoices, forms, reference pages, or other small PDF sets into one cleaner document.",
       },
     ],
-    relatedTools: ["split", "images", "compress"],
+    relatedTools: ["rotate", "split", "images"],
     bottomCtaTitle: "Ready to combine your PDFs?",
     bottomCtaCopy:
       "Open the merge workflow and export one organized PDF without leaving the browser.",
+  },
+  rotate: {
+    benefits: [
+      "Rotate individual PDF pages in a browser-based workflow that keeps the document on your device during normal use.",
+      "Useful when scans, phone captures, or mixed-orientation PDFs open with pages turned the wrong way.",
+      "Select specific pages to rotate together or adjust one page at a time before exporting the corrected document.",
+      "The workflow stays practical: upload one PDF, review page previews, rotate what needs fixing, and download the result.",
+      "A good fit when you need a fast orientation fix without opening heavier PDF editing software.",
+    ],
+    steps: [
+      "Upload the PDF you want to correct.",
+      "Select pages and rotate them left or right in 90-degree steps.",
+      "Export a new PDF with the updated page orientation.",
+    ],
+    faqs: [
+      {
+        question: "Can I rotate just one page instead of the whole PDF?",
+        answer:
+          "Yes. ProjectStack lets you rotate individual pages with per-page controls or select several pages and rotate them together.",
+      },
+      {
+        question: "Are my PDFs uploaded during rotation?",
+        answer:
+          "No. The current Rotate PDF Pages workflow processes the file locally in your browser during normal use.",
+      },
+      {
+        question: "What rotation options are available?",
+        answer:
+          "Pages can be rotated clockwise or counterclockwise in 90-degree increments before you export the updated PDF.",
+      },
+      {
+        question: "When is this tool most useful?",
+        answer:
+          "It works well for scanned documents, sideways phone captures, and PDFs that mix portrait and landscape pages.",
+      },
+    ],
+    relatedTools: ["merge", "split", "pdfToImage"],
+    bottomCtaTitle: "Need to fix PDF page orientation?",
+    bottomCtaCopy:
+      "Open the rotation workflow and export a corrected PDF directly from your browser.",
   },
   split: {
     benefits: [
@@ -76,7 +116,7 @@ const TOOL_SEO_CONTENT = {
           "It is handy when you need to extract a few pages from a larger file, share smaller sections, or separate a document for review.",
       },
     ],
-    relatedTools: ["merge", "images", "compress"],
+    relatedTools: ["rotate", "merge", "pdfToImage"],
     bottomCtaTitle: "Need smaller PDF files fast?",
     bottomCtaCopy:
       "Start the split tool and turn one document into smaller browser-processed downloads.",
@@ -116,7 +156,7 @@ const TOOL_SEO_CONTENT = {
           "It is useful when you want to collect screenshots, scans, receipts, or photos into one PDF that is easier to send or archive.",
       },
     ],
-    relatedTools: ["pdfToImage", "merge", "compress"],
+    relatedTools: ["pdfToImage", "rotate", "compress"],
     bottomCtaTitle: "Turn your images into one PDF",
     bottomCtaCopy:
       "Launch the conversion workflow and build a clean PDF from your images directly in the browser.",
@@ -156,7 +196,7 @@ const TOOL_SEO_CONTENT = {
           "It is useful when you need page thumbnails, shareable image versions of documents, or visual assets from a PDF without opening design software.",
       },
     ],
-    relatedTools: ["images", "split", "merge"],
+    relatedTools: ["images", "rotate", "split"],
     bottomCtaTitle: "Need PNG images from a PDF?",
     bottomCtaCopy:
       "Open the PDF to Image workflow and generate page images directly in your browser.",
@@ -196,7 +236,7 @@ const TOOL_SEO_CONTENT = {
           "It is a good fit when image files are too large for forms, email attachments, or lightweight content publishing.",
       },
     ],
-    relatedTools: ["images", "pdfToImage", "merge"],
+    relatedTools: ["images", "pdfToImage", "rotate"],
     bottomCtaTitle: "Need smaller image files?",
     bottomCtaCopy:
       "Open the compression tool and create lighter image downloads without adding extra workflow friction.",
@@ -205,6 +245,7 @@ const TOOL_SEO_CONTENT = {
 
 const TOOL_LABELS = {
   merge: "Merge PDF",
+  rotate: "Rotate PDF Pages",
   split: "Split PDF",
   images: "Images to PDF",
   pdfToImage: "PDF to Image",
@@ -213,6 +254,7 @@ const TOOL_LABELS = {
 
 const TOOL_HELPERS = {
   merge: "Combine multiple PDFs into one finished document.",
+  rotate: "Fix page orientation and export a corrected PDF.",
   split: "Break one PDF into smaller page-based files.",
   images: "Turn JPG and PNG files into one PDF.",
   pdfToImage: "Export each PDF page as a PNG image.",

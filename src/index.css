@@ -1022,6 +1022,112 @@ h1 {
   gap: 16px;
 }
 
+.rotate-toolbar {
+  margin-top: 18px;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fafafa 0%, #f8fafc 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rotate-toolbar-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rotate-toolbar-copy strong {
+  color: #111827;
+}
+
+.rotate-toolbar-copy span {
+  color: #4b5563;
+  font-size: 0.92rem;
+}
+
+.rotate-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.rotate-page-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.rotate-page-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: #fafafa;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rotate-page-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #374151;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.rotate-page-preview-shell {
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  min-height: 220px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.rotate-page-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 240px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.18s ease;
+}
+
+.rotate-page-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rotate-page-meta h3 {
+  margin: 0;
+  color: #111827;
+}
+
+.rotate-page-meta p {
+  margin: 6px 0 0;
+  color: #4b5563;
+}
+
+.rotate-page-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .tool-seo-content {
   margin-top: 36px;
   display: flex;
@@ -1398,7 +1504,8 @@ h1 {
   .tool-preview-grid,
   .tool-seo-steps,
   .pdf-image-grid,
-  .tool-pair-grid {
+  .tool-pair-grid,
+  .rotate-page-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1406,7 +1513,9 @@ h1 {
   .workspace-brand-bar,
   .file-selection-card,
   .pdf-image-results-header,
-  .pdf-image-card-body {
+  .pdf-image-card-body,
+  .rotate-toolbar,
+  .rotate-page-meta {
     flex-direction: column;
     align-items: flex-start;
   }

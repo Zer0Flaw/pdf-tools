@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./index.css";
 import ToolNav from "./components/ToolNav";
 import MergeTool from "./tools/MergeTool";
+import RotatePdfTool from "./tools/RotatePdfTool";
 import SplitTool from "./tools/SplitTool";
 import CompressTool from "./tools/CompressTool";
 import ImagesToPdfTool from "./tools/ImagesToPdfTool";
@@ -16,12 +17,13 @@ import { trackEvent } from "./utils/analytics";
 const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
 const VALID_VIEWS = ["home", "workspace", "support"];
-const VALID_TOOLS = ["merge", "split", "compress", "images", "pdfToImage"];
+const VALID_TOOLS = ["merge", "rotate", "split", "compress", "images", "pdfToImage"];
 const HOME_TITLE = "ProjectStack | Browser-Based PDF and Image Tools";
 const HOME_DESCRIPTION =
-  "Use browser-based PDF and image tools with ProjectStack. Merge PDFs, split files, convert images to PDF, convert PDFs to images, and compress images in one clean workspace.";
+  "Use browser-based PDF and image tools with ProjectStack. Merge PDFs, rotate pages, split files, convert images to PDF, convert PDFs to images, and compress images in one clean workspace.";
 const TOOL_ROUTES = {
   merge: "/merge-pdf",
+  rotate: "/rotate-pdf-pages",
   split: "/split-pdf",
   images: "/images-to-pdf",
   pdfToImage: "/pdf-to-image",
@@ -36,6 +38,14 @@ const TOOL_METADATA = {
     heading: "Merge PDF Files Online",
     intro:
       "Combine multiple PDF files into one organized document with fast browser-based processing, local file handling, and simple order control before export.",
+  },
+  rotate: {
+    title: "Rotate PDF Pages Online | ProjectStack",
+    description:
+      "Rotate PDF pages online in your browser with ProjectStack. Adjust page orientation, keep files local, and export a corrected PDF.",
+    heading: "Rotate PDF Pages Online",
+    intro:
+      "Rotate individual PDF pages in a browser-based workspace built for quick page fixes, simple orientation control, and privacy-respecting local processing.",
   },
   split: {
     title: "Split PDF Files Online | ProjectStack",
@@ -239,6 +249,8 @@ export default function App() {
 
   function renderActiveTool() {
     switch (activeTool) {
+      case "rotate":
+        return <RotatePdfTool />;
       case "split":
         return <SplitTool />;
       case "compress":

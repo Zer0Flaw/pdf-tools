@@ -10,6 +10,13 @@ const TOOL_PREVIEWS = [
     cta: "Open Merge PDF",
   },
   {
+    id: "rotate",
+    route: "/rotate-pdf-pages",
+    title: "Rotate PDF Pages",
+    description: "Fix page orientation and export a corrected PDF.",
+    cta: "Open Rotate PDF Pages",
+  },
+  {
     id: "split",
     route: "/split-pdf",
     title: "Split PDF",
@@ -62,8 +69,9 @@ export default function LandingPage({ onStart, onOpenTool }) {
           </p>
           <h1 className="hero-title">Simple file tools for practical work</h1>
           <p className="hero-subtitle">
-            Merge PDFs, split files, convert images to PDF, convert PDFs to
-            images, and compress images in one clean workspace.
+            Merge PDFs, rotate pages, split files, convert images to PDF,
+            convert PDFs to images, and compress images in one clean
+            workspace.
           </p>
 
           <div className="hero-actions">
@@ -145,6 +153,11 @@ export default function LandingPage({ onStart, onOpenTool }) {
           <div className="feature-card">
             <h3>Merge PDF</h3>
             <p>Combine multiple PDFs into a single finished document.</p>
+          </div>
+
+          <div className="feature-card">
+            <h3>Rotate PDF Pages</h3>
+            <p>Fix page orientation and export a corrected PDF.</p>
           </div>
 
           <div className="feature-card">

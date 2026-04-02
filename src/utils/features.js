@@ -19,6 +19,21 @@ export const FEATURE_GATES = {
     upgradeReason: UPGRADE_REASONS.MERGE_LIMITS,
     watermarkUpgradeReason: UPGRADE_REASONS.MERGE_WATERMARK,
   },
+  rotate: {
+    id: "rotate",
+    maxFiles: 1,
+    maxFileSize: 5 * MB,
+    premiumFlags: {
+      unlimitedMerges: false,
+      unlimitedImages: false,
+      watermarkFree: false,
+      largerFiles: true,
+    },
+    privacyMessage: "Files are processed locally in your browser.",
+    processingMessage: "Rotating locally in your browser...",
+    adPlacement: "postExport",
+    upgradeReason: UPGRADE_REASONS.ROTATE_LIMITS,
+  },
   split: {
     id: "split",
     maxFiles: 1,
