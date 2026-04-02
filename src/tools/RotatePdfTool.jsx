@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { degrees, PDFDocument } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import AdSlot from "../components/AdSlot";
 import { getBaseFileName } from "../utils/fileNaming";
@@ -7,6 +6,8 @@ import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
+import { rotatePdfPages } from "../utils/pdfPageOperations";
+import { validatePdfFile } from "../utils/pdfValidation";
 
 const ROTATE_FEATURE = getFeatureGate("rotate");
 const MAX_FILE_SIZE = ROTATE_FEATURE.maxFileSize;
@@ -64,15 +65,14 @@ export default function RotatePdfTool() {
   }
 
   function validatePdf(selectedFile) {
-    if (
-      selectedFile.type !== "application/pdf" &&
-      !selectedFile.name.toLowerCase().endsWith(".pdf")
-    ) {
-      setMessage({ type: "error", text: "Only PDF files are supported." });
+    const result = validatePdfFile(selectedFile, MAX_FILE_SIZE, isPremium);
+
+    if (!result.isValid && result.reason === "file_type") {
+      setMessage({ type: "error", text: result.message });
       return false;
     }
 
-    if (!isPremium && selectedFile.size > MAX_FILE_SIZE) {
+    if (!result.isValid && result.reason === "file_size_limit") {
       trackEvent("free_limit_encountered", {
         tool: "rotate",
         file_count: 1,
@@ -219,14 +219,7 @@ export default function RotatePdfTool() {
 
     try {
       const bytes = await file.arrayBuffer();
-      const pdf = await PDFDocument.load(bytes);
-
-      pages.forEach((pageState, index) => {
-        const page = pdf.getPage(index);
-        page.setRotation(degrees(pageState.rotation));
-      });
-
-      const rotatedBytes = await pdf.save();
+      const rotatedBytes = await rotatePdfPages(bytes, pages);
       const blob = new Blob([rotatedBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");

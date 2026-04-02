@@ -7,7 +7,6 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { PDFDocument } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import AdSlot from "../components/AdSlot";
 import { getBaseFileName } from "../utils/fileNaming";
@@ -15,6 +14,8 @@ import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
+import { reorderPdfPages } from "../utils/pdfPageOperations";
+import { validatePdfFile } from "../utils/pdfValidation";
 
 const REORDER_FEATURE = getFeatureGate("reorder");
 const MAX_FILE_SIZE = REORDER_FEATURE.maxFileSize;
@@ -119,15 +120,14 @@ export default function ReorderPdfPagesTool() {
   }
 
   function validatePdf(selectedFile) {
-    if (
-      selectedFile.type !== "application/pdf" &&
-      !selectedFile.name.toLowerCase().endsWith(".pdf")
-    ) {
-      setMessage({ type: "error", text: "Only PDF files are supported." });
+    const result = validatePdfFile(selectedFile, MAX_FILE_SIZE, isPremium);
+
+    if (!result.isValid && result.reason === "file_type") {
+      setMessage({ type: "error", text: result.message });
       return false;
     }
 
-    if (!isPremium && selectedFile.size > MAX_FILE_SIZE) {
+    if (!result.isValid && result.reason === "file_size_limit") {
       trackEvent("free_limit_encountered", {
         tool: "reorder",
         file_count: 1,
@@ -250,14 +250,10 @@ export default function ReorderPdfPagesTool() {
 
     try {
       const bytes = await file.arrayBuffer();
-      const sourcePdf = await PDFDocument.load(bytes);
-      const nextPdf = await PDFDocument.create();
-      const orderedIndexes = pages.map((page) => page.pageNumber - 1);
-      const copiedPages = await nextPdf.copyPages(sourcePdf, orderedIndexes);
-
-      copiedPages.forEach((page) => nextPdf.addPage(page));
-
-      const pdfBytes = await nextPdf.save();
+      const pdfBytes = await reorderPdfPages(
+        bytes,
+        pages.map((page) => page.pageNumber),
+      );
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");

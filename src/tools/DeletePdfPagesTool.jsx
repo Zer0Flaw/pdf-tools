@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { PDFDocument } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import AdSlot from "../components/AdSlot";
 import { getBaseFileName } from "../utils/fileNaming";
@@ -7,6 +6,8 @@ import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
+import { deletePdfPages } from "../utils/pdfPageOperations";
+import { validatePdfFile } from "../utils/pdfValidation";
 
 const DELETE_FEATURE = getFeatureGate("delete");
 const MAX_FILE_SIZE = DELETE_FEATURE.maxFileSize;
@@ -59,15 +60,14 @@ export default function DeletePdfPagesTool() {
   }
 
   function validatePdf(selectedFile) {
-    if (
-      selectedFile.type !== "application/pdf" &&
-      !selectedFile.name.toLowerCase().endsWith(".pdf")
-    ) {
-      setMessage({ type: "error", text: "Only PDF files are supported." });
+    const result = validatePdfFile(selectedFile, MAX_FILE_SIZE, isPremium);
+
+    if (!result.isValid && result.reason === "file_type") {
+      setMessage({ type: "error", text: result.message });
       return false;
     }
 
-    if (!isPremium && selectedFile.size > MAX_FILE_SIZE) {
+    if (!result.isValid && result.reason === "file_size_limit") {
       trackEvent("free_limit_encountered", {
         tool: "delete",
         file_count: 1,
@@ -238,14 +238,10 @@ export default function DeletePdfPagesTool() {
 
     try {
       const bytes = await file.arrayBuffer();
-      const sourcePdf = await PDFDocument.load(bytes);
-      const nextPdf = await PDFDocument.create();
-      const keepIndexes = keptPages.map((page) => page.pageNumber - 1);
-      const copiedPages = await nextPdf.copyPages(sourcePdf, keepIndexes);
-
-      copiedPages.forEach((page) => nextPdf.addPage(page));
-
-      const pdfBytes = await nextPdf.save();
+      const pdfBytes = await deletePdfPages(
+        bytes,
+        keptPages.map((page) => page.pageNumber),
+      );
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");

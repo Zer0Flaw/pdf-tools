@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { PDFDocument } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import AdSlot from "../components/AdSlot";
 import { getBaseFileName } from "../utils/fileNaming";
@@ -7,6 +6,8 @@ import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
+import { extractPdfPages } from "../utils/pdfPageOperations";
+import { validatePdfFile } from "../utils/pdfValidation";
 
 const EXTRACT_FEATURE = getFeatureGate("extract");
 const MAX_FILE_SIZE = EXTRACT_FEATURE.maxFileSize;
@@ -59,15 +60,14 @@ export default function ExtractPdfPagesTool() {
   }
 
   function validatePdf(selectedFile) {
-    if (
-      selectedFile.type !== "application/pdf" &&
-      !selectedFile.name.toLowerCase().endsWith(".pdf")
-    ) {
-      setMessage({ type: "error", text: "Only PDF files are supported." });
+    const result = validatePdfFile(selectedFile, MAX_FILE_SIZE, isPremium);
+
+    if (!result.isValid && result.reason === "file_type") {
+      setMessage({ type: "error", text: result.message });
       return false;
     }
 
-    if (!isPremium && selectedFile.size > MAX_FILE_SIZE) {
+    if (!result.isValid && result.reason === "file_size_limit") {
       trackEvent("free_limit_encountered", {
         tool: "extract",
         file_count: 1,
@@ -188,14 +188,7 @@ export default function ExtractPdfPagesTool() {
 
     try {
       const bytes = await file.arrayBuffer();
-      const sourcePdf = await PDFDocument.load(bytes);
-      const nextPdf = await PDFDocument.create();
-      const pageIndexes = selectedPages.map((pageNumber) => pageNumber - 1);
-      const copiedPages = await nextPdf.copyPages(sourcePdf, pageIndexes);
-
-      copiedPages.forEach((page) => nextPdf.addPage(page));
-
-      const pdfBytes = await nextPdf.save();
+      const pdfBytes = await extractPdfPages(bytes, selectedPages);
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
