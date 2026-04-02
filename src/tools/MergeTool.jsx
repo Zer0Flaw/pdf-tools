@@ -140,6 +140,12 @@ export default function MergeTool() {
     );
 
     if (!acceptedFiles.length && oversizedFiles.length > 0) {
+      trackEvent("free_limit_encountered", {
+        tool: "merge",
+        file_count: oversizedFiles.length,
+        input_type: "pdf",
+        gated_feature: "file_size_limit",
+      });
       setMessage({
         type: "error",
         text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
@@ -147,38 +153,60 @@ export default function MergeTool() {
       return;
     }
 
-    setFiles((prev) => {
-      const remainingSlots = isPremium
-        ? Infinity
-        : MAX_FREE_FILES - prev.length;
-      const limitedAcceptedFiles = acceptedFiles.slice(0, remainingSlots);
-      const combined = [...prev, ...limitedAcceptedFiles];
+    const remainingSlots = isPremium ? Infinity : MAX_FREE_FILES - files.length;
+    const limitedAcceptedFiles = acceptedFiles.slice(0, remainingSlots);
+    const rejectedForCount = Math.max(acceptedFiles.length - limitedAcceptedFiles.length, 0);
 
-      if (
-        !isPremium &&
-        oversizedFiles.length > 0 &&
-        acceptedFiles.length > remainingSlots
-      ) {
-        setMessage({
-          type: "error",
-          text: `Some files were skipped because of the ${FILE_SIZE_LIMIT_LABEL} limit and free plan file limit.`,
-        });
-      } else if (!isPremium && oversizedFiles.length > 0) {
-        setMessage({
-          type: "error",
-          text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
-        });
-      } else if (!isPremium && acceptedFiles.length > remainingSlots) {
-        setMessage({
-          type: "error",
-          text: `Free plan allows up to ${MAX_FREE_FILES} PDFs.`,
-        });
-      } else {
-        setMessage(null);
-      }
+    if (limitedAcceptedFiles.length > 0) {
+      trackEvent("file_uploaded", {
+        tool: "merge",
+        file_count: limitedAcceptedFiles.length,
+        input_type: "pdf",
+      });
+    }
 
-      return combined;
-    });
+    if (
+      !isPremium &&
+      oversizedFiles.length > 0 &&
+      acceptedFiles.length > remainingSlots
+    ) {
+      trackEvent("free_limit_encountered", {
+        tool: "merge",
+        file_count: oversizedFiles.length + rejectedForCount,
+        input_type: "pdf",
+        gated_feature: "file_size_and_count_limit",
+      });
+      setMessage({
+        type: "error",
+        text: `Some files were skipped because of the ${FILE_SIZE_LIMIT_LABEL} limit and free plan file limit.`,
+      });
+    } else if (!isPremium && oversizedFiles.length > 0) {
+      trackEvent("free_limit_encountered", {
+        tool: "merge",
+        file_count: oversizedFiles.length,
+        input_type: "pdf",
+        gated_feature: "file_size_limit",
+      });
+      setMessage({
+        type: "error",
+        text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
+      });
+    } else if (!isPremium && acceptedFiles.length > remainingSlots) {
+      trackEvent("free_limit_encountered", {
+        tool: "merge",
+        file_count: rejectedForCount,
+        input_type: "pdf",
+        gated_feature: "file_count_limit",
+      });
+      setMessage({
+        type: "error",
+        text: `Free plan allows up to ${MAX_FREE_FILES} PDFs.`,
+      });
+    } else {
+      setMessage(null);
+    }
+
+    setFiles((prev) => [...prev, ...limitedAcceptedFiles]);
   }
 
   function handleFileChange(e) {
@@ -205,9 +233,18 @@ export default function MergeTool() {
   }
 
   function removeFile(indexToRemove) {
+    const removedFile = files[indexToRemove];
     setFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
     setShowExportAd(false);
     setMessage(null);
+
+    if (removedFile) {
+      trackEvent("file_removed", {
+        tool: "merge",
+        file_count: 1,
+        input_type: "pdf",
+      });
+    }
   }
 
   function moveFileUp(index) {
@@ -217,6 +254,11 @@ export default function MergeTool() {
       const arr = [...prev];
       [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
       return arr;
+    });
+    trackEvent("files_reordered", {
+      tool: "merge",
+      file_count: files.length,
+      input_type: "pdf",
     });
   }
 
@@ -228,12 +270,25 @@ export default function MergeTool() {
       [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
       return arr;
     });
+    if (index !== files.length - 1) {
+      trackEvent("files_reordered", {
+        tool: "merge",
+        file_count: files.length,
+        input_type: "pdf",
+      });
+    }
   }
 
   function handleDragEnd(event) {
     const { active, over } = event;
 
     if (!over || active.id === over.id) return;
+
+    trackEvent("files_reordered", {
+      tool: "merge",
+      file_count: files.length,
+      input_type: "pdf",
+    });
 
     setFiles((prev) => {
       const oldIndex = prev.findIndex(
@@ -265,6 +320,12 @@ export default function MergeTool() {
   async function mergePdfs() {
     if (!files.length || isMerging) return;
 
+    trackEvent("process_started", {
+      tool: "merge",
+      file_count: files.length,
+      input_type: "pdf",
+      output_type: "pdf",
+    });
     setIsMerging(true);
     setShowExportAd(false);
     setMessage(null);
@@ -306,17 +367,26 @@ export default function MergeTool() {
         consumeDailyWatermarkRemoval();
         setUseFreeWatermarkRemoval(false);
         setCanRemoveWatermarkToday(false);
-        trackEvent("watermark_removed", {
+        trackEvent("watermark_free_export_used", {
           tool: "merge",
+          output_type: "pdf",
         });
       }
 
       setShowExportAd(true);
-      trackEvent("export_success", {
+      trackEvent("process_completed", {
         tool: "merge",
         file_count: files.length,
+        input_type: "pdf",
+        output_type: "pdf",
         size_bytes: blob.size,
         watermark_free: skipWatermark,
+      });
+      trackEvent("export_downloaded", {
+        tool: "merge",
+        file_count: files.length,
+        output_type: "pdf",
+        size_bytes: blob.size,
       });
       setMessage({
         type: "success",

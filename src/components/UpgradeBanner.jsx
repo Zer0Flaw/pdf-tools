@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trackUpgradeIntent } from "../utils/upgradeReasons";
 import AdSlot from "./AdSlot";
+import { trackEvent } from "../utils/analytics";
 
 export default function UpgradeBanner({
   title = "Unlock Pro",
@@ -14,6 +15,16 @@ export default function UpgradeBanner({
   secondaryHint = "",
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const hasTrackedViewRef = useRef(false);
+
+  useEffect(() => {
+    if (hasTrackedViewRef.current) return;
+
+    hasTrackedViewRef.current = true;
+    trackEvent("upgrade_banner_viewed", {
+      gated_feature: upgradeReason || undefined,
+    });
+  }, [upgradeReason]);
 
   function handleUpgradeClick() {
     trackUpgradeIntent(upgradeReason);

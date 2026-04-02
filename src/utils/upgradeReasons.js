@@ -29,5 +29,8 @@ export function trackUpgradeIntent(reason, source = "upgrade-banner") {
     // Ignore storage issues and keep the app usable.
   }
 
-  trackEvent("upgrade_clicked", { reason, source });
+  trackEvent("upgrade_cta_clicked", {
+    gated_feature: reason,
+    source,
+  });
 }

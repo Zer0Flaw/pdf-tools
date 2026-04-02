@@ -40,6 +40,12 @@ export default function SplitTool() {
     }
 
     if (!isPremium && selected.size > MAX_FILE_SIZE) {
+      trackEvent("free_limit_encountered", {
+        tool: "split",
+        file_count: 1,
+        input_type: "pdf",
+        gated_feature: "file_size_limit",
+      });
       setMessage({
         type: "error",
         text: `File exceeds ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
@@ -49,6 +55,11 @@ export default function SplitTool() {
 
     setFile(selected);
     setMessage(null);
+    trackEvent("file_uploaded", {
+      tool: "split",
+      file_count: 1,
+      input_type: "pdf",
+    });
   }
 
   function getSplitFileName(selectedFile, pageNumber) {
@@ -58,6 +69,12 @@ export default function SplitTool() {
   async function splitPdf() {
     if (!file || isProcessing) return;
 
+    trackEvent("process_started", {
+      tool: "split",
+      file_count: 1,
+      input_type: "pdf",
+      output_type: "pdf",
+    });
     setIsProcessing(true);
     setShowExportAd(false);
     setMessage(null);
@@ -87,9 +104,17 @@ export default function SplitTool() {
       }
 
       setShowExportAd(true);
-      trackEvent("export_success", {
+      trackEvent("process_completed", {
         tool: "split",
         file_count: pageCount,
+        input_type: "pdf",
+        output_type: "pdf",
+        size_bytes: totalBytes,
+      });
+      trackEvent("export_downloaded", {
+        tool: "split",
+        file_count: pageCount,
+        output_type: "pdf",
         size_bytes: totalBytes,
       });
       setMessage({

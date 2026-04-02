@@ -200,7 +200,7 @@ export default function App() {
   useEffect(() => {
     if (activeView !== "workspace") return;
 
-    trackEvent("tool_selected", {
+    trackEvent("tool_opened", {
       tool: activeTool,
     });
   }, [activeTool, activeView]);

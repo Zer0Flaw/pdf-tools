@@ -126,6 +126,12 @@ export default function CompressTool() {
     );
 
     if (!acceptedFiles.length && oversizedFiles.length > 0) {
+      trackEvent("free_limit_encountered", {
+        tool: "compress",
+        file_count: oversizedFiles.length,
+        input_type: "image",
+        gated_feature: "file_size_limit",
+      });
       setMessage({
         type: "error",
         text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
@@ -133,38 +139,60 @@ export default function CompressTool() {
       return;
     }
 
-    setFiles((prev) => {
-      const remainingSlots = isPremium
-        ? Infinity
-        : MAX_FREE_IMAGES - prev.length;
-      const limitedAcceptedFiles = acceptedFiles.slice(0, remainingSlots);
-      const combined = [...prev, ...limitedAcceptedFiles];
+    const remainingSlots = isPremium ? Infinity : MAX_FREE_IMAGES - files.length;
+    const limitedAcceptedFiles = acceptedFiles.slice(0, remainingSlots);
+    const rejectedForCount = Math.max(acceptedFiles.length - limitedAcceptedFiles.length, 0);
 
-      if (
-        !isPremium &&
-        oversizedFiles.length > 0 &&
-        acceptedFiles.length > remainingSlots
-      ) {
-        setMessage({
-          type: "error",
-          text: `Some files were skipped because of the ${FILE_SIZE_LIMIT_LABEL} limit and free plan image limit.`,
-        });
-      } else if (!isPremium && oversizedFiles.length > 0) {
-        setMessage({
-          type: "error",
-          text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
-        });
-      } else if (!isPremium && acceptedFiles.length > remainingSlots) {
-        setMessage({
-          type: "error",
-          text: `Free plan allows up to ${MAX_FREE_IMAGES} images.`,
-        });
-      } else {
-        setMessage(null);
-      }
+    if (limitedAcceptedFiles.length > 0) {
+      trackEvent("file_uploaded", {
+        tool: "compress",
+        file_count: limitedAcceptedFiles.length,
+        input_type: "image",
+      });
+    }
 
-      return combined;
-    });
+    if (
+      !isPremium &&
+      oversizedFiles.length > 0 &&
+      acceptedFiles.length > remainingSlots
+    ) {
+      trackEvent("free_limit_encountered", {
+        tool: "compress",
+        file_count: oversizedFiles.length + rejectedForCount,
+        input_type: "image",
+        gated_feature: "file_size_and_count_limit",
+      });
+      setMessage({
+        type: "error",
+        text: `Some files were skipped because of the ${FILE_SIZE_LIMIT_LABEL} limit and free plan image limit.`,
+      });
+    } else if (!isPremium && oversizedFiles.length > 0) {
+      trackEvent("free_limit_encountered", {
+        tool: "compress",
+        file_count: oversizedFiles.length,
+        input_type: "image",
+        gated_feature: "file_size_limit",
+      });
+      setMessage({
+        type: "error",
+        text: `Some files exceeded the ${FILE_SIZE_LIMIT_LABEL} limit for free users.`,
+      });
+    } else if (!isPremium && acceptedFiles.length > remainingSlots) {
+      trackEvent("free_limit_encountered", {
+        tool: "compress",
+        file_count: rejectedForCount,
+        input_type: "image",
+        gated_feature: "file_count_limit",
+      });
+      setMessage({
+        type: "error",
+        text: `Free plan allows up to ${MAX_FREE_IMAGES} images.`,
+      });
+    } else {
+      setMessage(null);
+    }
+
+    setFiles((prev) => [...prev, ...limitedAcceptedFiles]);
   }
 
   function handleFileChange(e) {
@@ -191,9 +219,18 @@ export default function CompressTool() {
   }
 
   function removeFile(indexToRemove) {
+    const removedFile = files[indexToRemove];
     setFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
     setShowExportAd(false);
     setMessage(null);
+
+    if (removedFile) {
+      trackEvent("file_removed", {
+        tool: "compress",
+        file_count: 1,
+        input_type: "image",
+      });
+    }
   }
 
   function moveFileUp(index) {
@@ -203,6 +240,11 @@ export default function CompressTool() {
       const arr = [...prev];
       [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
       return arr;
+    });
+    trackEvent("files_reordered", {
+      tool: "compress",
+      file_count: files.length,
+      input_type: "image",
     });
   }
 
@@ -214,12 +256,25 @@ export default function CompressTool() {
       [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
       return arr;
     });
+    if (index !== files.length - 1) {
+      trackEvent("files_reordered", {
+        tool: "compress",
+        file_count: files.length,
+        input_type: "image",
+      });
+    }
   }
 
   function handleDragEnd(event) {
     const { active, over } = event;
 
     if (!over || active.id === over.id) return;
+
+    trackEvent("files_reordered", {
+      tool: "compress",
+      file_count: files.length,
+      input_type: "image",
+    });
 
     setFiles((prev) => {
       const oldIndex = prev.findIndex(
@@ -314,6 +369,12 @@ export default function CompressTool() {
   async function compressImages() {
     if (!files.length || isCompressing) return;
 
+    trackEvent("process_started", {
+      tool: "compress",
+      file_count: files.length,
+      input_type: "image",
+      output_type: "image",
+    });
     setIsCompressing(true);
     setShowExportAd(false);
     setMessage(null);
@@ -343,10 +404,18 @@ export default function CompressTool() {
           : 0;
 
       setShowExportAd(true);
-      trackEvent("export_success", {
+      trackEvent("process_completed", {
         tool: "compress",
         file_count: files.length,
+        input_type: "image",
+        output_type: "image",
         size_bytes_before: originalBytes,
+        size_bytes_after: compressedBytes,
+      });
+      trackEvent("export_downloaded", {
+        tool: "compress",
+        file_count: files.length,
+        output_type: "image",
         size_bytes_after: compressedBytes,
       });
       setMessage({

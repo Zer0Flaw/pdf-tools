@@ -1,11 +1,30 @@
 const STORAGE_KEY = "projectstack-analytics-events";
 
+function isBrowser() {
+  return typeof window !== "undefined";
+}
+
+function normalizeMetadata(metadata) {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return {};
+  }
+
+  return Object.entries(metadata).reduce((cleaned, [key, value]) => {
+    if (typeof value === "undefined") {
+      return cleaned;
+    }
+
+    cleaned[key] = value;
+    return cleaned;
+  }, {});
+}
+
 export function trackEvent(name, metadata = {}) {
-  if (typeof window === "undefined" || !name) return;
+  if (!isBrowser() || !name) return;
 
   const payload = {
     name,
-    metadata,
+    metadata: normalizeMetadata(metadata),
     timestamp: new Date().toISOString(),
   };
 
