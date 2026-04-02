@@ -6,6 +6,7 @@ export const UPGRADE_REASONS = {
   MERGE_WATERMARK: "merge-watermark",
   IMAGES_LIMITS: "images-limits",
   IMAGES_WATERMARK: "images-watermark",
+  PDF_TO_IMAGE_LIMITS: "pdf-to-image-limits",
   SPLIT_LIMITS: "split-limits",
   COMPRESS_LIMITS: "compress-limits",
 };

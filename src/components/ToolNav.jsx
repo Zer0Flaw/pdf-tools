@@ -11,8 +11,23 @@ const TOOL_GROUPS = [
   {
     id: "convert",
     label: "Convert Files",
-    description: "Turn everyday file types into a cleaner finished document.",
-    tools: [{ id: "images", label: "Images to PDF", shortLabel: "Images to PDF" }],
+    description:
+      "Move between image and PDF formats with a matched conversion pair.",
+    pairLabel: "Two-way conversion",
+    tools: [
+      {
+        id: "images",
+        label: "Images to PDF",
+        shortLabel: "Images to PDF",
+        helper: "Turn JPG and PNG files into one PDF",
+      },
+      {
+        id: "pdfToImage",
+        label: "PDF to Image",
+        shortLabel: "PDF to Image",
+        helper: "Export each PDF page as a PNG image",
+      },
+    ],
   },
   {
     id: "compress",
@@ -36,9 +51,16 @@ export default function ToolNav({ activeTool, onChange }) {
           <div className="tool-nav-group-copy">
             <p className="tool-nav-group-label">{group.label}</p>
             <p className="tool-nav-group-description">{group.description}</p>
+            {group.pairLabel && (
+              <p className="tool-nav-group-pair">{group.pairLabel}</p>
+            )}
           </div>
 
-          <div className="tool-nav-group-tools">
+          <div
+            className={`tool-nav-group-tools ${
+              group.id === "convert" ? "tool-nav-group-tools-convert" : ""
+            }`}
+          >
             {group.tools.map((tool) => (
               <button
                 key={tool.id}
@@ -48,6 +70,9 @@ export default function ToolNav({ activeTool, onChange }) {
                 aria-pressed={activeTool === tool.id}
               >
                 <span className="tool-tab-title">{tool.label}</span>
+                {tool.helper && (
+                  <span className="tool-tab-helper">{tool.helper}</span>
+                )}
                 <span className="tool-tab-sub">
                   {activeTool === tool.id ? "Open now" : `Use ${tool.shortLabel}`}
                 </span>

@@ -50,6 +50,21 @@ export const FEATURE_GATES = {
     upgradeReason: UPGRADE_REASONS.IMAGES_LIMITS,
     watermarkUpgradeReason: UPGRADE_REASONS.IMAGES_WATERMARK,
   },
+  pdfToImage: {
+    id: "pdfToImage",
+    maxFiles: 1,
+    maxFileSize: 5 * MB,
+    premiumFlags: {
+      unlimitedMerges: false,
+      unlimitedImages: false,
+      watermarkFree: false,
+      largerFiles: true,
+    },
+    privacyMessage: "Files are processed locally in your browser.",
+    processingMessage: "Converting locally in your browser...",
+    adPlacement: "postExport",
+    upgradeReason: UPGRADE_REASONS.PDF_TO_IMAGE_LIMITS,
+  },
   compress: {
     id: "compress",
     maxFiles: 5,

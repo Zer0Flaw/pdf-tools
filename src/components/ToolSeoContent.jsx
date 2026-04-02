@@ -116,10 +116,50 @@ const TOOL_SEO_CONTENT = {
           "It is useful when you want to collect screenshots, scans, receipts, or photos into one PDF that is easier to send or archive.",
       },
     ],
-    relatedTools: ["merge", "split", "compress"],
+    relatedTools: ["pdfToImage", "merge", "compress"],
     bottomCtaTitle: "Turn your images into one PDF",
     bottomCtaCopy:
       "Launch the conversion workflow and build a clean PDF from your images directly in the browser.",
+  },
+  pdfToImage: {
+    benefits: [
+      "Convert PDF pages into PNG image downloads in a browser-based workflow that keeps the core process local.",
+      "Useful when you need page previews, visual assets, slide images, or document pages in a format that is easier to share.",
+      "ProjectStack handles the current PDF-to-image flow in your browser, so normal processing does not require a server upload.",
+      "The tool keeps the steps simple: upload one PDF, render the pages, then download the images you need.",
+      "A practical option when a full PDF is less convenient than individual page images for review, design, or upload workflows.",
+    ],
+    steps: [
+      "Choose the PDF you want to convert into page images.",
+      "Run the browser-based conversion to generate PNG files for each page.",
+      "Download one page at a time or export the full image set.",
+    ],
+    faqs: [
+      {
+        question: "What format are the exported page images?",
+        answer:
+          "The current ProjectStack PDF to Image workflow exports each page as a PNG image to keep the first version simple and reliable.",
+      },
+      {
+        question: "Are my PDF pages uploaded during conversion?",
+        answer:
+          "No. For the current core workflow, ProjectStack converts PDF pages locally in your browser during normal use.",
+      },
+      {
+        question: "Can I download just one page image?",
+        answer:
+          "Yes. After conversion, you can download individual page images or use the download-all action for the full set.",
+      },
+      {
+        question: "When is PDF to Image useful?",
+        answer:
+          "It is useful when you need page thumbnails, shareable image versions of documents, or visual assets from a PDF without opening design software.",
+      },
+    ],
+    relatedTools: ["images", "split", "merge"],
+    bottomCtaTitle: "Need PNG images from a PDF?",
+    bottomCtaCopy:
+      "Open the PDF to Image workflow and generate page images directly in your browser.",
   },
   compress: {
     benefits: [
@@ -156,7 +196,7 @@ const TOOL_SEO_CONTENT = {
           "It is a good fit when image files are too large for forms, email attachments, or lightweight content publishing.",
       },
     ],
-    relatedTools: ["images", "merge", "split"],
+    relatedTools: ["images", "pdfToImage", "merge"],
     bottomCtaTitle: "Need smaller image files?",
     bottomCtaCopy:
       "Open the compression tool and create lighter image downloads without adding extra workflow friction.",
@@ -167,7 +207,16 @@ const TOOL_LABELS = {
   merge: "Merge PDF",
   split: "Split PDF",
   images: "Images to PDF",
+  pdfToImage: "PDF to Image",
   compress: "Compress Images",
+};
+
+const TOOL_HELPERS = {
+  merge: "Combine multiple PDFs into one finished document.",
+  split: "Break one PDF into smaller page-based files.",
+  images: "Turn JPG and PNG files into one PDF.",
+  pdfToImage: "Export each PDF page as a PNG image.",
+  compress: "Reduce image size for easier uploads and sharing.",
 };
 
 export default function ToolSeoContent({
@@ -242,6 +291,7 @@ export default function ToolSeoContent({
           {content.relatedTools.map((relatedTool) => (
             <div key={relatedTool} className="tool-preview-card">
               <h3>{TOOL_LABELS[relatedTool]}</h3>
+              <p>{TOOL_HELPERS[relatedTool]}</p>
               <button
                 type="button"
                 className="hero-secondary-btn tool-preview-btn"

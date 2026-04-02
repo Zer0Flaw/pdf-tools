@@ -5,6 +5,7 @@ import MergeTool from "./tools/MergeTool";
 import SplitTool from "./tools/SplitTool";
 import CompressTool from "./tools/CompressTool";
 import ImagesToPdfTool from "./tools/ImagesToPdfTool";
+import PdfToImageTool from "./tools/PdfToImageTool";
 import LandingPage from "./components/LandingPage";
 import SupportPage, { SUPPORT_PAGES } from "./components/SupportPage";
 import ToolSeoContent from "./components/ToolSeoContent";
@@ -15,14 +16,15 @@ import { trackEvent } from "./utils/analytics";
 const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
 const VALID_VIEWS = ["home", "workspace", "support"];
-const VALID_TOOLS = ["merge", "split", "compress", "images"];
+const VALID_TOOLS = ["merge", "split", "compress", "images", "pdfToImage"];
 const HOME_TITLE = "ProjectStack | Browser-Based PDF and Image Tools";
 const HOME_DESCRIPTION =
-  "Use browser-based PDF and image tools with ProjectStack. Merge PDFs, split files, convert images to PDF, and compress images in one clean workspace.";
+  "Use browser-based PDF and image tools with ProjectStack. Merge PDFs, split files, convert images to PDF, convert PDFs to images, and compress images in one clean workspace.";
 const TOOL_ROUTES = {
   merge: "/merge-pdf",
   split: "/split-pdf",
   images: "/images-to-pdf",
+  pdfToImage: "/pdf-to-image",
   compress: "/compress-images",
 };
 
@@ -58,6 +60,14 @@ const TOOL_METADATA = {
     heading: "Images to PDF Online",
     intro:
       "Turn JPG and PNG images into one clean PDF with a browser-based workflow built for fast conversion, simple reordering, and privacy-respecting processing.",
+  },
+  pdfToImage: {
+    title: "PDF to Image Online | ProjectStack",
+    description:
+      "Convert PDF pages to image files online in your browser with ProjectStack. Generate clean PNG page downloads without server-side processing for the core workflow.",
+    heading: "PDF to Image Online",
+    intro:
+      "Turn PDF pages into clean PNG image downloads with browser-based processing built for quick exports, simple downloads, and privacy-respecting file handling.",
   },
 };
 
@@ -235,6 +245,8 @@ export default function App() {
         return <CompressTool />;
       case "images":
         return <ImagesToPdfTool />;
+      case "pdfToImage":
+        return <PdfToImageTool />;
       case "merge":
       default:
         return <MergeTool />;

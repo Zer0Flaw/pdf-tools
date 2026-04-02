@@ -24,6 +24,13 @@ const TOOL_PREVIEWS = [
     cta: "Open Images to PDF",
   },
   {
+    id: "pdfToImage",
+    route: "/pdf-to-image",
+    title: "PDF to Image",
+    description: "Turn PDF pages into clean PNG image downloads.",
+    cta: "Open PDF to Image",
+  },
+  {
     id: "compress",
     route: "/compress-images",
     title: "Compress Images",
@@ -34,6 +41,9 @@ const TOOL_PREVIEWS = [
 
 export default function LandingPage({ onStart, onOpenTool }) {
   const [showFooterAd, setShowFooterAd] = useState(false);
+  const conversionTools = TOOL_PREVIEWS.filter((tool) =>
+    ["images", "pdfToImage"].includes(tool.id),
+  );
 
   return (
     <div className="landing-page">
@@ -52,8 +62,8 @@ export default function LandingPage({ onStart, onOpenTool }) {
           </p>
           <h1 className="hero-title">Simple file tools for practical work</h1>
           <p className="hero-subtitle">
-            Merge PDFs, split files, convert images to PDF, and compress images
-            in one clean workspace.
+            Merge PDFs, split files, convert images to PDF, convert PDFs to
+            images, and compress images in one clean workspace.
           </p>
 
           <div className="hero-actions">
@@ -148,6 +158,11 @@ export default function LandingPage({ onStart, onOpenTool }) {
           </div>
 
           <div className="feature-card">
+            <h3>PDF to Image</h3>
+            <p>Convert PDF pages into clean PNG image downloads.</p>
+          </div>
+
+          <div className="feature-card">
             <h3>Compress Images</h3>
             <p>Reduce file size for easier sharing and storage.</p>
           </div>
@@ -182,6 +197,34 @@ export default function LandingPage({ onStart, onOpenTool }) {
               </button>
             </div>
           ))}
+        </div>
+
+        <div className="tool-pair-callout">
+          <div className="tool-pair-copy">
+            <p className="section-eyebrow">Convert Files</p>
+            <h3>Switch cleanly between PDFs and images</h3>
+            <p>
+              ProjectStack keeps both conversion directions together so it is
+              easy to move from image sets to PDFs or turn a PDF back into
+              page-by-page PNGs.
+            </p>
+          </div>
+
+          <div className="tool-pair-grid">
+            {conversionTools.map((tool) => (
+              <div key={`pair-${tool.id}`} className="tool-preview-card">
+                <h3>{tool.title}</h3>
+                <p>{tool.description}</p>
+                <button
+                  type="button"
+                  className="hero-secondary-btn tool-preview-btn"
+                  onClick={() => onOpenTool?.(tool.id)}
+                >
+                  {tool.cta}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
