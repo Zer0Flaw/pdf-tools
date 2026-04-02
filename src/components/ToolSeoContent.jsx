@@ -36,7 +36,7 @@ const TOOL_SEO_CONTENT = {
           "It works well for combining invoices, forms, reference pages, or other small PDF sets into one cleaner document.",
       },
     ],
-    relatedTools: ["rotate", "split", "images"],
+    relatedTools: ["rotate", "delete", "split"],
     bottomCtaTitle: "Ready to combine your PDFs?",
     bottomCtaCopy:
       "Open the merge workflow and export one organized PDF without leaving the browser.",
@@ -76,10 +76,50 @@ const TOOL_SEO_CONTENT = {
           "It works well for scanned documents, sideways phone captures, and PDFs that mix portrait and landscape pages.",
       },
     ],
-    relatedTools: ["merge", "split", "pdfToImage"],
+    relatedTools: ["delete", "merge", "split"],
     bottomCtaTitle: "Need to fix PDF page orientation?",
     bottomCtaCopy:
       "Open the rotation workflow and export a corrected PDF directly from your browser.",
+  },
+  delete: {
+    benefits: [
+      "Delete unwanted PDF pages in a browser-based workflow that keeps the document on your device during normal use.",
+      "Useful when a PDF includes blank pages, duplicate pages, cover sheets, or sections you do not want in the final file.",
+      "Review page previews, mark specific pages for deletion, and keep the remaining document intact before export.",
+      "The workflow stays practical: upload one PDF, choose the pages to remove, and download the cleaned-up result.",
+      "A good fit when you need a smaller, cleaner PDF without opening a heavier editing app.",
+    ],
+    steps: [
+      "Upload the PDF you want to clean up.",
+      "Select pages and mark the ones you want removed from the output file.",
+      "Export a new PDF with the unwanted pages excluded.",
+    ],
+    faqs: [
+      {
+        question: "Can I remove multiple pages at once?",
+        answer:
+          "Yes. ProjectStack lets you select several pages together and mark them for deletion in one step.",
+      },
+      {
+        question: "What happens if I try to delete every page?",
+        answer:
+          "ProjectStack prevents that invalid state and requires at least one page to remain in the exported PDF.",
+      },
+      {
+        question: "Are my PDFs uploaded during page deletion?",
+        answer:
+          "No. The current Delete PDF Pages workflow processes the file locally in your browser during normal use.",
+      },
+      {
+        question: "When is this tool most useful?",
+        answer:
+          "It is useful for removing blank pages, duplicate pages, title pages, appendices, or sections you no longer need in the final document.",
+      },
+    ],
+    relatedTools: ["rotate", "split", "merge"],
+    bottomCtaTitle: "Need a cleaner PDF?",
+    bottomCtaCopy:
+      "Open the delete-pages workflow and export a trimmed PDF directly from your browser.",
   },
   split: {
     benefits: [
@@ -116,7 +156,7 @@ const TOOL_SEO_CONTENT = {
           "It is handy when you need to extract a few pages from a larger file, share smaller sections, or separate a document for review.",
       },
     ],
-    relatedTools: ["rotate", "merge", "pdfToImage"],
+    relatedTools: ["delete", "rotate", "merge"],
     bottomCtaTitle: "Need smaller PDF files fast?",
     bottomCtaCopy:
       "Start the split tool and turn one document into smaller browser-processed downloads.",
@@ -236,7 +276,7 @@ const TOOL_SEO_CONTENT = {
           "It is a good fit when image files are too large for forms, email attachments, or lightweight content publishing.",
       },
     ],
-    relatedTools: ["images", "pdfToImage", "rotate"],
+    relatedTools: ["images", "pdfToImage", "delete"],
     bottomCtaTitle: "Need smaller image files?",
     bottomCtaCopy:
       "Open the compression tool and create lighter image downloads without adding extra workflow friction.",
@@ -246,6 +286,7 @@ const TOOL_SEO_CONTENT = {
 const TOOL_LABELS = {
   merge: "Merge PDF",
   rotate: "Rotate PDF Pages",
+  delete: "Delete PDF Pages",
   split: "Split PDF",
   images: "Images to PDF",
   pdfToImage: "PDF to Image",
@@ -255,6 +296,7 @@ const TOOL_LABELS = {
 const TOOL_HELPERS = {
   merge: "Combine multiple PDFs into one finished document.",
   rotate: "Fix page orientation and export a corrected PDF.",
+  delete: "Remove unwanted pages and export a cleaner PDF.",
   split: "Break one PDF into smaller page-based files.",
   images: "Turn JPG and PNG files into one PDF.",
   pdfToImage: "Export each PDF page as a PNG image.",

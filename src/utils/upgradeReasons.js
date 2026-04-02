@@ -4,6 +4,7 @@ import { trackEvent } from "./analytics";
 export const UPGRADE_REASONS = {
   MERGE_LIMITS: "merge-limits",
   MERGE_WATERMARK: "merge-watermark",
+  DELETE_LIMITS: "delete-limits",
   ROTATE_LIMITS: "rotate-limits",
   IMAGES_LIMITS: "images-limits",
   IMAGES_WATERMARK: "images-watermark",

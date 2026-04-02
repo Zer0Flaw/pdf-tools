@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { degrees, PDFDocument } from "pdf-lib";
+import { PDFDocument } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import AdSlot from "../components/AdSlot";
 import { getBaseFileName } from "../utils/fileNaming";
@@ -8,17 +8,12 @@ import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
 
-const ROTATE_FEATURE = getFeatureGate("rotate");
-const MAX_FILE_SIZE = ROTATE_FEATURE.maxFileSize;
-const MAX_FILES = ROTATE_FEATURE.maxFiles;
+const DELETE_FEATURE = getFeatureGate("delete");
+const MAX_FILE_SIZE = DELETE_FEATURE.maxFileSize;
+const MAX_FILES = DELETE_FEATURE.maxFiles;
 const FILE_SIZE_LIMIT_LABEL = formatFeatureFileSize(MAX_FILE_SIZE);
 
-function normalizeRotation(value) {
-  const normalized = value % 360;
-  return normalized < 0 ? normalized + 360 : normalized;
-}
-
-export default function RotatePdfTool() {
+export default function DeletePdfPagesTool() {
   const [file, setFile] = useState(null);
   const [pages, setPages] = useState([]);
   const [selectedPages, setSelectedPages] = useState([]);
@@ -74,7 +69,7 @@ export default function RotatePdfTool() {
 
     if (!isPremium && selectedFile.size > MAX_FILE_SIZE) {
       trackEvent("free_limit_encountered", {
-        tool: "rotate",
+        tool: "delete",
         file_count: 1,
         input_type: "pdf",
         gated_feature: "file_size_limit",
@@ -96,7 +91,7 @@ export default function RotatePdfTool() {
     setSelectedFile(selectedFile);
     setMessage(null);
     trackEvent("file_uploaded", {
-      tool: "rotate",
+      tool: "delete",
       file_count: 1,
       input_type: "pdf",
     });
@@ -134,7 +129,7 @@ export default function RotatePdfTool() {
     setMessage(null);
   }
 
-  async function preparePages() {
+  async function loadPdfPages() {
     if (!file || isProcessing) return;
 
     setIsProcessing(true);
@@ -147,14 +142,14 @@ export default function RotatePdfTool() {
       const previewPages = await buildPdfPagePreviews(bytes);
       const nextPages = previewPages.map((page) => ({
         ...page,
-        rotation: 0,
+        markedForDeletion: false,
       }));
 
       setPages(nextPages);
       setSelectedPages(nextPages.map((page) => page.pageNumber));
       setMessage({
         type: "success",
-        text: `Ready to rotate ${nextPages.length} page${nextPages.length === 1 ? "" : "s"}.`,
+        text: `Ready to review ${nextPages.length} page${nextPages.length === 1 ? "" : "s"} for deletion.`,
       });
     } catch {
       setMessage({
@@ -164,16 +159,6 @@ export default function RotatePdfTool() {
     } finally {
       setIsProcessing(false);
     }
-  }
-
-  function rotatePage(pageNumber, delta) {
-    setPages((prev) =>
-      prev.map((page) =>
-        page.pageNumber === pageNumber
-          ? { ...page, rotation: normalizeRotation(page.rotation + delta) }
-          : page,
-      ),
-    );
   }
 
   function togglePageSelection(pageNumber) {
@@ -192,23 +177,57 @@ export default function RotatePdfTool() {
     setSelectedPages([]);
   }
 
-  function rotateSelectedPages(delta) {
-    if (!selectedPages.length) return;
+  function updateDeletionState(targetPageNumbers, markedForDeletion) {
+    if (!targetPageNumbers.length) return;
 
-    setPages((prev) =>
-      prev.map((page) =>
-        selectedPages.includes(page.pageNumber)
-          ? { ...page, rotation: normalizeRotation(page.rotation + delta) }
-          : page,
-      ),
+    const nextPages = pages.map((page) =>
+      targetPageNumbers.includes(page.pageNumber)
+        ? { ...page, markedForDeletion }
+        : page,
     );
+    const remainingPages = nextPages.filter((page) => !page.markedForDeletion).length;
+
+    if (remainingPages === 0) {
+      setMessage({
+        type: "error",
+        text: "At least one page must remain in the PDF.",
+      });
+      return;
+    }
+
+    setPages(nextPages);
+    setMessage(null);
   }
 
-  async function exportRotatedPdf() {
+  function markSelectedForDeletion() {
+    updateDeletionState(selectedPages, true);
+  }
+
+  function keepSelectedPages() {
+    updateDeletionState(selectedPages, false);
+  }
+
+  function toggleDeletionForPage(pageNumber) {
+    const page = pages.find((entry) => entry.pageNumber === pageNumber);
+    if (!page) return;
+
+    updateDeletionState([pageNumber], !page.markedForDeletion);
+  }
+
+  async function exportDeletedPdf() {
     if (!file || !pages.length || isProcessing) return;
 
+    const keptPages = pages.filter((page) => !page.markedForDeletion);
+    if (!keptPages.length) {
+      setMessage({
+        type: "error",
+        text: "At least one page must remain in the PDF.",
+      });
+      return;
+    }
+
     trackEvent("process_started", {
-      tool: "rotate",
+      tool: "delete",
       file_count: 1,
       input_type: "pdf",
       output_type: "pdf",
@@ -219,58 +238,61 @@ export default function RotatePdfTool() {
 
     try {
       const bytes = await file.arrayBuffer();
-      const pdf = await PDFDocument.load(bytes);
+      const sourcePdf = await PDFDocument.load(bytes);
+      const nextPdf = await PDFDocument.create();
+      const keepIndexes = keptPages.map((page) => page.pageNumber - 1);
+      const copiedPages = await nextPdf.copyPages(sourcePdf, keepIndexes);
 
-      pages.forEach((pageState, index) => {
-        const page = pdf.getPage(index);
-        page.setRotation(degrees(pageState.rotation));
-      });
+      copiedPages.forEach((page) => nextPdf.addPage(page));
 
-      const rotatedBytes = await pdf.save();
-      const blob = new Blob([rotatedBytes], { type: "application/pdf" });
+      const pdfBytes = await nextPdf.save();
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
 
       link.href = url;
-      link.download = `${getBaseFileName(file.name)}-rotated.pdf`;
+      link.download = `${getBaseFileName(file.name)}-trimmed.pdf`;
       link.click();
       URL.revokeObjectURL(url);
 
       setShowExportAd(true);
       trackEvent("process_completed", {
-        tool: "rotate",
-        file_count: pages.length,
+        tool: "delete",
+        file_count: keptPages.length,
         input_type: "pdf",
         output_type: "pdf",
         size_bytes: blob.size,
       });
       trackEvent("export_downloaded", {
-        tool: "rotate",
-        file_count: pages.length,
+        tool: "delete",
+        file_count: keptPages.length,
         output_type: "pdf",
         size_bytes: blob.size,
       });
       setMessage({
         type: "success",
-        text: `Rotated PDF downloaded successfully (${formatBytes(blob.size)}).`,
+        text: `Updated PDF downloaded successfully (${formatBytes(blob.size)}).`,
       });
     } catch {
       setMessage({
         type: "error",
-        text: "Something went wrong while exporting your rotated PDF.",
+        text: "Something went wrong while exporting your updated PDF.",
       });
     } finally {
       setIsProcessing(false);
     }
   }
 
+  const deletedCount = pages.filter((page) => page.markedForDeletion).length;
+  const remainingCount = pages.length - deletedCount;
+
   return (
     <>
       <div className="tool-header">
         <div>
-          <h2>Rotate PDF Pages</h2>
+          <h2>Delete PDF Pages</h2>
           <p className="tool-sub">
-            Rotate individual PDF pages and export a corrected document.
+            Remove selected PDF pages and export a cleaner document.
           </p>
         </div>
 
@@ -279,14 +301,14 @@ export default function RotatePdfTool() {
 
       <UpgradeBanner
         title={`Free plan: ${FILE_SIZE_LIMIT_LABEL} max file`}
-        subtitle="ProjectStack Pro is designed for bigger PDFs and more capable document cleanup workflows over time."
+        subtitle="ProjectStack Pro is designed for bigger PDFs and more capable page-level cleanup workflows over time."
         features={[
-          "Rotate larger PDFs without hitting the free cap",
-          "Keep repeat document cleanup moving with less friction",
+          "Edit larger PDFs without hitting the free cap",
+          "Move through page cleanup tasks with less friction",
           "Unlock more advanced PDF editing workflows as ProjectStack grows",
         ]}
         ctaText="See Pro benefits"
-        upgradeReason={ROTATE_FEATURE.upgradeReason}
+        upgradeReason={DELETE_FEATURE.upgradeReason}
       />
 
       <div
@@ -332,12 +354,12 @@ export default function RotatePdfTool() {
       )}
 
       <div className="usage-indicator trust-indicator">
-        {ROTATE_FEATURE.privacyMessage}
+        {DELETE_FEATURE.privacyMessage}
       </div>
 
       {isProcessing && (
         <div className="usage-indicator processing-indicator">
-          {ROTATE_FEATURE.processingMessage}
+          {DELETE_FEATURE.processingMessage}
         </div>
       )}
 
@@ -346,12 +368,12 @@ export default function RotatePdfTool() {
       )}
 
       <AdSlot
-        placement={ROTATE_FEATURE.adPlacement}
+        placement={DELETE_FEATURE.adPlacement}
         isVisible={showExportAd}
       />
 
       {file && !pages.length && !isProcessing && (
-        <button className="merge-btn" onClick={preparePages}>
+        <button className="merge-btn" onClick={loadPdfPages}>
           Load PDF Pages
         </button>
       )}
@@ -360,8 +382,13 @@ export default function RotatePdfTool() {
         <>
           <div className="rotate-toolbar">
             <div className="rotate-toolbar-copy">
-              <strong>Selected pages: {selectedPages.length}</strong>
-              <span>Choose pages to rotate together, or use each page card.</span>
+              <strong>
+                {deletedCount} page{deletedCount === 1 ? "" : "s"} marked for
+                deletion
+              </strong>
+              <span>
+                {remainingCount} page{remainingCount === 1 ? "" : "s"} will stay in the exported PDF.
+              </span>
             </div>
 
             <div className="rotate-toolbar-actions">
@@ -382,25 +409,30 @@ export default function RotatePdfTool() {
               <button
                 type="button"
                 className="hero-secondary-btn"
-                onClick={() => rotateSelectedPages(-90)}
+                onClick={markSelectedForDeletion}
                 disabled={!selectedPages.length}
               >
-                Rotate Selected Left
+                Remove Selected
               </button>
               <button
                 type="button"
                 className="hero-secondary-btn"
-                onClick={() => rotateSelectedPages(90)}
+                onClick={keepSelectedPages}
                 disabled={!selectedPages.length}
               >
-                Rotate Selected Right
+                Keep Selected
               </button>
             </div>
           </div>
 
           <div className="rotate-page-grid">
             {pages.map((page) => (
-              <article key={page.pageNumber} className="rotate-page-card">
+              <article
+                key={page.pageNumber}
+                className={`rotate-page-card ${
+                  page.markedForDeletion ? "rotate-page-card-deleted" : ""
+                }`}
+              >
                 <label className="rotate-page-select">
                   <input
                     type="checkbox"
@@ -415,30 +447,26 @@ export default function RotatePdfTool() {
                     className="rotate-page-preview"
                     src={page.previewUrl}
                     alt={`Preview of PDF page ${page.pageNumber}`}
-                    style={{ transform: `rotate(${page.rotation}deg)` }}
                   />
                 </div>
 
                 <div className="rotate-page-meta">
                   <div>
                     <h3>Page {page.pageNumber}</h3>
-                    <p>Rotation: {page.rotation}°</p>
+                    <p>
+                      {page.markedForDeletion
+                        ? "Marked for deletion"
+                        : "Will stay in the output PDF"}
+                    </p>
                   </div>
 
                   <div className="rotate-page-actions">
                     <button
                       type="button"
                       className="hero-secondary-btn"
-                      onClick={() => rotatePage(page.pageNumber, -90)}
+                      onClick={() => toggleDeletionForPage(page.pageNumber)}
                     >
-                      Rotate Left
-                    </button>
-                    <button
-                      type="button"
-                      className="hero-secondary-btn"
-                      onClick={() => rotatePage(page.pageNumber, 90)}
-                    >
-                      Rotate Right
+                      {page.markedForDeletion ? "Keep Page" : "Delete Page"}
                     </button>
                   </div>
                 </div>
@@ -450,10 +478,10 @@ export default function RotatePdfTool() {
 
       <button
         className="merge-btn"
-        disabled={!pages.length || isProcessing}
-        onClick={exportRotatedPdf}
+        disabled={!pages.length || !remainingCount || isProcessing}
+        onClick={exportDeletedPdf}
       >
-        {isProcessing ? "Exporting..." : "Export Rotated PDF"}
+        {isProcessing ? "Exporting..." : "Export Updated PDF"}
       </button>
     </>
   );

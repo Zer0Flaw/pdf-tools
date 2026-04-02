@@ -17,6 +17,13 @@ const TOOL_PREVIEWS = [
     cta: "Open Rotate PDF Pages",
   },
   {
+    id: "delete",
+    route: "/delete-pdf-pages",
+    title: "Delete PDF Pages",
+    description: "Remove unwanted pages and export a cleaner PDF.",
+    cta: "Open Delete PDF Pages",
+  },
+  {
     id: "split",
     route: "/split-pdf",
     title: "Split PDF",
@@ -69,8 +76,8 @@ export default function LandingPage({ onStart, onOpenTool }) {
           </p>
           <h1 className="hero-title">Simple file tools for practical work</h1>
           <p className="hero-subtitle">
-            Merge PDFs, rotate pages, split files, convert images to PDF,
-            convert PDFs to images, and compress images in one clean
+            Merge PDFs, rotate pages, delete pages, split files, convert images
+            to PDF, convert PDFs to images, and compress images in one clean
             workspace.
           </p>
 
@@ -158,6 +165,11 @@ export default function LandingPage({ onStart, onOpenTool }) {
           <div className="feature-card">
             <h3>Rotate PDF Pages</h3>
             <p>Fix page orientation and export a corrected PDF.</p>
+          </div>
+
+          <div className="feature-card">
+            <h3>Delete PDF Pages</h3>
+            <p>Remove unwanted pages and export a cleaner PDF.</p>
           </div>
 
           <div className="feature-card">

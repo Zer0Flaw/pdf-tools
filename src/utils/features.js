@@ -34,6 +34,21 @@ export const FEATURE_GATES = {
     adPlacement: "postExport",
     upgradeReason: UPGRADE_REASONS.ROTATE_LIMITS,
   },
+  delete: {
+    id: "delete",
+    maxFiles: 1,
+    maxFileSize: 5 * MB,
+    premiumFlags: {
+      unlimitedMerges: false,
+      unlimitedImages: false,
+      watermarkFree: false,
+      largerFiles: true,
+    },
+    privacyMessage: "Files are processed locally in your browser.",
+    processingMessage: "Updating locally in your browser...",
+    adPlacement: "postExport",
+    upgradeReason: UPGRADE_REASONS.DELETE_LIMITS,
+  },
   split: {
     id: "split",
     maxFiles: 1,
