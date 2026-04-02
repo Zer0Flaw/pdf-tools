@@ -36,7 +36,7 @@ const TOOL_SEO_CONTENT = {
           "It works well for combining invoices, forms, reference pages, or other small PDF sets into one cleaner document.",
       },
     ],
-    relatedTools: ["rotate", "delete", "reorder"],
+    relatedTools: ["rotate", "delete", "extract"],
     bottomCtaTitle: "Ready to combine your PDFs?",
     bottomCtaCopy:
       "Open the merge workflow and export one organized PDF without leaving the browser.",
@@ -76,7 +76,7 @@ const TOOL_SEO_CONTENT = {
           "It works well for scanned documents, sideways phone captures, and PDFs that mix portrait and landscape pages.",
       },
     ],
-    relatedTools: ["delete", "reorder", "merge"],
+    relatedTools: ["delete", "reorder", "extract"],
     bottomCtaTitle: "Need to fix PDF page orientation?",
     bottomCtaCopy:
       "Open the rotation workflow and export a corrected PDF directly from your browser.",
@@ -116,7 +116,7 @@ const TOOL_SEO_CONTENT = {
           "It is useful for removing blank pages, duplicate pages, title pages, appendices, or sections you no longer need in the final document.",
       },
     ],
-    relatedTools: ["reorder", "rotate", "merge"],
+    relatedTools: ["extract", "reorder", "rotate"],
     bottomCtaTitle: "Need a cleaner PDF?",
     bottomCtaCopy:
       "Open the delete-pages workflow and export a trimmed PDF directly from your browser.",
@@ -156,10 +156,50 @@ const TOOL_SEO_CONTENT = {
           "It is useful when pages are out of sequence, sections need to be rearranged, or you want a cleaner reading flow before sharing a PDF.",
       },
     ],
-    relatedTools: ["delete", "rotate", "merge"],
+    relatedTools: ["extract", "delete", "rotate"],
     bottomCtaTitle: "Need to rearrange a PDF?",
     bottomCtaCopy:
       "Open the reorder workflow and export a reorganized PDF directly from your browser.",
+  },
+  extract: {
+    benefits: [
+      "Extract selected PDF pages in a browser-based workflow that keeps the document on your device during normal use.",
+      "Useful when you want a shorter PDF made from a few key pages without keeping the rest of the document.",
+      "Review page previews, choose exactly which pages to keep, and export them into one new PDF file.",
+      "The workflow stays practical: upload one PDF, select the pages you want, and download a smaller focused document.",
+      "A good fit when you need excerpts, handouts, supporting pages, or a tighter version of a longer PDF.",
+    ],
+    steps: [
+      "Upload the PDF you want to extract pages from.",
+      "Select the pages you want in the new file.",
+      "Export a new PDF containing only those selected pages.",
+    ],
+    faqs: [
+      {
+        question: "Can I extract multiple pages into one new PDF?",
+        answer:
+          "Yes. ProjectStack lets you select multiple pages and export them together into one new PDF file.",
+      },
+      {
+        question: "Are my PDFs uploaded during extraction?",
+        answer:
+          "No. The current Extract PDF Pages workflow processes the file locally in your browser during normal use.",
+      },
+      {
+        question: "What happens if I select every page?",
+        answer:
+          "The tool will still export a new PDF using the selected pages, but it is most useful when you only need a subset of the original document.",
+      },
+      {
+        question: "When is this tool most useful?",
+        answer:
+          "It is useful when you want just a few pages from a longer PDF for sharing, printing, review, or combining with other documents later.",
+      },
+    ],
+    relatedTools: ["delete", "reorder", "split"],
+    bottomCtaTitle: "Need a smaller PDF from selected pages?",
+    bottomCtaCopy:
+      "Open the extract workflow and export a new PDF made from the pages you choose.",
   },
   split: {
     benefits: [
@@ -196,7 +236,7 @@ const TOOL_SEO_CONTENT = {
           "It is handy when you need to extract a few pages from a larger file, share smaller sections, or separate a document for review.",
       },
     ],
-    relatedTools: ["reorder", "delete", "rotate"],
+    relatedTools: ["extract", "reorder", "delete"],
     bottomCtaTitle: "Need smaller PDF files fast?",
     bottomCtaCopy:
       "Start the split tool and turn one document into smaller browser-processed downloads.",
@@ -328,6 +368,7 @@ const TOOL_LABELS = {
   rotate: "Rotate PDF Pages",
   delete: "Delete PDF Pages",
   reorder: "Reorder PDF Pages",
+  extract: "Extract PDF Pages",
   split: "Split PDF",
   images: "Images to PDF",
   pdfToImage: "PDF to Image",
@@ -339,6 +380,7 @@ const TOOL_HELPERS = {
   rotate: "Fix page orientation and export a corrected PDF.",
   delete: "Remove unwanted pages and export a cleaner PDF.",
   reorder: "Drag pages into a new sequence and export the updated PDF.",
+  extract: "Select pages and export them into a new PDF.",
   split: "Break one PDF into smaller page-based files.",
   images: "Turn JPG and PNG files into one PDF.",
   pdfToImage: "Export each PDF page as a PNG image.",

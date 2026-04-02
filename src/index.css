@@ -1114,6 +1114,11 @@ h1 {
   filter: saturate(0.55);
 }
 
+.extract-page-card-selected {
+  border-color: #c7d2fe;
+  background: linear-gradient(180deg, #f8faff 0%, #eef2ff 100%);
+}
+
 .reorder-page-card {
   cursor: grab;
 }

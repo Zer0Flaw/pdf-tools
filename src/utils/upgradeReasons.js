@@ -5,6 +5,7 @@ export const UPGRADE_REASONS = {
   MERGE_LIMITS: "merge-limits",
   MERGE_WATERMARK: "merge-watermark",
   DELETE_LIMITS: "delete-limits",
+  EXTRACT_LIMITS: "extract-limits",
   REORDER_LIMITS: "reorder-limits",
   ROTATE_LIMITS: "rotate-limits",
   IMAGES_LIMITS: "images-limits",

@@ -3,6 +3,7 @@ import "./index.css";
 import ToolNav from "./components/ToolNav";
 import MergeTool from "./tools/MergeTool";
 import DeletePdfPagesTool from "./tools/DeletePdfPagesTool";
+import ExtractPdfPagesTool from "./tools/ExtractPdfPagesTool";
 import ReorderPdfPagesTool from "./tools/ReorderPdfPagesTool";
 import RotatePdfTool from "./tools/RotatePdfTool";
 import SplitTool from "./tools/SplitTool";
@@ -19,15 +20,16 @@ import { trackEvent } from "./utils/analytics";
 const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
 const VALID_VIEWS = ["home", "workspace", "support"];
-const VALID_TOOLS = ["merge", "rotate", "delete", "reorder", "split", "compress", "images", "pdfToImage"];
+const VALID_TOOLS = ["merge", "rotate", "delete", "reorder", "extract", "split", "compress", "images", "pdfToImage"];
 const HOME_TITLE = "ProjectStack | Browser-Based PDF and Image Tools";
 const HOME_DESCRIPTION =
-  "Use browser-based PDF and image tools with ProjectStack. Merge PDFs, rotate pages, delete pages, reorder pages, split files, convert images to PDF, convert PDFs to images, and compress images in one clean workspace.";
+  "Use browser-based PDF and image tools with ProjectStack. Merge PDFs, rotate pages, delete pages, reorder pages, extract pages, split files, convert images to PDF, convert PDFs to images, and compress images in one clean workspace.";
 const TOOL_ROUTES = {
   merge: "/merge-pdf",
   rotate: "/rotate-pdf-pages",
   delete: "/delete-pdf-pages",
   reorder: "/reorder-pdf-pages",
+  extract: "/extract-pdf-pages",
   split: "/split-pdf",
   images: "/images-to-pdf",
   pdfToImage: "/pdf-to-image",
@@ -66,6 +68,14 @@ const TOOL_METADATA = {
     heading: "Reorder PDF Pages Online",
     intro:
       "Reorder PDF pages in a browser-based workspace built for quick organization, drag-and-drop page control, and privacy-respecting local processing.",
+  },
+  extract: {
+    title: "Extract PDF Pages Online | ProjectStack",
+    description:
+      "Extract PDF pages online in your browser with ProjectStack. Select the pages you want to keep, keep files local, and export a new PDF.",
+    heading: "Extract PDF Pages Online",
+    intro:
+      "Extract selected PDF pages in a browser-based workspace built for quick page selection, simple export, and privacy-respecting local processing.",
   },
   split: {
     title: "Split PDF Files Online | ProjectStack",
@@ -269,6 +279,8 @@ export default function App() {
 
   function renderActiveTool() {
     switch (activeTool) {
+      case "extract":
+        return <ExtractPdfPagesTool />;
       case "reorder":
         return <ReorderPdfPagesTool />;
       case "delete":

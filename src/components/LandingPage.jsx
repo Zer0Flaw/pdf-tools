@@ -31,6 +31,13 @@ const TOOL_PREVIEWS = [
     cta: "Open Reorder PDF Pages",
   },
   {
+    id: "extract",
+    route: "/extract-pdf-pages",
+    title: "Extract PDF Pages",
+    description: "Select pages and export them into a new PDF.",
+    cta: "Open Extract PDF Pages",
+  },
+  {
     id: "split",
     route: "/split-pdf",
     title: "Split PDF",
@@ -84,8 +91,8 @@ export default function LandingPage({ onStart, onOpenTool }) {
           <h1 className="hero-title">Simple file tools for practical work</h1>
           <p className="hero-subtitle">
             Merge PDFs, rotate pages, delete pages, reorder pages, split files,
-            convert images to PDF, convert PDFs to images, and compress images
-            in one clean workspace.
+            extract pages, convert images to PDF, convert PDFs to images, and
+            compress images in one clean workspace.
           </p>
 
           <div className="hero-actions">
@@ -182,6 +189,11 @@ export default function LandingPage({ onStart, onOpenTool }) {
           <div className="feature-card">
             <h3>Reorder PDF Pages</h3>
             <p>Drag pages into a new sequence and export the updated PDF.</p>
+          </div>
+
+          <div className="feature-card">
+            <h3>Extract PDF Pages</h3>
+            <p>Select pages and export them into a new PDF.</p>
           </div>
 
           <div className="feature-card">

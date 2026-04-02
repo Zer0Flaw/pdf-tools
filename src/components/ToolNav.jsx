@@ -10,6 +10,7 @@ const TOOL_GROUPS = [
       { id: "rotate", label: "Rotate PDF Pages" },
       { id: "delete", label: "Delete PDF Pages" },
       { id: "reorder", label: "Reorder PDF Pages" },
+      { id: "extract", label: "Extract PDF Pages" },
     ],
   },
   {
