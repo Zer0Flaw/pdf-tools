@@ -1114,6 +1114,47 @@ h1 {
   filter: saturate(0.55);
 }
 
+.reorder-page-card {
+  cursor: grab;
+}
+
+.reorder-page-card-dragging {
+  cursor: grabbing;
+}
+
+.reorder-page-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  background: #ffffff;
+  cursor: grab;
+}
+
+.reorder-page-drag-handle:active {
+  cursor: grabbing;
+}
+
+.reorder-page-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.reorder-page-hint {
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .rotate-page-meta {
   display: flex;
   align-items: flex-start;

@@ -36,7 +36,7 @@ const TOOL_SEO_CONTENT = {
           "It works well for combining invoices, forms, reference pages, or other small PDF sets into one cleaner document.",
       },
     ],
-    relatedTools: ["rotate", "delete", "split"],
+    relatedTools: ["rotate", "delete", "reorder"],
     bottomCtaTitle: "Ready to combine your PDFs?",
     bottomCtaCopy:
       "Open the merge workflow and export one organized PDF without leaving the browser.",
@@ -76,7 +76,7 @@ const TOOL_SEO_CONTENT = {
           "It works well for scanned documents, sideways phone captures, and PDFs that mix portrait and landscape pages.",
       },
     ],
-    relatedTools: ["delete", "merge", "split"],
+    relatedTools: ["delete", "reorder", "merge"],
     bottomCtaTitle: "Need to fix PDF page orientation?",
     bottomCtaCopy:
       "Open the rotation workflow and export a corrected PDF directly from your browser.",
@@ -116,10 +116,50 @@ const TOOL_SEO_CONTENT = {
           "It is useful for removing blank pages, duplicate pages, title pages, appendices, or sections you no longer need in the final document.",
       },
     ],
-    relatedTools: ["rotate", "split", "merge"],
+    relatedTools: ["reorder", "rotate", "merge"],
     bottomCtaTitle: "Need a cleaner PDF?",
     bottomCtaCopy:
       "Open the delete-pages workflow and export a trimmed PDF directly from your browser.",
+  },
+  reorder: {
+    benefits: [
+      "Reorder PDF pages in a browser-based workflow that keeps the document on your device during normal use.",
+      "Useful when a PDF needs a cleaner reading order, a different section sequence, or a quick page reorganization before sharing.",
+      "Drag page cards into a new order and see the sequence update immediately before exporting the updated document.",
+      "The workflow stays practical: upload one PDF, rearrange pages visually, and download the reorganized result.",
+      "A good fit when you need a faster way to restructure a PDF without opening heavier editing software.",
+    ],
+    steps: [
+      "Upload the PDF you want to reorganize.",
+      "Drag pages into the order you want in the final document.",
+      "Export a new PDF with the updated page sequence.",
+    ],
+    faqs: [
+      {
+        question: "Can I drag pages into any order I want?",
+        answer:
+          "Yes. ProjectStack lets you drag page cards into a new sequence, and the exported PDF follows that order.",
+      },
+      {
+        question: "Are my PDFs uploaded during reordering?",
+        answer:
+          "No. The current Reorder PDF Pages workflow processes the file locally in your browser during normal use.",
+      },
+      {
+        question: "Does the page order update before I export?",
+        answer:
+          "Yes. The visual order updates immediately in the workspace as you drag pages into place.",
+      },
+      {
+        question: "When is this tool most useful?",
+        answer:
+          "It is useful when pages are out of sequence, sections need to be rearranged, or you want a cleaner reading flow before sharing a PDF.",
+      },
+    ],
+    relatedTools: ["delete", "rotate", "merge"],
+    bottomCtaTitle: "Need to rearrange a PDF?",
+    bottomCtaCopy:
+      "Open the reorder workflow and export a reorganized PDF directly from your browser.",
   },
   split: {
     benefits: [
@@ -156,7 +196,7 @@ const TOOL_SEO_CONTENT = {
           "It is handy when you need to extract a few pages from a larger file, share smaller sections, or separate a document for review.",
       },
     ],
-    relatedTools: ["delete", "rotate", "merge"],
+    relatedTools: ["reorder", "delete", "rotate"],
     bottomCtaTitle: "Need smaller PDF files fast?",
     bottomCtaCopy:
       "Start the split tool and turn one document into smaller browser-processed downloads.",
@@ -287,6 +327,7 @@ const TOOL_LABELS = {
   merge: "Merge PDF",
   rotate: "Rotate PDF Pages",
   delete: "Delete PDF Pages",
+  reorder: "Reorder PDF Pages",
   split: "Split PDF",
   images: "Images to PDF",
   pdfToImage: "PDF to Image",
@@ -297,6 +338,7 @@ const TOOL_HELPERS = {
   merge: "Combine multiple PDFs into one finished document.",
   rotate: "Fix page orientation and export a corrected PDF.",
   delete: "Remove unwanted pages and export a cleaner PDF.",
+  reorder: "Drag pages into a new sequence and export the updated PDF.",
   split: "Break one PDF into smaller page-based files.",
   images: "Turn JPG and PNG files into one PDF.",
   pdfToImage: "Export each PDF page as a PNG image.",

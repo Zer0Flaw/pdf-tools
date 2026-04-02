@@ -49,6 +49,21 @@ export const FEATURE_GATES = {
     adPlacement: "postExport",
     upgradeReason: UPGRADE_REASONS.DELETE_LIMITS,
   },
+  reorder: {
+    id: "reorder",
+    maxFiles: 1,
+    maxFileSize: 5 * MB,
+    premiumFlags: {
+      unlimitedMerges: false,
+      unlimitedImages: false,
+      watermarkFree: false,
+      largerFiles: true,
+    },
+    privacyMessage: "Files are processed locally in your browser.",
+    processingMessage: "Reordering locally in your browser...",
+    adPlacement: "postExport",
+    upgradeReason: UPGRADE_REASONS.REORDER_LIMITS,
+  },
   split: {
     id: "split",
     maxFiles: 1,

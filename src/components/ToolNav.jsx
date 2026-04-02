@@ -9,6 +9,7 @@ const TOOL_GROUPS = [
       { id: "split", label: "Split PDF" },
       { id: "rotate", label: "Rotate PDF Pages" },
       { id: "delete", label: "Delete PDF Pages" },
+      { id: "reorder", label: "Reorder PDF Pages" },
     ],
   },
   {

@@ -24,6 +24,13 @@ const TOOL_PREVIEWS = [
     cta: "Open Delete PDF Pages",
   },
   {
+    id: "reorder",
+    route: "/reorder-pdf-pages",
+    title: "Reorder PDF Pages",
+    description: "Drag pages into a new sequence and export the updated PDF.",
+    cta: "Open Reorder PDF Pages",
+  },
+  {
     id: "split",
     route: "/split-pdf",
     title: "Split PDF",
@@ -76,9 +83,9 @@ export default function LandingPage({ onStart, onOpenTool }) {
           </p>
           <h1 className="hero-title">Simple file tools for practical work</h1>
           <p className="hero-subtitle">
-            Merge PDFs, rotate pages, delete pages, split files, convert images
-            to PDF, convert PDFs to images, and compress images in one clean
-            workspace.
+            Merge PDFs, rotate pages, delete pages, reorder pages, split files,
+            convert images to PDF, convert PDFs to images, and compress images
+            in one clean workspace.
           </p>
 
           <div className="hero-actions">
@@ -170,6 +177,11 @@ export default function LandingPage({ onStart, onOpenTool }) {
           <div className="feature-card">
             <h3>Delete PDF Pages</h3>
             <p>Remove unwanted pages and export a cleaner PDF.</p>
+          </div>
+
+          <div className="feature-card">
+            <h3>Reorder PDF Pages</h3>
+            <p>Drag pages into a new sequence and export the updated PDF.</p>
           </div>
 
           <div className="feature-card">
