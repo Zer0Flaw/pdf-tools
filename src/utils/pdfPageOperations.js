@@ -1,13 +1,16 @@
 import { degrees, PDFDocument } from "pdf-lib";
 
-function toPageIndexes(pageNumbers) {
+function toZeroBasedPageIndexes(pageNumbers) {
   return pageNumbers.map((pageNumber) => pageNumber - 1);
 }
 
-async function buildPdfFromPageIndexes(bytes, pageIndexes) {
+async function buildPdfFromPageNumbers(bytes, pageNumbers) {
   const sourcePdf = await PDFDocument.load(bytes);
   const nextPdf = await PDFDocument.create();
-  const copiedPages = await nextPdf.copyPages(sourcePdf, pageIndexes);
+  const copiedPages = await nextPdf.copyPages(
+    sourcePdf,
+    toZeroBasedPageIndexes(pageNumbers),
+  );
 
   copiedPages.forEach((page) => nextPdf.addPage(page));
 
@@ -19,7 +22,7 @@ async function buildPdfFromPageStates(bytes, pageStates) {
   const nextPdf = await PDFDocument.create();
   const copiedPages = await nextPdf.copyPages(
     sourcePdf,
-    toPageIndexes(pageStates.map((page) => page.pageNumber)),
+    toZeroBasedPageIndexes(pageStates.map((page) => page.pageNumber)),
   );
 
   copiedPages.forEach((page, index) => {
@@ -42,15 +45,15 @@ export async function rotatePdfPages(bytes, pages) {
 }
 
 export async function deletePdfPages(bytes, keptPageNumbers) {
-  return buildPdfFromPageIndexes(bytes, toPageIndexes(keptPageNumbers));
+  return buildPdfFromPageNumbers(bytes, keptPageNumbers);
 }
 
 export async function reorderPdfPages(bytes, orderedPageNumbers) {
-  return buildPdfFromPageIndexes(bytes, toPageIndexes(orderedPageNumbers));
+  return buildPdfFromPageNumbers(bytes, orderedPageNumbers);
 }
 
 export async function extractPdfPages(bytes, selectedPageNumbers) {
-  return buildPdfFromPageIndexes(bytes, toPageIndexes(selectedPageNumbers));
+  return buildPdfFromPageNumbers(bytes, selectedPageNumbers);
 }
 
 export async function editPdfPages(bytes, pageStates) {

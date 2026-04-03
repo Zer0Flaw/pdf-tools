@@ -204,7 +204,6 @@ export default function ReorderPdfPagesTool() {
         ...page,
         id: `page-${page.pageNumber}`,
         totalPages: previewPages.length,
-        originalIndex: index,
       }));
 
       setPages(nextPages);

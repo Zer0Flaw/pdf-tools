@@ -364,6 +364,17 @@ export default function EditPdfTool() {
     });
   }
 
+  function getIncludedPages() {
+    return pages.filter((page) => !page.markedForDeletion);
+  }
+
+  function getSelectedIncludedPages() {
+    return pages.filter(
+      (page) =>
+        selectedPages.includes(page.pageNumber) && !page.markedForDeletion,
+    );
+  }
+
   async function downloadPdfDocument(pdfBytes, downloadName, successText, metadata = {}) {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
@@ -396,11 +407,35 @@ export default function EditPdfTool() {
     });
   }
 
+  async function runPdfExport(exporter, onErrorMessage) {
+    trackEvent("process_started", {
+      tool: "edit",
+      file_count: 1,
+      input_type: "pdf",
+      output_type: "pdf",
+    });
+    setIsProcessing(true);
+    setShowExportAd(false);
+    setMessage(null);
+
+    try {
+      const bytes = await file.arrayBuffer();
+      await exporter(bytes);
+    } catch {
+      setMessage({
+        type: "error",
+        text: onErrorMessage,
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  }
+
   async function exportEditedDocument() {
     if (!file || !pages.length || isProcessing) return;
 
-    const remainingPages = pages.filter((page) => !page.markedForDeletion);
-    if (!remainingPages.length) {
+    const includedPages = getIncludedPages();
+    if (!includedPages.length) {
       setMessage({
         type: "error",
         text: "At least one page must remain in the edited PDF.",
@@ -408,47 +443,25 @@ export default function EditPdfTool() {
       return;
     }
 
-    trackEvent("process_started", {
-      tool: "edit",
-      file_count: 1,
-      input_type: "pdf",
-      output_type: "pdf",
-    });
-    setIsProcessing(true);
-    setShowExportAd(false);
-    setMessage(null);
-
-    try {
-      const bytes = await file.arrayBuffer();
+    await runPdfExport(async (bytes) => {
       const pdfBytes = await editPdfPages(bytes, pages);
       await downloadPdfDocument(
         pdfBytes,
         `${getBaseFileName(file.name)}-edited.pdf`,
         "Edited PDF downloaded successfully",
         {
-          fileCount: remainingPages.length,
+          fileCount: includedPages.length,
           extra: { export_kind: "edited_pdf" },
         },
       );
-    } catch {
-      setMessage({
-        type: "error",
-        text: "Something went wrong while exporting your edited PDF.",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+    }, "Something went wrong while exporting your edited PDF.");
   }
 
   async function exportSelectedPages() {
     if (!file || !selectedPages.length || isProcessing) return;
 
-    const selectedKeptPages = pages.filter(
-      (page) =>
-        selectedPages.includes(page.pageNumber) && !page.markedForDeletion,
-    );
-
-    if (!selectedKeptPages.length) {
+    const selectedIncludedPages = getSelectedIncludedPages();
+    if (!selectedIncludedPages.length) {
       setMessage({
         type: "error",
         text: "Select at least one page that is still included in the document.",
@@ -456,44 +469,23 @@ export default function EditPdfTool() {
       return;
     }
 
-    trackEvent("process_started", {
-      tool: "edit",
-      file_count: 1,
-      input_type: "pdf",
-      output_type: "pdf",
-    });
-    setIsProcessing(true);
-    setShowExportAd(false);
-    setMessage(null);
-
-    try {
-      const bytes = await file.arrayBuffer();
+    await runPdfExport(async (bytes) => {
       const pdfBytes = await extractEditedPdfPages(bytes, pages, selectedPages);
       await downloadPdfDocument(
         pdfBytes,
         `${getBaseFileName(file.name)}-selected-pages.pdf`,
         "Selected pages downloaded successfully",
         {
-          fileCount: selectedKeptPages.length,
+          fileCount: selectedIncludedPages.length,
           extra: { export_kind: "selected_pages" },
         },
       );
-    } catch {
-      setMessage({
-        type: "error",
-        text: "Something went wrong while exporting your selected pages.",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+    }, "Something went wrong while exporting your selected pages.");
   }
 
   const deletedCount = pages.filter((page) => page.markedForDeletion).length;
   const remainingCount = pages.length - deletedCount;
-  const selectedIncludedCount = pages.filter(
-    (page) =>
-      selectedPages.includes(page.pageNumber) && !page.markedForDeletion,
-  ).length;
+  const selectedIncludedCount = getSelectedIncludedPages().length;
 
   return (
     <>
