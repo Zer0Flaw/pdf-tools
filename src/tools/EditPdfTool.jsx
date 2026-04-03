@@ -619,6 +619,13 @@ export default function EditPdfTool() {
         {pages.length > 0 && activePage && (
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <div className="edit-pdf-shell edit-pdf-editor-panel">
+            <div className="edit-pdf-doc-summary" aria-label="Loaded document summary">
+              <div className="edit-pdf-doc-summary-copy">
+                <strong>{file.name}</strong>
+                <span>{pages.length} page{pages.length === 1 ? "" : "s"} loaded</span>
+              </div>
+            </div>
+
             <div className="edit-pdf-toolbar">
               <div className="edit-pdf-toolbar-section edit-pdf-toolbar-status">
                 <strong>{remainingCount} pages in export</strong>
