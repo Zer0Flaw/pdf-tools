@@ -1184,6 +1184,298 @@ h1 {
   justify-content: flex-end;
 }
 
+.edit-pdf-shell {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.edit-pdf-toolbar {
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fbfbfc 0%, #f7f9fc 100%);
+  padding: 16px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.edit-pdf-toolbar-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.edit-pdf-toolbar-status {
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 180px;
+}
+
+.edit-pdf-toolbar-status strong {
+  color: #111827;
+}
+
+.edit-pdf-toolbar-status span {
+  color: #4b5563;
+  font-size: 0.92rem;
+}
+
+.edit-pdf-toolbar-section-right {
+  justify-content: flex-end;
+}
+
+.edit-pdf-export-btn {
+  margin: 0;
+  width: auto;
+}
+
+.edit-pdf-workspace {
+  display: grid;
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
+  gap: 18px;
+  min-height: 640px;
+}
+
+.edit-pdf-sidebar,
+.edit-pdf-viewer {
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background: #fafafa;
+}
+
+.edit-pdf-sidebar {
+  padding: 14px;
+  background: linear-gradient(180deg, #fafbfd 0%, #f6f8fb 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+
+.edit-pdf-sidebar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.edit-pdf-sidebar-head strong {
+  color: #111827;
+}
+
+.edit-pdf-sidebar-head span {
+  color: #6b7280;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.edit-pdf-thumbnail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.edit-pdf-thumb {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.edit-pdf-thumb:hover {
+  border-color: #cbd5e1;
+}
+
+.edit-pdf-thumb.active {
+  border-color: #111827;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+}
+
+.edit-pdf-thumb.selected {
+  background: linear-gradient(180deg, #f8faff 0%, #eef2ff 100%);
+  border-color: #c7d2fe;
+}
+
+.edit-pdf-thumb.deleted {
+  background: linear-gradient(180deg, #fff7f7 0%, #fff1f2 100%);
+  border-color: #fecaca;
+}
+
+.edit-pdf-thumb.dragging {
+  transform: rotate(1deg);
+}
+
+.edit-pdf-thumb-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.edit-pdf-thumb-handle {
+  border: 1px dashed #d1d5db;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #4b5563;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: grab;
+}
+
+.edit-pdf-thumb-handle:active {
+  cursor: grabbing;
+}
+
+.edit-pdf-thumb-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.edit-pdf-thumb-preview {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  min-height: 138px;
+  padding: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.edit-pdf-thumb-image {
+  display: block;
+  max-width: 100%;
+  max-height: 168px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.18s ease;
+}
+
+.edit-pdf-thumb.deleted .edit-pdf-thumb-image {
+  opacity: 0.58;
+  filter: saturate(0.5);
+}
+
+.edit-pdf-thumb-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.edit-pdf-thumb-meta strong {
+  color: #111827;
+  font-size: 0.95rem;
+}
+
+.edit-pdf-thumb-meta span {
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.edit-pdf-viewer {
+  padding: 18px;
+  background: linear-gradient(180deg, #fbfbfc 0%, #f7f8fb 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.edit-pdf-viewer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.edit-pdf-viewer-head h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 1.45rem;
+}
+
+.edit-pdf-viewer-head p:last-child {
+  margin: 6px 0 0;
+  color: #4b5563;
+}
+
+.edit-pdf-viewer-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.edit-pdf-viewer-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid #dbe1ea;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.edit-pdf-viewer-stage {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #f2f4f7 0%, #eef2f7 100%);
+  padding: 20px;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.edit-pdf-viewer-canvas {
+  min-width: min(100%, 420px);
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.edit-pdf-viewer-image {
+  display: block;
+  max-width: 100%;
+  max-height: 620px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transform-origin: center center;
+  transition: transform 0.18s ease;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.edit-pdf-viewer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .tool-seo-content {
   margin-top: 36px;
   display: flex;
@@ -1563,6 +1855,35 @@ h1 {
   .tool-pair-grid,
   .rotate-page-grid {
     grid-template-columns: 1fr;
+  }
+
+  .edit-pdf-workspace {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .edit-pdf-toolbar,
+  .edit-pdf-toolbar-section,
+  .edit-pdf-viewer-head,
+  .edit-pdf-viewer-chip-row,
+  .edit-pdf-viewer-actions {
+    align-items: stretch;
+  }
+
+  .edit-pdf-toolbar,
+  .edit-pdf-toolbar-section,
+  .edit-pdf-viewer-head,
+  .edit-pdf-viewer-chip-row,
+  .edit-pdf-viewer-actions {
+    flex-direction: column;
+  }
+
+  .edit-pdf-toolbar-section-right {
+    justify-content: flex-start;
+  }
+
+  .edit-pdf-viewer-stage {
+    min-height: 320px;
   }
 
   .landing-cta-card,

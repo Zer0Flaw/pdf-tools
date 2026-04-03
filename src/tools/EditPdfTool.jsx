@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
-  rectSortingStrategy,
-  useSortable,
   arrayMove,
+  useSortable,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import UpgradeBanner from "../components/UpgradeBanner";
@@ -27,14 +27,14 @@ function normalizeRotation(value) {
   return normalized < 0 ? normalized + 360 : normalized;
 }
 
-function SortableEditablePdfPageCard({
+function SortableThumbnailPage({
   page,
   index,
   totalPages,
+  isActive,
   isSelected,
+  onActivate,
   onToggleSelection,
-  onRotatePage,
-  onToggleDeletion,
 }) {
   const {
     attributes,
@@ -48,81 +48,72 @@ function SortableEditablePdfPageCard({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.65 : 1,
+    opacity: isDragging ? 0.68 : 1,
   };
+
+  function handleActivate() {
+    onActivate(page.pageNumber);
+  }
 
   return (
     <article
       ref={setNodeRef}
       style={style}
-      className={`rotate-page-card reorder-page-card ${
-        isDragging ? "reorder-page-card-dragging" : ""
-      } ${page.markedForDeletion ? "rotate-page-card-deleted" : ""} ${
-        isSelected ? "extract-page-card-selected" : ""
+      className={`edit-pdf-thumb ${isActive ? "active" : ""} ${
+        isSelected ? "selected" : ""
+      } ${page.markedForDeletion ? "deleted" : ""} ${
+        isDragging ? "dragging" : ""
       }`}
+      onClick={handleActivate}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleActivate();
+        }
+      }}
     >
-      <div
-        className="reorder-page-drag-handle"
-        {...attributes}
-        {...listeners}
-        aria-label={`Drag page ${page.pageNumber} to reorder`}
-      >
-        <span className="reorder-page-badge">Position {index + 1}</span>
-        <span className="reorder-page-hint">Drag to reorder</span>
+      <div className="edit-pdf-thumb-top">
+        <button
+          type="button"
+          className="edit-pdf-thumb-handle"
+          aria-label={`Drag page ${page.pageNumber} to reorder`}
+          onClick={(event) => event.stopPropagation()}
+          {...attributes}
+          {...listeners}
+        >
+          Reorder
+        </button>
+        <label
+          className="edit-pdf-thumb-check"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onToggleSelection(page.pageNumber)}
+          />
+          <span>Select</span>
+        </label>
       </div>
 
-      <label className="rotate-page-select">
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={() => onToggleSelection(page.pageNumber)}
-        />
-        <span>Select page {page.pageNumber}</span>
-      </label>
-
-      <div className="rotate-page-preview-shell">
+      <div className="edit-pdf-thumb-preview">
         <img
-          className="rotate-page-preview"
+          className="edit-pdf-thumb-image"
           src={page.previewUrl}
           alt={`Preview of PDF page ${page.pageNumber}`}
           style={{ transform: `rotate(${page.rotation}deg)` }}
         />
       </div>
 
-      <div className="rotate-page-meta">
-        <div>
-          <h3>Page {page.pageNumber}</h3>
-          <p>
-            {page.markedForDeletion
-              ? "Marked for deletion"
-              : `Position ${index + 1} of ${totalPages}`}
-          </p>
-          <p>Rotation: {page.rotation}°</p>
-        </div>
-
-        <div className="rotate-page-actions">
-          <button
-            type="button"
-            className="hero-secondary-btn"
-            onClick={() => onRotatePage(page.pageNumber, -90)}
-          >
-            Rotate Left
-          </button>
-          <button
-            type="button"
-            className="hero-secondary-btn"
-            onClick={() => onRotatePage(page.pageNumber, 90)}
-          >
-            Rotate Right
-          </button>
-          <button
-            type="button"
-            className="hero-secondary-btn"
-            onClick={() => onToggleDeletion(page.pageNumber)}
-          >
-            {page.markedForDeletion ? "Keep Page" : "Delete Page"}
-          </button>
-        </div>
+      <div className="edit-pdf-thumb-meta">
+        <strong>Page {page.pageNumber}</strong>
+        <span>
+          {page.markedForDeletion
+            ? "Deleted from export"
+            : `Position ${index + 1} of ${totalPages}`}
+        </span>
       </div>
     </article>
   );
@@ -132,6 +123,7 @@ export default function EditPdfTool() {
   const [file, setFile] = useState(null);
   const [pages, setPages] = useState([]);
   const [selectedPages, setSelectedPages] = useState([]);
+  const [activePageNumber, setActivePageNumber] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -160,11 +152,25 @@ export default function EditPdfTool() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!pages.length) {
+      if (activePageNumber !== null) {
+        setActivePageNumber(null);
+      }
+      return;
+    }
+
+    if (!pages.some((page) => page.pageNumber === activePageNumber)) {
+      setActivePageNumber(pages[0].pageNumber);
+    }
+  }, [activePageNumber, pages]);
+
   function resetPages() {
     revokePreviewUrls(previewUrlsRef.current);
     previewUrlsRef.current = [];
     setPages([]);
     setSelectedPages([]);
+    setActivePageNumber(null);
   }
 
   function setSelectedFile(nextFile) {
@@ -263,6 +269,7 @@ export default function EditPdfTool() {
 
       setPages(nextPages);
       setSelectedPages(nextPages.map((page) => page.pageNumber));
+      setActivePageNumber(nextPages[0]?.pageNumber ?? null);
       setMessage({
         type: "success",
         text: `Ready to edit ${nextPages.length} page${nextPages.length === 1 ? "" : "s"}.`,
@@ -301,6 +308,11 @@ export default function EditPdfTool() {
           : page,
       ),
     );
+  }
+
+  function rotateActivePage(delta) {
+    if (activePageNumber === null) return;
+    rotatePage(activePageNumber, delta);
   }
 
   function rotateSelectedPages(delta) {
@@ -351,6 +363,11 @@ export default function EditPdfTool() {
     updateDeletionState([pageNumber], !targetPage.markedForDeletion);
   }
 
+  function toggleActivePageDeletion() {
+    if (activePageNumber === null) return;
+    toggleDeletionForPage(activePageNumber);
+  }
+
   function handleDragEnd(event) {
     const { active, over } = event;
 
@@ -375,7 +392,12 @@ export default function EditPdfTool() {
     );
   }
 
-  async function downloadPdfDocument(pdfBytes, downloadName, successText, metadata = {}) {
+  async function downloadPdfDocument(
+    pdfBytes,
+    downloadName,
+    successText,
+    metadata = {},
+  ) {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -483,9 +505,14 @@ export default function EditPdfTool() {
     }, "Something went wrong while exporting your selected pages.");
   }
 
+  const activePage =
+    pages.find((page) => page.pageNumber === activePageNumber) || pages[0] || null;
   const deletedCount = pages.filter((page) => page.markedForDeletion).length;
   const remainingCount = pages.length - deletedCount;
   const selectedIncludedCount = getSelectedIncludedPages().length;
+  const activePageSelected = activePage
+    ? selectedPages.includes(activePage.pageNumber)
+    : false;
 
   return (
     <>
@@ -576,121 +603,182 @@ export default function EditPdfTool() {
         </button>
       )}
 
-      {pages.length > 0 && (
-        <>
-          <div className="rotate-toolbar">
-            <div className="rotate-toolbar-copy">
-              <strong>
-                {selectedPages.length} selected, {remainingCount} staying in the edited PDF
-              </strong>
-              <span>
-                Drag to reorder, rotate pages as needed, mark pages for deletion, or export just the current selection.
-              </span>
-            </div>
-
-            <div className="rotate-toolbar-actions">
-              <button
-                type="button"
-                className="hero-secondary-btn"
-                onClick={selectAllPages}
-              >
-                Select All
-              </button>
-              <button
-                type="button"
-                className="hero-secondary-btn"
-                onClick={clearPageSelection}
-              >
-                Clear Selection
-              </button>
-              <button
-                type="button"
-                className="hero-secondary-btn"
-                onClick={() => rotateSelectedPages(-90)}
-                disabled={!selectedPages.length}
-              >
-                Rotate Selected Left
-              </button>
-              <button
-                type="button"
-                className="hero-secondary-btn"
-                onClick={() => rotateSelectedPages(90)}
-                disabled={!selectedPages.length}
-              >
-                Rotate Selected Right
-              </button>
-              <button
-                type="button"
-                className="hero-secondary-btn"
-                onClick={markSelectedForDeletion}
-                disabled={!selectedPages.length}
-              >
-                Delete Selected
-              </button>
-              <button
-                type="button"
-                className="hero-secondary-btn"
-                onClick={keepSelectedPages}
-                disabled={!selectedPages.length}
-              >
-                Keep Selected
-              </button>
-            </div>
-          </div>
-
-          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext
-              items={pages.map((page) => page.id)}
-              strategy={rectSortingStrategy}
-            >
-              <div className="rotate-page-grid">
-                {pages.map((page, index) => (
-                  <SortableEditablePdfPageCard
-                    key={page.id}
-                    page={page}
-                    index={index}
-                    totalPages={pages.length}
-                    isSelected={selectedPages.includes(page.pageNumber)}
-                    onToggleSelection={togglePageSelection}
-                    onRotatePage={rotatePage}
-                    onToggleDeletion={toggleDeletionForPage}
-                  />
-                ))}
+      {pages.length > 0 && activePage && (
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <div className="edit-pdf-shell">
+            <div className="edit-pdf-toolbar">
+              <div className="edit-pdf-toolbar-section edit-pdf-toolbar-status">
+                <strong>{remainingCount} pages in export</strong>
+                <span>
+                  {selectedPages.length} selected, {deletedCount} removed from export
+                </span>
               </div>
-            </SortableContext>
-          </DndContext>
 
-          <div className="rotate-toolbar edit-pdf-actions">
-            <div className="rotate-toolbar-copy">
-              <strong>
-                {deletedCount} page{deletedCount === 1 ? "" : "s"} marked for deletion
-              </strong>
-              <span>
-                Export the full edited PDF, or export {selectedIncludedCount} selected page{selectedIncludedCount === 1 ? "" : "s"} into a separate file.
-              </span>
+              <div className="edit-pdf-toolbar-section">
+                <button
+                  type="button"
+                  className="hero-secondary-btn"
+                  onClick={selectAllPages}
+                >
+                  Select All
+                </button>
+                <button
+                  type="button"
+                  className="hero-secondary-btn"
+                  onClick={clearPageSelection}
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  className="hero-secondary-btn"
+                  onClick={() => rotateSelectedPages(-90)}
+                  disabled={!selectedPages.length}
+                >
+                  Rotate Left
+                </button>
+                <button
+                  type="button"
+                  className="hero-secondary-btn"
+                  onClick={() => rotateSelectedPages(90)}
+                  disabled={!selectedPages.length}
+                >
+                  Rotate Right
+                </button>
+                <button
+                  type="button"
+                  className="hero-secondary-btn"
+                  onClick={markSelectedForDeletion}
+                  disabled={!selectedPages.length}
+                >
+                  Delete
+                </button>
+                <button
+                  type="button"
+                  className="hero-secondary-btn"
+                  onClick={keepSelectedPages}
+                  disabled={!selectedPages.length}
+                >
+                  Keep
+                </button>
+              </div>
+
+              <div className="edit-pdf-toolbar-section edit-pdf-toolbar-section-right">
+                <button
+                  type="button"
+                  className="hero-secondary-btn"
+                  disabled={!selectedIncludedCount || isProcessing}
+                  onClick={exportSelectedPages}
+                >
+                  Export Selected
+                </button>
+                <button
+                  type="button"
+                  className="hero-primary-btn edit-pdf-export-btn"
+                  disabled={!pages.length || !remainingCount || isProcessing}
+                  onClick={exportEditedDocument}
+                >
+                  {isProcessing ? "Exporting..." : "Export PDF"}
+                </button>
+              </div>
             </div>
 
-            <div className="rotate-toolbar-actions">
-              <button
-                type="button"
-                className="hero-secondary-btn"
-                disabled={!selectedIncludedCount || isProcessing}
-                onClick={exportSelectedPages}
-              >
-                {isProcessing ? "Exporting..." : "Export Selected Pages"}
-              </button>
+            <div className="edit-pdf-workspace">
+              <aside className="edit-pdf-sidebar">
+                <div className="edit-pdf-sidebar-head">
+                  <strong>Pages</strong>
+                  <span>Drag to reorder</span>
+                </div>
+
+                <SortableContext
+                  items={pages.map((page) => page.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="edit-pdf-thumbnail-list">
+                    {pages.map((page, index) => (
+                      <SortableThumbnailPage
+                        key={page.id}
+                        page={page}
+                        index={index}
+                        totalPages={pages.length}
+                        isActive={activePage.pageNumber === page.pageNumber}
+                        isSelected={selectedPages.includes(page.pageNumber)}
+                        onActivate={setActivePageNumber}
+                        onToggleSelection={togglePageSelection}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </aside>
+
+              <section className="edit-pdf-viewer">
+                <div className="edit-pdf-viewer-head">
+                  <div>
+                    <p className="section-eyebrow">Document Viewer</p>
+                    <h3>Page {activePage.pageNumber}</h3>
+                    <p>
+                      {activePage.markedForDeletion
+                        ? "This page is currently removed from the edited PDF."
+                        : `Position ${pages.findIndex((page) => page.pageNumber === activePage.pageNumber) + 1} of ${pages.length}`}
+                    </p>
+                  </div>
+
+                  <div className="edit-pdf-viewer-chip-row">
+                    <span className="edit-pdf-viewer-chip">
+                      {activePageSelected ? "Selected" : "Not selected"}
+                    </span>
+                    <span className="edit-pdf-viewer-chip">
+                      Rotation {activePage.rotation}°
+                    </span>
+                  </div>
+                </div>
+
+                <div className="edit-pdf-viewer-stage">
+                  <div className="edit-pdf-viewer-canvas">
+                    <img
+                      className="edit-pdf-viewer-image"
+                      src={activePage.previewUrl}
+                      alt={`Preview of PDF page ${activePage.pageNumber}`}
+                      style={{ transform: `rotate(${activePage.rotation}deg)` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="edit-pdf-viewer-actions">
+                  <button
+                    type="button"
+                    className="hero-secondary-btn"
+                    onClick={() => togglePageSelection(activePage.pageNumber)}
+                  >
+                    {activePageSelected ? "Unselect Page" : "Select Page"}
+                  </button>
+                  <button
+                    type="button"
+                    className="hero-secondary-btn"
+                    onClick={() => rotateActivePage(-90)}
+                  >
+                    Rotate Left
+                  </button>
+                  <button
+                    type="button"
+                    className="hero-secondary-btn"
+                    onClick={() => rotateActivePage(90)}
+                  >
+                    Rotate Right
+                  </button>
+                  <button
+                    type="button"
+                    className="hero-secondary-btn"
+                    onClick={toggleActivePageDeletion}
+                  >
+                    {activePage.markedForDeletion ? "Keep Page" : "Delete Page"}
+                  </button>
+                </div>
+              </section>
             </div>
           </div>
-        </>
+        </DndContext>
       )}
-
-      <button
-        className="merge-btn"
-        disabled={!pages.length || !remainingCount || isProcessing}
-        onClick={exportEditedDocument}
-      >
-        {isProcessing ? "Exporting..." : "Export Edited PDF"}
-      </button>
     </>
   );
 }
