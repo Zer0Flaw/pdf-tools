@@ -517,6 +517,9 @@ export default function EditPdfTool() {
     ? selectedPages.includes(activePage.pageNumber)
     : false;
   const hasLoadedEditor = pages.length > 0 && activePage;
+  const activePagePosition = activePage
+    ? pages.findIndex((page) => page.pageNumber === activePage.pageNumber) + 1
+    : 0;
   const viewerStatusItems = activePage
     ? [
         `Page ${activePage.pageNumber} / ${pages.length}`,
@@ -763,7 +766,7 @@ export default function EditPdfTool() {
                     <p>
                       {activePage.markedForDeletion
                         ? "This page is currently removed from the edited PDF."
-                        : `Position ${pages.findIndex((page) => page.pageNumber === activePage.pageNumber) + 1} of ${pages.length}`}
+                        : `Position ${activePagePosition} of ${pages.length}`}
                     </p>
                   </div>
 
@@ -779,6 +782,21 @@ export default function EditPdfTool() {
 
                 <div className="edit-pdf-viewer-body">
                   <div className="edit-pdf-viewer-workspace">
+                    <div className="edit-pdf-viewer-page-header" aria-label="Active page context">
+                      <div className="edit-pdf-viewer-page-header-copy">
+                        <span className="edit-pdf-viewer-page-kicker">Active page</span>
+                        <strong>
+                          Page {activePage.pageNumber} of {pages.length}
+                        </strong>
+                      </div>
+                      <span className="edit-pdf-viewer-page-state">
+                        {activePage.markedForDeletion
+                          ? "Marked for deletion"
+                          : activePageSelected
+                            ? "Selected"
+                            : "Ready to edit"}
+                      </span>
+                    </div>
                     <div className="edit-pdf-viewer-stage">
                       <div className="edit-pdf-viewer-canvas-shell">
                         <div className="edit-pdf-viewer-preview-frame">
