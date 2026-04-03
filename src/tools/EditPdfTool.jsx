@@ -513,6 +513,14 @@ export default function EditPdfTool() {
   const activePageSelected = activePage
     ? selectedPages.includes(activePage.pageNumber)
     : false;
+  const viewerStatusItems = activePage
+    ? [
+        `Page ${activePage.pageNumber} / ${pages.length}`,
+        activePage.rotation ? `Rotation: ${activePage.rotation}°` : null,
+        activePageSelected ? "Selected" : null,
+        activePage.markedForDeletion ? "Marked for Deletion" : null,
+      ].filter(Boolean)
+    : [];
 
   return (
     <>
@@ -774,6 +782,16 @@ export default function EditPdfTool() {
                     {activePage.markedForDeletion ? "Keep Page" : "Delete Page"}
                   </button>
                 </div>
+
+                {viewerStatusItems.length > 0 && (
+                  <div className="edit-pdf-viewer-status" aria-label="Active page status">
+                    {viewerStatusItems.map((item) => (
+                      <span key={item} className="edit-pdf-viewer-status-item">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </section>
             </div>
           </div>
