@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -22,13 +22,20 @@ const EDIT_FEATURE = getFeatureGate("edit");
 const MAX_FILE_SIZE = EDIT_FEATURE.maxFileSize;
 const MAX_FILES = EDIT_FEATURE.maxFiles;
 const FILE_SIZE_LIMIT_LABEL = formatFeatureFileSize(MAX_FILE_SIZE);
+const MIN_ZOOM = 0.75;
+const MAX_ZOOM = 2;
+const ZOOM_STEP = 0.15;
 
 function normalizeRotation(value) {
   const normalized = value % 360;
   return normalized < 0 ? normalized + 360 : normalized;
 }
 
-function SortableThumbnailPage({
+function clampZoom(value) {
+  return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Number(value.toFixed(2))));
+}
+
+const SortableThumbnailPage = memo(function SortableThumbnailPage({
   page,
   index,
   totalPages,
@@ -119,6 +126,16 @@ function SortableThumbnailPage({
       </div>
     </article>
   );
+}, areThumbnailPropsEqual);
+
+function areThumbnailPropsEqual(prevProps, nextProps) {
+  return (
+    prevProps.page === nextProps.page &&
+    prevProps.index === nextProps.index &&
+    prevProps.totalPages === nextProps.totalPages &&
+    prevProps.isActive === nextProps.isActive &&
+    prevProps.isSelected === nextProps.isSelected
+  );
 }
 
 export default function EditPdfTool() {
@@ -127,6 +144,7 @@ export default function EditPdfTool() {
   const [pages, setPages] = useState([]);
   const [selectedPages, setSelectedPages] = useState([]);
   const [activePageNumber, setActivePageNumber] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -134,6 +152,19 @@ export default function EditPdfTool() {
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
   const isPremium = false;
+  const selectedPageSet = useMemo(() => new Set(selectedPages), [selectedPages]);
+  const pageIds = useMemo(() => pages.map((page) => page.id), [pages]);
+  const includedPages = useMemo(
+    () => pages.filter((page) => !page.markedForDeletion),
+    [pages],
+  );
+  const selectedIncludedPages = useMemo(
+    () =>
+      pages.filter(
+        (page) => selectedPageSet.has(page.pageNumber) && !page.markedForDeletion,
+      ),
+    [pages, selectedPageSet],
+  );
 
   useEffect(() => {
     previewUrlsRef.current = pages;
@@ -174,6 +205,7 @@ export default function EditPdfTool() {
     setPages([]);
     setSelectedPages([]);
     setActivePageNumber(null);
+    setZoomLevel(1);
   }
 
   function setSelectedFile(nextFile) {
@@ -287,13 +319,17 @@ export default function EditPdfTool() {
     }
   }
 
-  function togglePageSelection(pageNumber) {
+  const togglePageSelection = useCallback((pageNumber) => {
     setSelectedPages((prev) =>
       prev.includes(pageNumber)
         ? prev.filter((value) => value !== pageNumber)
         : [...prev, pageNumber].sort((a, b) => a - b),
     );
-  }
+  }, []);
+
+  const handleThumbnailActivate = useCallback((pageNumber) => {
+    setActivePageNumber(pageNumber);
+  }, []);
 
   function selectAllPages() {
     setSelectedPages(pages.map((page) => page.pageNumber));
@@ -316,6 +352,14 @@ export default function EditPdfTool() {
   function rotateActivePage(delta) {
     if (activePageNumber === null) return;
     rotatePage(activePageNumber, delta);
+  }
+
+  function adjustZoom(delta) {
+    setZoomLevel((prev) => clampZoom(prev + delta));
+  }
+
+  function resetZoom() {
+    setZoomLevel(1);
   }
 
   function rotateSelectedPages(delta) {
@@ -384,17 +428,6 @@ export default function EditPdfTool() {
     });
   }
 
-  function getIncludedPages() {
-    return pages.filter((page) => !page.markedForDeletion);
-  }
-
-  function getSelectedIncludedPages() {
-    return pages.filter(
-      (page) =>
-        selectedPages.includes(page.pageNumber) && !page.markedForDeletion,
-    );
-  }
-
   async function downloadPdfDocument(
     pdfBytes,
     downloadName,
@@ -459,7 +492,6 @@ export default function EditPdfTool() {
   async function exportEditedDocument() {
     if (!file || !pages.length || isProcessing) return;
 
-    const includedPages = getIncludedPages();
     if (!includedPages.length) {
       setMessage({
         type: "error",
@@ -485,7 +517,6 @@ export default function EditPdfTool() {
   async function exportSelectedPages() {
     if (!file || !selectedPages.length || isProcessing) return;
 
-    const selectedIncludedPages = getSelectedIncludedPages();
     if (!selectedIncludedPages.length) {
       setMessage({
         type: "error",
@@ -512,22 +543,23 @@ export default function EditPdfTool() {
     pages.find((page) => page.pageNumber === activePageNumber) || pages[0] || null;
   const deletedCount = pages.filter((page) => page.markedForDeletion).length;
   const remainingCount = pages.length - deletedCount;
-  const selectedIncludedCount = getSelectedIncludedPages().length;
+  const selectedIncludedCount = selectedIncludedPages.length;
   const activePageSelected = activePage
-    ? selectedPages.includes(activePage.pageNumber)
+    ? selectedPageSet.has(activePage.pageNumber)
     : false;
   const hasLoadedEditor = pages.length > 0 && activePage;
   const activePagePosition = activePage
     ? pages.findIndex((page) => page.pageNumber === activePage.pageNumber) + 1
     : 0;
   const viewerStatusItems = activePage
-    ? [
-        `Page ${activePage.pageNumber} / ${pages.length}`,
-        activePage.rotation ? `Rotation: ${activePage.rotation}°` : null,
-        activePageSelected ? "Selected" : null,
-        activePage.markedForDeletion ? "Marked for Deletion" : null,
-      ].filter(Boolean)
-    : [];
+      ? [
+          `Page ${activePage.pageNumber} / ${pages.length}`,
+          activePage.rotation ? `Rotation: ${activePage.rotation}°` : null,
+          zoomLevel !== 1 ? `Zoom: ${Math.round(zoomLevel * 100)}%` : null,
+          activePageSelected ? "Selected" : null,
+          activePage.markedForDeletion ? "Marked for Deletion" : null,
+        ].filter(Boolean)
+      : [];
 
   useEffect(() => {
     const appCard = toolRootRef.current?.closest(".app-card-editor");
@@ -775,12 +807,42 @@ export default function EditPdfTool() {
             <div className="edit-pdf-workspace">
               <aside className="edit-pdf-sidebar">
                 <div className="edit-pdf-sidebar-head">
-                  <strong>Pages</strong>
-                  <span>Drag to reorder</span>
+                  <div className="edit-pdf-sidebar-head-copy">
+                    <strong>Pages</strong>
+                    <span>Drag to reorder</span>
+                  </div>
+
+                  <div className="edit-pdf-sidebar-head-metrics" aria-label="Thumbnail rail overview">
+                    <span className="edit-pdf-sidebar-metric">
+                      <strong>{pages.length}</strong>
+                      pages
+                    </span>
+                    <span className="edit-pdf-sidebar-metric">
+                      <strong>{selectedPages.length}</strong>
+                      selected
+                    </span>
+                  </div>
+                </div>
+
+                <div className="edit-pdf-sidebar-command-bar" aria-label="Thumbnail rail commands">
+                  <button
+                    type="button"
+                    className="hero-secondary-btn"
+                    onClick={selectAllPages}
+                  >
+                    Select All
+                  </button>
+                  <button
+                    type="button"
+                    className="hero-secondary-btn"
+                    onClick={clearPageSelection}
+                  >
+                    Clear
+                  </button>
                 </div>
 
                 <SortableContext
-                  items={pages.map((page) => page.id)}
+                  items={pageIds}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="edit-pdf-thumbnail-list">
@@ -791,8 +853,8 @@ export default function EditPdfTool() {
                         index={index}
                         totalPages={pages.length}
                         isActive={activePage.pageNumber === page.pageNumber}
-                        isSelected={selectedPages.includes(page.pageNumber)}
-                        onActivate={setActivePageNumber}
+                        isSelected={selectedPageSet.has(page.pageNumber)}
+                        onActivate={handleThumbnailActivate}
                         onToggleSelection={togglePageSelection}
                       />
                     ))}
@@ -847,7 +909,9 @@ export default function EditPdfTool() {
                               className="edit-pdf-viewer-image"
                               src={activePage.previewUrl}
                               alt={`Preview of PDF page ${activePage.pageNumber}`}
-                              style={{ transform: `rotate(${activePage.rotation}deg)` }}
+                              style={{
+                                transform: `rotate(${activePage.rotation}deg) scale(${zoomLevel})`,
+                              }}
                             />
                           </div>
                         </div>
@@ -857,34 +921,72 @@ export default function EditPdfTool() {
                 </div>
 
                 <div className="edit-pdf-viewer-actions">
-                  <button
-                    type="button"
-                    className="hero-secondary-btn"
-                    onClick={() => togglePageSelection(activePage.pageNumber)}
-                  >
-                    {activePageSelected ? "Unselect Page" : "Select Page"}
-                  </button>
-                  <button
-                    type="button"
-                    className="hero-secondary-btn"
-                    onClick={() => rotateActivePage(-90)}
-                  >
-                    Rotate Left
-                  </button>
-                  <button
-                    type="button"
-                    className="hero-secondary-btn"
-                    onClick={() => rotateActivePage(90)}
-                  >
-                    Rotate Right
-                  </button>
-                  <button
-                    type="button"
-                    className="hero-secondary-btn"
-                    onClick={toggleActivePageDeletion}
-                  >
-                    {activePage.markedForDeletion ? "Keep Page" : "Delete Page"}
-                  </button>
+                  <div className="edit-pdf-viewer-action-group">
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => togglePageSelection(activePage.pageNumber)}
+                    >
+                      {activePageSelected ? "Unselect Page" : "Select Page"}
+                    </button>
+                  </div>
+
+                  <div className="edit-pdf-viewer-action-group">
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => rotateActivePage(-90)}
+                    >
+                      Rotate Left
+                    </button>
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => rotateActivePage(90)}
+                    >
+                      Rotate Right
+                    </button>
+                  </div>
+
+                  <div className="edit-pdf-viewer-action-group edit-pdf-viewer-action-group-zoom">
+                    <span className="edit-pdf-viewer-action-label">
+                      Zoom {Math.round(zoomLevel * 100)}%
+                    </span>
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => adjustZoom(-ZOOM_STEP)}
+                      disabled={zoomLevel <= MIN_ZOOM}
+                    >
+                      Zoom Out
+                    </button>
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => adjustZoom(ZOOM_STEP)}
+                      disabled={zoomLevel >= MAX_ZOOM}
+                    >
+                      Zoom In
+                    </button>
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={resetZoom}
+                      disabled={zoomLevel === 1}
+                    >
+                      Reset Zoom
+                    </button>
+                  </div>
+
+                  <div className="edit-pdf-viewer-action-group">
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={toggleActivePageDeletion}
+                    >
+                      {activePage.markedForDeletion ? "Keep Page" : "Delete Page"}
+                    </button>
+                  </div>
                 </div>
 
                 {viewerStatusItems.length > 0 && (
