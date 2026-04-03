@@ -1522,11 +1522,10 @@ h1 {
   border-radius: 18px;
   background: linear-gradient(180deg, #fbfbfc 0%, #f7f9fc 100%);
   padding: 16px 18px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
+  gap: 16px 18px;
+  align-items: stretch;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.72),
     0 10px 24px rgba(15, 23, 42, 0.04);
@@ -1538,17 +1537,80 @@ h1 {
   background: rgba(255, 255, 255, 0.86);
 }
 
+.edit-pdf-toolbar-overview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding-right: 18px;
+  border-right: 1px solid rgba(203, 213, 225, 0.78);
+}
+
+.edit-pdf-toolbar-command-bar {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.edit-pdf-toolbar-groups {
+  flex: 1 1 420px;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.edit-pdf-toolbar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(219, 228, 239, 0.95);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.95) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.edit-pdf-flow.loaded .edit-pdf-toolbar-group {
+  border-color: rgba(203, 213, 225, 0.9);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(246, 249, 253, 0.96) 100%);
+}
+
+.edit-pdf-toolbar-group-export {
+  flex: 0 0 auto;
+  min-width: 182px;
+  margin-left: auto;
+}
+
+.edit-pdf-toolbar-label {
+  flex: 0 0 auto;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .edit-pdf-toolbar-section {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .edit-pdf-toolbar-status {
   flex-direction: column;
   align-items: flex-start;
-  min-width: 180px;
+  min-width: 0;
+  gap: 4px;
 }
 
 .edit-pdf-toolbar-status strong {
@@ -1560,13 +1622,39 @@ h1 {
   font-size: 0.92rem;
 }
 
+.edit-pdf-toolbar-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.edit-pdf-toolbar-metric {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(203, 213, 225, 0.88);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.98) 100%);
+  color: #475569;
+  font-size: 0.79rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.edit-pdf-toolbar-metric strong {
+  color: #0f172a;
+  font-size: 0.88rem;
+}
+
 .edit-pdf-toolbar-section-right {
   justify-content: flex-end;
 }
 
 .edit-pdf-export-btn {
   margin: 0;
-  width: auto;
+  width: 100%;
+  min-width: 140px;
 }
 
 .edit-pdf-workspace {
@@ -1967,6 +2055,22 @@ h1 {
 
 .edit-pdf-flow.loaded .edit-pdf-viewer-stage {
   min-height: 560px;
+  margin-top: 4px;
+  padding: 28px 26px;
+  border-color: rgba(191, 219, 254, 0.55);
+  background:
+    radial-gradient(circle at top, rgba(219, 234, 254, 0.28) 0%, rgba(255, 255, 255, 0) 54%),
+    linear-gradient(180deg, rgba(248, 250, 252, 0.92) 0%, rgba(241, 245, 249, 0.88) 100%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(226, 232, 240, 0.4) 0,
+      rgba(226, 232, 240, 0.4) 10px,
+      rgba(248, 250, 252, 0.78) 10px,
+      rgba(248, 250, 252, 0.78) 20px
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 16px 32px rgba(15, 23, 42, 0.06);
 }
 
 .edit-pdf-viewer-canvas-shell {
@@ -1975,7 +2079,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  padding: 10px 12px;
 }
 
 .edit-pdf-viewer-preview-frame {
@@ -1984,7 +2088,8 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 18px;
+  margin: 0 auto;
+  padding: 22px 24px;
   border-radius: 24px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(248, 250, 252, 0.98) 100%);
   border: 1px solid rgba(203, 213, 225, 0.85);
@@ -1999,12 +2104,13 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 28px 24px;
+  margin: 0 auto;
+  padding: 34px 30px;
   border-radius: 20px;
   background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
   border: 1px solid rgba(203, 213, 225, 0.9);
   box-shadow:
-    0 20px 40px rgba(15, 23, 42, 0.08),
+    0 22px 44px rgba(15, 23, 42, 0.09),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
@@ -2014,10 +2120,14 @@ h1 {
   max-height: 560px;
   width: auto;
   height: auto;
+  margin: 0 auto;
   object-fit: contain;
   transform-origin: center center;
   transition: transform 0.18s ease;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.92),
+    0 16px 34px rgba(15, 23, 42, 0.14),
+    0 4px 10px rgba(15, 23, 42, 0.08);
 }
 
 .edit-pdf-viewer-actions {
@@ -2028,8 +2138,8 @@ h1 {
 }
 
 .edit-pdf-flow.loaded .edit-pdf-viewer-actions {
-  padding: 12px 14px 0;
-  margin-top: -2px;
+  padding: 12px 14px 2px;
+  margin-top: 4px;
   border-top: 1px solid rgba(191, 219, 254, 0.72);
   background: linear-gradient(
     180deg,
@@ -2522,7 +2632,10 @@ h1 {
     max-height: none;
   }
 
-  .edit-pdf-toolbar,
+  .edit-pdf-toolbar-overview,
+  .edit-pdf-toolbar-command-bar,
+  .edit-pdf-toolbar-groups,
+  .edit-pdf-toolbar-group,
   .edit-pdf-toolbar-section,
   .edit-pdf-viewer-head,
   .edit-pdf-viewer-chip-row,
@@ -2531,6 +2644,10 @@ h1 {
   }
 
   .edit-pdf-toolbar,
+  .edit-pdf-toolbar-overview,
+  .edit-pdf-toolbar-command-bar,
+  .edit-pdf-toolbar-groups,
+  .edit-pdf-toolbar-group,
   .edit-pdf-toolbar-section,
   .edit-pdf-viewer-head,
   .edit-pdf-viewer-chip-row,
@@ -2538,8 +2655,24 @@ h1 {
     flex-direction: column;
   }
 
+  .edit-pdf-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-pdf-toolbar-overview {
+    padding-right: 0;
+    padding-bottom: 12px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(203, 213, 225, 0.82);
+  }
+
   .edit-pdf-doc-summary {
     align-items: flex-start;
+  }
+
+  .edit-pdf-toolbar-group-export {
+    margin-left: 0;
+    min-width: 0;
   }
 
   .edit-pdf-toolbar-section-right {
@@ -2566,7 +2699,7 @@ h1 {
 
   .edit-pdf-viewer-canvas-shell {
     min-height: auto;
-    padding: 0;
+    padding: 2px 0;
   }
 
   .edit-pdf-viewer-page-header {
@@ -2581,12 +2714,12 @@ h1 {
   .edit-pdf-viewer-preview-frame {
     width: 100%;
     min-height: auto;
-    padding: 12px;
+    padding: 14px 12px;
   }
 
   .edit-pdf-viewer-canvas {
     width: 100%;
-    padding: 18px 14px;
+    padding: 20px 16px;
   }
 
   .landing-cta-card,

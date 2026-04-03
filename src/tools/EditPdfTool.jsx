@@ -653,82 +653,124 @@ export default function EditPdfTool() {
               </div>
             </div>
 
-            <div className="edit-pdf-toolbar">
-              <div className="edit-pdf-toolbar-section edit-pdf-toolbar-status">
-                <strong>{remainingCount} pages in export</strong>
-                <span>
-                  {selectedPages.length} selected, {deletedCount} removed from export
-                </span>
-              </div>
+              <div className="edit-pdf-toolbar">
+                <div className="edit-pdf-toolbar-overview">
+                  <div className="edit-pdf-toolbar-section edit-pdf-toolbar-status">
+                    <strong>{remainingCount} pages in export</strong>
+                    <span>
+                      {selectedPages.length} selected, {deletedCount} removed from export
+                    </span>
+                  </div>
 
-              <div className="edit-pdf-toolbar-section">
-                <button
-                  type="button"
-                  className="hero-secondary-btn"
-                  onClick={selectAllPages}
-                >
-                  Select All
-                </button>
-                <button
-                  type="button"
-                  className="hero-secondary-btn"
-                  onClick={clearPageSelection}
-                >
-                  Clear
-                </button>
-                <button
-                  type="button"
-                  className="hero-secondary-btn"
-                  onClick={() => rotateSelectedPages(-90)}
-                  disabled={!selectedPages.length}
-                >
-                  Rotate Left
-                </button>
-                <button
-                  type="button"
-                  className="hero-secondary-btn"
-                  onClick={() => rotateSelectedPages(90)}
-                  disabled={!selectedPages.length}
-                >
-                  Rotate Right
-                </button>
-                <button
-                  type="button"
-                  className="hero-secondary-btn"
-                  onClick={markSelectedForDeletion}
-                  disabled={!selectedPages.length}
-                >
-                  Delete
-                </button>
-                <button
-                  type="button"
-                  className="hero-secondary-btn"
-                  onClick={keepSelectedPages}
-                  disabled={!selectedPages.length}
-                >
-                  Keep
-                </button>
-              </div>
+                  <div className="edit-pdf-toolbar-metrics" aria-label="Toolbar document metrics">
+                    <span className="edit-pdf-toolbar-metric">
+                      <strong>{selectedPages.length}</strong>
+                      selected
+                    </span>
+                    <span className="edit-pdf-toolbar-metric">
+                      <strong>{selectedIncludedCount}</strong>
+                      ready
+                    </span>
+                    <span className="edit-pdf-toolbar-metric">
+                      <strong>{deletedCount}</strong>
+                      removed
+                    </span>
+                  </div>
+                </div>
 
-              <div className="edit-pdf-toolbar-section edit-pdf-toolbar-section-right">
-                <button
-                  type="button"
-                  className="hero-secondary-btn"
-                  disabled={!selectedIncludedCount || isProcessing}
-                  onClick={exportSelectedPages}
-                >
-                  Export Selected
-                </button>
-                <button
-                  type="button"
-                  className="hero-primary-btn edit-pdf-export-btn"
-                  disabled={!pages.length || !remainingCount || isProcessing}
-                  onClick={exportEditedDocument}
-                >
-                  {isProcessing ? "Exporting..." : "Export PDF"}
-                </button>
+                <div className="edit-pdf-toolbar-command-bar" aria-label="Edit PDF commands">
+                  <div className="edit-pdf-toolbar-groups">
+                    <section className="edit-pdf-toolbar-group" aria-label="Selection commands">
+                      <span className="edit-pdf-toolbar-label">Selection</span>
+                      <div className="edit-pdf-toolbar-section">
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={selectAllPages}
+                        >
+                          Select All
+                        </button>
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={clearPageSelection}
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    </section>
+
+                    <section className="edit-pdf-toolbar-group" aria-label="Rotation commands">
+                      <span className="edit-pdf-toolbar-label">Rotate</span>
+                      <div className="edit-pdf-toolbar-section">
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={() => rotateSelectedPages(-90)}
+                          disabled={!selectedPages.length}
+                        >
+                          Rotate Left
+                        </button>
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={() => rotateSelectedPages(90)}
+                          disabled={!selectedPages.length}
+                        >
+                          Rotate Right
+                        </button>
+                      </div>
+                    </section>
+
+                    <section className="edit-pdf-toolbar-group" aria-label="Page action commands">
+                      <span className="edit-pdf-toolbar-label">Page Actions</span>
+                      <div className="edit-pdf-toolbar-section">
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={markSelectedForDeletion}
+                          disabled={!selectedPages.length}
+                        >
+                          Delete
+                        </button>
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={keepSelectedPages}
+                          disabled={!selectedPages.length}
+                        >
+                          Keep
+                        </button>
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          disabled={!selectedIncludedCount || isProcessing}
+                          onClick={exportSelectedPages}
+                        >
+                          Extract Selected
+                        </button>
+                      </div>
+                    </section>
+                  </div>
+
+                  <section
+                    className="edit-pdf-toolbar-group edit-pdf-toolbar-group-export"
+                    aria-label="Export commands"
+                  >
+                    <span className="edit-pdf-toolbar-label">Export</span>
+                    <div className="edit-pdf-toolbar-section edit-pdf-toolbar-section-right">
+                      <button
+                        type="button"
+                        className="hero-primary-btn edit-pdf-export-btn"
+                        disabled={!pages.length || !remainingCount || isProcessing}
+                        onClick={exportEditedDocument}
+                      >
+                        {isProcessing ? "Exporting..." : "Export PDF"}
+                      </button>
+                    </div>
+                  </section>
+                </div>
               </div>
-            </div>
 
             <div className="edit-pdf-workspace">
               <aside className="edit-pdf-sidebar">
