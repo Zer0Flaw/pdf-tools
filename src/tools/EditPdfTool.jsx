@@ -514,6 +514,7 @@ export default function EditPdfTool() {
   const activePageSelected = activePage
     ? selectedPages.includes(activePage.pageNumber)
     : false;
+  const hasLoadedEditor = pages.length > 0 && activePage;
   const viewerStatusItems = activePage
     ? [
         `Page ${activePage.pageNumber} / ${pages.length}`,
@@ -548,73 +549,76 @@ export default function EditPdfTool() {
         upgradeReason={EDIT_FEATURE.upgradeReason}
       />
 
-      <div
-        className={`drop-zone ${isDragOver ? "drag-over" : ""} ${isProcessing ? "disabled" : ""}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => {
-          if (!isProcessing) fileInputRef.current?.click();
-        }}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="application/pdf"
-          onChange={handleFileChange}
-          hidden
-        />
+      <div className={`edit-pdf-flow ${hasLoadedEditor ? "loaded" : "empty"}`}>
+        <div className="edit-pdf-setup-panel">
+          <div
+            className={`drop-zone edit-pdf-drop-zone ${isDragOver ? "drag-over" : ""} ${isProcessing ? "disabled" : ""}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => {
+              if (!isProcessing) fileInputRef.current?.click();
+            }}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileChange}
+              hidden
+            />
 
-        <div className="drop-zone-title">Select or Drop PDF Here</div>
-        <div className="drop-zone-sub">
-          Free plan includes one PDF up to {FILE_SIZE_LIMIT_LABEL}
-        </div>
-      </div>
-
-      {file && (
-        <div className="file-selection-card">
-          <div className="file-meta">
-            <p className="file-name">{file.name}</p>
-            <p className="file-size">{formatBytes(file.size)}</p>
+            <div className="drop-zone-title">Select or Drop PDF Here</div>
+            <div className="drop-zone-sub">
+              Free plan includes one PDF up to {FILE_SIZE_LIMIT_LABEL}
+            </div>
           </div>
 
-          <button type="button" className="remove-btn" onClick={clearSelectedFile}>
-            Remove
-          </button>
+          {file && (
+            <div className="file-selection-card edit-pdf-file-card">
+              <div className="file-meta">
+                <p className="file-name">{file.name}</p>
+                <p className="file-size">{formatBytes(file.size)}</p>
+              </div>
+
+              <button type="button" className="remove-btn" onClick={clearSelectedFile}>
+                Remove
+              </button>
+            </div>
+          )}
+
+          {file && (
+            <div className="usage-indicator">
+              {MAX_FILES} / {MAX_FILES} PDF selected
+            </div>
+          )}
+
+          <div className="usage-indicator trust-indicator">
+            {EDIT_FEATURE.privacyMessage}
+          </div>
+
+          {isProcessing && (
+            <div className="usage-indicator processing-indicator">
+              {EDIT_FEATURE.processingMessage}
+            </div>
+          )}
+
+          {message && (
+            <div className={`inline-message ${message.type}`}>{message.text}</div>
+          )}
+
+          <AdSlot placement={EDIT_FEATURE.adPlacement} isVisible={showExportAd} />
+
+          {file && !pages.length && !isProcessing && (
+            <button className="merge-btn" onClick={loadPdfPages}>
+              Load PDF Pages
+            </button>
+          )}
         </div>
-      )}
 
-      {file && (
-        <div className="usage-indicator">
-          {MAX_FILES} / {MAX_FILES} PDF selected
-        </div>
-      )}
-
-      <div className="usage-indicator trust-indicator">
-        {EDIT_FEATURE.privacyMessage}
-      </div>
-
-      {isProcessing && (
-        <div className="usage-indicator processing-indicator">
-          {EDIT_FEATURE.processingMessage}
-        </div>
-      )}
-
-      {message && (
-        <div className={`inline-message ${message.type}`}>{message.text}</div>
-      )}
-
-      <AdSlot placement={EDIT_FEATURE.adPlacement} isVisible={showExportAd} />
-
-      {file && !pages.length && !isProcessing && (
-        <button className="merge-btn" onClick={loadPdfPages}>
-          Load PDF Pages
-        </button>
-      )}
-
-      {pages.length > 0 && activePage && (
+        {pages.length > 0 && activePage && (
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <div className="edit-pdf-shell">
+          <div className="edit-pdf-shell edit-pdf-editor-panel">
             <div className="edit-pdf-toolbar">
               <div className="edit-pdf-toolbar-section edit-pdf-toolbar-status">
                 <strong>{remainingCount} pages in export</strong>
@@ -746,13 +750,15 @@ export default function EditPdfTool() {
                   <div className="edit-pdf-viewer-workspace">
                     <div className="edit-pdf-viewer-stage">
                       <div className="edit-pdf-viewer-canvas-shell">
-                        <div className="edit-pdf-viewer-canvas">
-                          <img
-                            className="edit-pdf-viewer-image"
-                            src={activePage.previewUrl}
-                            alt={`Preview of PDF page ${activePage.pageNumber}`}
-                            style={{ transform: `rotate(${activePage.rotation}deg)` }}
-                          />
+                        <div className="edit-pdf-viewer-preview-frame">
+                          <div className="edit-pdf-viewer-canvas">
+                            <img
+                              className="edit-pdf-viewer-image"
+                              src={activePage.previewUrl}
+                              alt={`Preview of PDF page ${activePage.pageNumber}`}
+                              style={{ transform: `rotate(${activePage.rotation}deg)` }}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -803,7 +809,8 @@ export default function EditPdfTool() {
             </div>
           </div>
         </DndContext>
-      )}
+        )}
+      </div>
     </>
   );
 }
