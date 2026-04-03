@@ -1301,6 +1301,78 @@ h1 {
   gap: 18px;
 }
 
+.edit-pdf-tool {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.edit-pdf-tool .tool-header,
+.edit-pdf-tool .upgrade-banner {
+  margin-bottom: 0;
+}
+
+.edit-pdf-tool.loaded .tool-header {
+  align-items: flex-start;
+  padding: 0 4px;
+  opacity: 0.86;
+}
+
+.edit-pdf-tool.loaded .tool-header h2 {
+  font-size: 1.58rem;
+}
+
+.edit-pdf-tool.loaded .tool-sub {
+  color: #64748b;
+  font-size: 0.94rem;
+}
+
+.edit-pdf-tool.loaded .free-badge {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.edit-pdf-tool.loaded .upgrade-banner {
+  padding: 12px 14px;
+  gap: 12px;
+  background: linear-gradient(180deg, #fbfcfe 0%, #f7f9fc 100%);
+  border-color: #e5e7eb;
+  box-shadow: none;
+}
+
+.app-card-editor.edit-pdf-active .route-intro {
+  margin-bottom: 14px;
+  padding: 14px 18px;
+  border: 1px solid #eef2f7;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fcfdff 0%, #f8fafc 100%);
+}
+
+.app-card-editor.edit-pdf-active .route-intro h1 {
+  font-size: 1.72rem;
+}
+
+.app-card-editor.edit-pdf-active .route-intro p {
+  color: #64748b;
+}
+
+.app-card-editor.edit-pdf-active .route-trust-note {
+  margin-top: 12px;
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #4b5563;
+}
+
+.app-card-editor.edit-pdf-active .tool-hero-actions {
+  display: none;
+}
+
+.app-card-editor.edit-pdf-active .tool-nav {
+  margin-bottom: 12px;
+  padding-top: 0;
+  background: transparent;
+}
+
 .edit-pdf-flow {
   display: flex;
   flex-direction: column;
@@ -1325,10 +1397,16 @@ h1 {
 }
 
 .edit-pdf-flow.loaded .edit-pdf-setup-panel {
-  padding: 0;
-  border: none;
-  background: transparent;
-  box-shadow: none;
+  display: grid;
+  grid-template-columns: minmax(240px, 1.2fr) minmax(220px, 0.95fr) repeat(2, minmax(0, 0.8fr));
+  align-items: stretch;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, #fbfcfe 0%, #f5f7fb 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 12px 24px rgba(15, 23, 42, 0.04);
 }
 
 .edit-pdf-drop-zone {
@@ -1340,10 +1418,23 @@ h1 {
 }
 
 .edit-pdf-flow.loaded .edit-pdf-drop-zone {
-  padding: 28px 22px;
+  min-height: 100%;
+  padding: 20px 18px;
+  gap: 12px;
   border-style: solid;
   border-color: #cfd8e3;
   background: linear-gradient(180deg, #fcfdff 0%, #f8fafc 100%);
+}
+
+.edit-pdf-flow.loaded .edit-pdf-drop-zone .drop-zone-title {
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 0.94rem;
+}
+
+.edit-pdf-flow.loaded .edit-pdf-drop-zone .drop-zone-sub {
+  max-width: 320px;
+  font-size: 0.88rem;
 }
 
 .edit-pdf-file-card {
@@ -1359,8 +1450,32 @@ h1 {
   margin-right: 0;
 }
 
+.edit-pdf-flow.loaded .edit-pdf-file-card,
+.edit-pdf-flow.loaded .usage-indicator {
+  margin: 0;
+  min-height: 100%;
+}
+
+.edit-pdf-flow.loaded .usage-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.edit-pdf-flow.loaded .inline-message,
+.edit-pdf-flow.loaded .ad-slot-shell,
+.edit-pdf-flow.loaded .merge-btn {
+  grid-column: 1 / -1;
+}
+
 .edit-pdf-editor-panel {
-  margin-top: 6px;
+  margin-top: 0;
+  padding: 18px;
+  border: 1px solid #dbe3ef;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #f9fbff 0%, #f2f5fb 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 24px 56px rgba(15, 23, 42, 0.08);
 }
 
 .edit-pdf-doc-summary {
@@ -1375,6 +1490,12 @@ h1 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.78),
     0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.edit-pdf-flow.loaded .edit-pdf-doc-summary {
+  padding: 10px 14px;
+  border-color: #dbe3ef;
+  background: rgba(255, 255, 255, 0.82);
 }
 
 .edit-pdf-doc-summary-copy {
@@ -1409,6 +1530,12 @@ h1 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.72),
     0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.edit-pdf-flow.loaded .edit-pdf-toolbar {
+  padding: 14px 16px;
+  border-color: #dbe3ef;
+  background: rgba(255, 255, 255, 0.86);
 }
 
 .edit-pdf-toolbar-section {
@@ -1449,6 +1576,11 @@ h1 {
   min-height: 680px;
 }
 
+.edit-pdf-flow.loaded .edit-pdf-workspace {
+  min-height: 720px;
+  gap: 16px;
+}
+
 .edit-pdf-sidebar,
 .edit-pdf-viewer {
   border: 1px solid #e5e7eb;
@@ -1457,6 +1589,11 @@ h1 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.72),
     0 12px 28px rgba(15, 23, 42, 0.05);
+}
+
+.edit-pdf-flow.loaded .edit-pdf-sidebar,
+.edit-pdf-flow.loaded .edit-pdf-viewer {
+  border-color: #dbe3ef;
 }
 
 .edit-pdf-sidebar {
@@ -1468,6 +1605,13 @@ h1 {
   min-height: 0;
   overflow: hidden;
   max-height: 680px;
+}
+
+.edit-pdf-flow.loaded .edit-pdf-sidebar {
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 14px 28px rgba(15, 23, 42, 0.06);
 }
 
 .edit-pdf-sidebar-head {
@@ -1629,11 +1773,23 @@ h1 {
   min-height: 680px;
 }
 
+.edit-pdf-flow.loaded .edit-pdf-viewer {
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fc 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 18px 36px rgba(15, 23, 42, 0.07);
+}
+
 .edit-pdf-viewer-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+}
+
+.edit-pdf-flow.loaded .edit-pdf-viewer-head {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eef2f7;
 }
 
 .edit-pdf-viewer-head h3 {
@@ -1705,6 +1861,10 @@ h1 {
   overflow: auto;
 }
 
+.edit-pdf-flow.loaded .edit-pdf-viewer-stage {
+  min-height: 560px;
+}
+
 .edit-pdf-viewer-canvas-shell {
   width: 100%;
   min-height: 100%;
@@ -1763,6 +1923,11 @@ h1 {
   padding-top: 2px;
 }
 
+.edit-pdf-flow.loaded .edit-pdf-viewer-actions {
+  padding-top: 10px;
+  border-top: 1px solid #eef2f7;
+}
+
 .edit-pdf-viewer-status {
   display: flex;
   flex-wrap: wrap;
@@ -1782,6 +1947,19 @@ h1 {
   color: #374151;
   font-size: 0.84rem;
   font-weight: 700;
+}
+
+@media (max-width: 1080px) {
+  .edit-pdf-flow.loaded .edit-pdf-setup-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .edit-pdf-flow.loaded .edit-pdf-drop-zone,
+  .edit-pdf-flow.loaded .inline-message,
+  .edit-pdf-flow.loaded .ad-slot-shell,
+  .edit-pdf-flow.loaded .merge-btn {
+    grid-column: 1 / -1;
+  }
 }
 
 .tool-seo-content {
@@ -2253,6 +2431,19 @@ h1 {
   .edit-pdf-viewer-stage {
     min-height: 320px;
     padding: 16px;
+  }
+
+  .edit-pdf-flow.loaded .edit-pdf-setup-panel {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .edit-pdf-flow.loaded .edit-pdf-drop-zone {
+    padding: 20px 16px;
+  }
+
+  .edit-pdf-editor-panel {
+    padding: 14px;
   }
 
   .edit-pdf-viewer-canvas-shell {

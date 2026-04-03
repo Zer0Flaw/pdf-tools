@@ -122,6 +122,7 @@ function SortableThumbnailPage({
 }
 
 export default function EditPdfTool() {
+  const toolRootRef = useRef(null);
   const [file, setFile] = useState(null);
   const [pages, setPages] = useState([]);
   const [selectedPages, setSelectedPages] = useState([]);
@@ -525,8 +526,22 @@ export default function EditPdfTool() {
       ].filter(Boolean)
     : [];
 
+  useEffect(() => {
+    const appCard = toolRootRef.current?.closest(".app-card-editor");
+    if (!appCard) return undefined;
+
+    appCard.classList.toggle("edit-pdf-active", Boolean(hasLoadedEditor));
+
+    return () => {
+      appCard.classList.remove("edit-pdf-active");
+    };
+  }, [hasLoadedEditor]);
+
   return (
-    <>
+    <div
+      ref={toolRootRef}
+      className={`edit-pdf-tool ${hasLoadedEditor ? "loaded" : "empty"}`}
+    >
       <div className="tool-header">
         <div>
           <h2>Edit PDF</h2>
@@ -827,6 +842,6 @@ export default function EditPdfTool() {
         </DndContext>
         )}
       </div>
-    </>
+    </div>
   );
 }
