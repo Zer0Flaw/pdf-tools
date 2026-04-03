@@ -14,6 +14,7 @@ import { getDateStamp } from "../utils/fileNaming";
 import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
+import { activateOnEnterOrSpace } from "../utils/accessibility";
 import {
   canUseDailyWatermarkRemoval,
   consumeDailyWatermarkRemoval,
@@ -58,15 +59,24 @@ function SortableFileItem({
       </div>
 
       <div className="file-actions">
-        <button type="button" onClick={() => moveFileUp(index)}>
+        <button
+          type="button"
+          aria-label={`Move ${file.name} up`}
+          onClick={() => moveFileUp(index)}
+        >
           ↑
         </button>
-        <button type="button" onClick={() => moveFileDown(index)}>
+        <button
+          type="button"
+          aria-label={`Move ${file.name} down`}
+          onClick={() => moveFileDown(index)}
+        >
           ↓
         </button>
         <button
           type="button"
           className="remove-btn"
+          aria-label={`Remove ${file.name} from the merge list`}
           onClick={() => removeFile(index)}
         >
           Remove
@@ -452,11 +462,19 @@ export default function MergeTool() {
     ${isDragOver ? "drag-over" : ""} 
     ${isMerging ? "disabled" : ""}
   `}
+        role="button"
+        tabIndex={isMerging ? -1 : 0}
+        aria-label={`Upload PDFs for Merge PDF. Free plan includes up to ${MAX_FREE_FILES} PDFs, ${FILE_SIZE_LIMIT_LABEL} each.`}
+        aria-disabled={isMerging}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => {
           if (!isMerging) fileInputRef.current?.click();
+        }}
+        onKeyDown={(event) => {
+          if (isMerging) return;
+          activateOnEnterOrSpace(event, () => fileInputRef.current?.click());
         }}
       >
         <input

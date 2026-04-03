@@ -100,10 +100,11 @@ export default function LandingPage({ onStart, onOpenTool }) {
           </p>
 
           <div className="hero-actions">
-            <button className="hero-primary-btn" onClick={onStart}>
+            <button type="button" className="hero-primary-btn" onClick={onStart}>
               Open Workspace
             </button>
             <button
+              type="button"
               className="hero-secondary-btn"
               onClick={() => {
                 setShowFooterAd(true);
@@ -240,7 +241,7 @@ export default function LandingPage({ onStart, onOpenTool }) {
             </p>
           </div>
 
-          <button className="hero-primary-btn" onClick={onStart}>
+          <button type="button" className="hero-primary-btn" onClick={onStart}>
             Launch ProjectStack
           </button>
         </div>

@@ -5,6 +5,7 @@ import { getBaseFileName } from "../utils/fileNaming";
 import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
+import { activateOnEnterOrSpace } from "../utils/accessibility";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
 import { deletePdfPages } from "../utils/pdfPageOperations";
 import { validatePdfFile } from "../utils/pdfValidation";
@@ -309,11 +310,19 @@ export default function DeletePdfPagesTool() {
 
       <div
         className={`drop-zone ${isDragOver ? "drag-over" : ""} ${isProcessing ? "disabled" : ""}`}
+        role="button"
+        tabIndex={isProcessing ? -1 : 0}
+        aria-label={`Upload a PDF for Delete PDF Pages. Free plan includes one PDF up to ${FILE_SIZE_LIMIT_LABEL}.`}
+        aria-disabled={isProcessing}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => {
           if (!isProcessing) fileInputRef.current?.click();
+        }}
+        onKeyDown={(event) => {
+          if (isProcessing) return;
+          activateOnEnterOrSpace(event, () => fileInputRef.current?.click());
         }}
       >
         <input

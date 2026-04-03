@@ -6,6 +6,7 @@ import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import AdSlot from "../components/AdSlot";
 import { trackEvent } from "../utils/analytics";
+import { activateOnEnterOrSpace } from "../utils/accessibility";
 
 const SPLIT_FEATURE = getFeatureGate("split");
 const MAX_FILE_SIZE = SPLIT_FEATURE.maxFileSize;
@@ -154,7 +155,16 @@ export default function SplitTool() {
         upgradeReason={SPLIT_FEATURE.upgradeReason}
       />
 
-      <div className="drop-zone" onClick={() => fileInputRef.current?.click()}>
+      <div
+        className="drop-zone"
+        role="button"
+        tabIndex={0}
+        aria-label={`Upload a PDF for Split PDF. Free plan includes one PDF up to ${FILE_SIZE_LIMIT_LABEL}.`}
+        onClick={() => fileInputRef.current?.click()}
+        onKeyDown={(event) =>
+          activateOnEnterOrSpace(event, () => fileInputRef.current?.click())
+        }
+      >
         <input
           ref={fileInputRef}
           type="file"

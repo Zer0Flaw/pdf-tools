@@ -14,6 +14,7 @@ import { getDateStamp } from "../utils/fileNaming";
 import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
+import { activateOnEnterOrSpace } from "../utils/accessibility";
 import {
   canUseDailyWatermarkRemoval,
   consumeDailyWatermarkRemoval,
@@ -58,15 +59,24 @@ function SortableImageItem({
       </div>
 
       <div className="file-actions">
-        <button type="button" onClick={() => moveFileUp(index)}>
+        <button
+          type="button"
+          aria-label={`Move ${file.name} up`}
+          onClick={() => moveFileUp(index)}
+        >
           ↑
         </button>
-        <button type="button" onClick={() => moveFileDown(index)}>
+        <button
+          type="button"
+          aria-label={`Move ${file.name} down`}
+          onClick={() => moveFileDown(index)}
+        >
           ↓
         </button>
         <button
           type="button"
           className="remove-btn"
+          aria-label={`Remove ${file.name} from the image list`}
           onClick={() => removeFile(index)}
         >
           Remove
@@ -453,11 +463,19 @@ export default function ImagesToPdfTool() {
 
       <div
         className={`drop-zone ${isDragOver ? "drag-over" : ""} ${isConverting ? "disabled" : ""}`}
+        role="button"
+        tabIndex={isConverting ? -1 : 0}
+        aria-label={`Upload images for Images to PDF. Free plan includes up to ${MAX_FREE_IMAGES} images, ${FILE_SIZE_LIMIT_LABEL} each.`}
+        aria-disabled={isConverting}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => {
           if (!isConverting) fileInputRef.current?.click();
+        }}
+        onKeyDown={(event) => {
+          if (isConverting) return;
+          activateOnEnterOrSpace(event, () => fileInputRef.current?.click());
         }}
       >
         <input

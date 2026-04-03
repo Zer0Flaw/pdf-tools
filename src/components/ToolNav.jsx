@@ -64,6 +64,7 @@ export default function ToolNav({ activeTool, onChange }) {
           {TOOL_GROUPS.map((group) => {
             const isOpen = openGroup === group.id;
             const isActiveGroup = group.id === activeGroup?.id;
+            const dropdownId = `tool-nav-dropdown-${group.id}`;
 
             return (
               <div
@@ -79,12 +80,18 @@ export default function ToolNav({ activeTool, onChange }) {
                   onClick={() => handleGroupToggle(group.id)}
                   aria-expanded={isOpen}
                   aria-haspopup="menu"
+                  aria-controls={dropdownId}
                 >
                   <span>{group.label}</span>
-                  <span className="tool-nav-trigger-chevron">▾</span>
+                  <span className="tool-nav-trigger-chevron" aria-hidden="true">▾</span>
                 </button>
 
-                <div className="tool-nav-dropdown" role="menu" aria-label={group.label}>
+                <div
+                  id={dropdownId}
+                  className="tool-nav-dropdown"
+                  role="menu"
+                  aria-label={group.label}
+                >
                   {group.tools.map((tool) => (
                     <button
                       key={tool.id}
