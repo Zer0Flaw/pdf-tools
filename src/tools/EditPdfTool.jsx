@@ -64,6 +64,7 @@ function SortableThumbnailPage({
       } ${page.markedForDeletion ? "deleted" : ""} ${
         isDragging ? "dragging" : ""
       }`}
+      aria-current={isActive ? "page" : undefined}
       onClick={handleActivate}
       role="button"
       tabIndex={0}
@@ -741,14 +742,20 @@ export default function EditPdfTool() {
                   </div>
                 </div>
 
-                <div className="edit-pdf-viewer-stage">
-                  <div className="edit-pdf-viewer-canvas">
-                    <img
-                      className="edit-pdf-viewer-image"
-                      src={activePage.previewUrl}
-                      alt={`Preview of PDF page ${activePage.pageNumber}`}
-                      style={{ transform: `rotate(${activePage.rotation}deg)` }}
-                    />
+                <div className="edit-pdf-viewer-body">
+                  <div className="edit-pdf-viewer-workspace">
+                    <div className="edit-pdf-viewer-stage">
+                      <div className="edit-pdf-viewer-canvas-shell">
+                        <div className="edit-pdf-viewer-canvas">
+                          <img
+                            className="edit-pdf-viewer-image"
+                            src={activePage.previewUrl}
+                            alt={`Preview of PDF page ${activePage.pageNumber}`}
+                            style={{ transform: `rotate(${activePage.rotation}deg)` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 

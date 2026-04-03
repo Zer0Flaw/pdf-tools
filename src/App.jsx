@@ -357,8 +357,7 @@ export default function App() {
   }
 
   const activeToolMetadata = TOOL_METADATA[activeTool];
-  const workspaceCardClassName =
-    activeTool === "edit" ? "app-card app-card-editor" : "app-card";
+  const workspaceCardClassName = "app-card app-card-editor";
 
   return (
     <>
