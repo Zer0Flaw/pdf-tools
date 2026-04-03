@@ -1,6 +1,46 @@
 import AdSlot from "./AdSlot";
 
 const TOOL_SEO_CONTENT = {
+  edit: {
+    benefits: [
+      "Handle common page-level PDF cleanup in one browser-based workspace without sending files to a server for core processing.",
+      "Reorder pages, rotate them into the right orientation, remove pages you do not need, and export only the pages you want to keep.",
+      "The editor keeps the page grid practical and visual, so it is easier to scan the document before you download the updated file.",
+      "Selected-page export makes it easy to pull out just the pages you need after you finish cleanup or reorganization work.",
+      "A good fit when you want a lightweight page organizer without juggling several separate editing steps first.",
+    ],
+    steps: [
+      "Upload one PDF and load the page grid in your browser.",
+      "Drag to reorder pages, rotate pages, and mark pages you want removed or extracted.",
+      "Export the full edited PDF or download only the selected pages as a separate file.",
+    ],
+    faqs: [
+      {
+        question: "What can I do inside Edit PDF?",
+        answer:
+          "The current editor combines page reordering, page rotation, page deletion, and selected-page extraction in one workspace.",
+      },
+      {
+        question: "Are my PDFs uploaded while I edit them?",
+        answer:
+          "No. ProjectStack's current core Edit PDF workflow runs locally in your browser during normal use.",
+      },
+      {
+        question: "Can I export only a few selected pages?",
+        answer:
+          "Yes. You can select pages in the editor and export that selection as a separate PDF without leaving the main workspace.",
+      },
+      {
+        question: "Can I still use the standalone page tools?",
+        answer:
+          "Yes. The standalone Rotate, Delete, Reorder, and Extract tools remain available if you prefer a narrower workflow.",
+      },
+    ],
+    relatedTools: ["rotate", "delete", "reorder"],
+    bottomCtaTitle: "Need one place to organize PDF pages?",
+    bottomCtaCopy:
+      "Open the Edit PDF workspace and handle the most common page-level cleanup tasks in one browser-based flow.",
+  },
   merge: {
     benefits: [
       "Combine multiple PDFs in one browser-based workflow without sending files to a server for core processing.",
@@ -364,6 +404,7 @@ const TOOL_SEO_CONTENT = {
 };
 
 const TOOL_LABELS = {
+  edit: "Edit PDF",
   merge: "Merge PDF",
   rotate: "Rotate PDF Pages",
   delete: "Delete PDF Pages",
@@ -376,6 +417,7 @@ const TOOL_LABELS = {
 };
 
 const TOOL_HELPERS = {
+  edit: "Reorder, rotate, delete, and extract pages in one editor.",
   merge: "Combine multiple PDFs into one finished document.",
   rotate: "Fix page orientation and export a corrected PDF.",
   delete: "Remove unwanted pages and export a cleaner PDF.",

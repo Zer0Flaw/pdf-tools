@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./index.css";
 import ToolNav from "./components/ToolNav";
+import EditPdfTool from "./tools/EditPdfTool";
 import MergeTool from "./tools/MergeTool";
 import DeletePdfPagesTool from "./tools/DeletePdfPagesTool";
 import ExtractPdfPagesTool from "./tools/ExtractPdfPagesTool";
@@ -20,11 +21,12 @@ import { trackEvent } from "./utils/analytics";
 const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
 const VALID_VIEWS = ["home", "workspace", "support"];
-const VALID_TOOLS = ["merge", "rotate", "delete", "reorder", "extract", "split", "compress", "images", "pdfToImage"];
+const VALID_TOOLS = ["edit", "merge", "rotate", "delete", "reorder", "extract", "split", "compress", "images", "pdfToImage"];
 const HOME_TITLE = "ProjectStack | Browser-Based PDF and Image Tools";
 const HOME_DESCRIPTION =
-  "Use browser-based PDF and image tools with ProjectStack. Merge PDFs, rotate pages, delete pages, reorder pages, extract pages, split files, convert images to PDF, convert PDFs to images, and compress images in one clean workspace.";
+  "Use browser-based PDF and image tools with ProjectStack. Edit PDFs, merge files, rotate pages, delete pages, reorder pages, extract pages, split files, convert images to PDF, convert PDFs to images, and compress images in one clean workspace.";
 const TOOL_ROUTES = {
+  edit: "/edit-pdf",
   merge: "/merge-pdf",
   rotate: "/rotate-pdf-pages",
   delete: "/delete-pdf-pages",
@@ -37,6 +39,14 @@ const TOOL_ROUTES = {
 };
 
 const TOOL_METADATA = {
+  edit: {
+    title: "Edit PDF Online | ProjectStack",
+    description:
+      "Edit PDF pages online in your browser with ProjectStack. Reorder, rotate, delete, and extract pages in one local browser-based workspace.",
+    heading: "Edit PDF Online",
+    intro:
+      "Organize and clean up PDF pages in one browser-based editor built for reordering, rotating, deleting, extracting, and exporting without sending files away for core processing.",
+  },
   merge: {
     title: "Merge PDF Files Online | ProjectStack",
     description:
@@ -279,6 +289,8 @@ export default function App() {
 
   function renderActiveTool() {
     switch (activeTool) {
+      case "edit":
+        return <EditPdfTool />;
       case "extract":
         return <ExtractPdfPagesTool />;
       case "reorder":

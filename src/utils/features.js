@@ -3,6 +3,21 @@ import { UPGRADE_REASONS } from "./upgradeReasons";
 const MB = 1024 * 1024;
 
 export const FEATURE_GATES = {
+  edit: {
+    id: "edit",
+    maxFiles: 1,
+    maxFileSize: 5 * MB,
+    premiumFlags: {
+      unlimitedMerges: false,
+      unlimitedImages: false,
+      watermarkFree: false,
+      largerFiles: true,
+    },
+    privacyMessage: "Files are processed locally in your browser.",
+    processingMessage: "Editing locally in your browser...",
+    adPlacement: "postExport",
+    upgradeReason: UPGRADE_REASONS.EDIT_LIMITS,
+  },
   merge: {
     id: "merge",
     maxFiles: 3,

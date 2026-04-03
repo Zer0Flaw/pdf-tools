@@ -2,6 +2,7 @@ const STORAGE_KEY = "projectstack-upgrade-intents";
 import { trackEvent } from "./analytics";
 
 export const UPGRADE_REASONS = {
+  EDIT_LIMITS: "edit-limits",
   MERGE_LIMITS: "merge-limits",
   MERGE_WATERMARK: "merge-watermark",
   DELETE_LIMITS: "delete-limits",

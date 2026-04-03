@@ -3,6 +3,13 @@ import AdSlot from "./AdSlot";
 
 const TOOL_PREVIEWS = [
   {
+    id: "edit",
+    route: "/edit-pdf",
+    title: "Edit PDF",
+    description: "Reorder, rotate, delete, and extract pages in one editor.",
+    cta: "Open Edit PDF",
+  },
+  {
     id: "merge",
     route: "/merge-pdf",
     title: "Merge PDF",
@@ -90,9 +97,9 @@ export default function LandingPage({ onStart, onOpenTool }) {
           </p>
           <h1 className="hero-title">Simple file tools for practical work</h1>
           <p className="hero-subtitle">
-            Merge PDFs, rotate pages, delete pages, reorder pages, split files,
-            extract pages, convert images to PDF, convert PDFs to images, and
-            compress images in one clean workspace.
+            Edit PDFs, merge files, rotate pages, delete pages, reorder pages,
+            split files, extract pages, convert images to PDF, convert PDFs to
+            images, and compress images in one clean workspace.
           </p>
 
           <div className="hero-actions">
@@ -171,6 +178,11 @@ export default function LandingPage({ onStart, onOpenTool }) {
         </div>
 
         <div className="feature-grid">
+          <div className="feature-card">
+            <h3>Edit PDF</h3>
+            <p>Reorder, rotate, delete, and extract pages in one editor.</p>
+          </div>
+
           <div className="feature-card">
             <h3>Merge PDF</h3>
             <p>Combine multiple PDFs into a single finished document.</p>
