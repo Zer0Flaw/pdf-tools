@@ -357,12 +357,14 @@ export default function App() {
   }
 
   const activeToolMetadata = TOOL_METADATA[activeTool];
+  const workspaceCardClassName =
+    activeTool === "edit" ? "app-card app-card-editor" : "app-card";
 
   return (
     <>
       <ScrollToTop pathname={currentPath} />
       <div className="app-shell">
-        <div className="app-card">
+        <div className={workspaceCardClassName}>
           <div className="brand-bar workspace-brand-bar">
             <button
               type="button"

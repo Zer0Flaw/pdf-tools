@@ -52,6 +52,10 @@ input {
   min-height: calc(100vh - 64px);
 }
 
+.app-card-editor {
+  max-width: 1220px;
+}
+
 .app-card::before {
   content: "";
   position: absolute;
@@ -967,6 +971,10 @@ h1 {
   scroll-margin-top: 18px;
 }
 
+.app-card-editor .route-intro p {
+  max-width: 760px;
+}
+
 .pdf-image-results {
   margin-top: 18px;
   display: flex;
@@ -1236,8 +1244,8 @@ h1 {
 
 .edit-pdf-workspace {
   display: grid;
-  grid-template-columns: minmax(210px, 240px) minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: minmax(210px, 230px) minmax(0, 1fr);
+  gap: 18px;
   min-height: 680px;
 }
 
@@ -1256,6 +1264,7 @@ h1 {
   gap: 12px;
   min-height: 0;
   overflow: hidden;
+  max-height: 680px;
 }
 
 .edit-pdf-sidebar-head {
@@ -1399,6 +1408,7 @@ h1 {
   flex-direction: column;
   gap: 16px;
   overflow: hidden;
+  min-height: 680px;
 }
 
 .edit-pdf-viewer-head {
@@ -1452,7 +1462,7 @@ h1 {
       rgba(248, 250, 252, 0.7) 20px
     );
   padding: 24px;
-  min-height: 460px;
+  min-height: 520px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1898,6 +1908,16 @@ h1 {
   .edit-pdf-workspace {
     grid-template-columns: 1fr;
     min-height: 0;
+  }
+
+  .app-card-editor {
+    max-width: 100%;
+  }
+
+  .edit-pdf-sidebar,
+  .edit-pdf-viewer {
+    min-height: 0;
+    max-height: none;
   }
 
   .edit-pdf-toolbar,
