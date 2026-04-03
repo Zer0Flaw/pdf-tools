@@ -28,6 +28,45 @@ input {
   font: inherit;
 }
 
+button,
+.drop-zone,
+.tool-preview-card,
+.tool-nav-trigger,
+.tool-nav-item,
+.remove-btn,
+.upgrade-button,
+.upgrade-cta,
+.merge-btn,
+.hero-primary-btn,
+.hero-secondary-btn,
+.back-home-btn {
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease,
+    opacity 0.18s ease;
+}
+
+button:focus-visible,
+.drop-zone:focus-visible,
+.tool-preview-card:focus-visible,
+.tool-nav-trigger:focus-visible,
+.tool-nav-item:focus-visible,
+.remove-btn:focus-visible,
+.upgrade-button:focus-visible,
+.upgrade-cta:focus-visible,
+.merge-btn:focus-visible,
+.hero-primary-btn:focus-visible,
+.hero-secondary-btn:focus-visible,
+.back-home-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.18),
+    0 0 0 1px rgba(79, 70, 229, 0.45);
+}
+
 .app-shell {
   min-height: 100vh;
   padding: 32px 16px;
@@ -213,6 +252,7 @@ h1 {
 
 .remove-btn:hover {
   background: #fecaca;
+  transform: translateY(-1px);
 }
 
 .merge-btn {
@@ -222,7 +262,6 @@ h1 {
   padding: 16px;
   border-radius: 12px;
   font-weight: 700;
-  transition: 0.2s;
 }
 
 .merge-btn:disabled {
@@ -239,6 +278,7 @@ h1 {
 
 .merge-btn:not(:disabled):hover {
   background: #000000;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 640px) {
@@ -316,6 +356,7 @@ h1 {
 
 .upgrade-button:hover {
   background: #3f50ff;
+  transform: translateY(-1px);
 }
 
 .upgrade-button:disabled {
@@ -483,12 +524,12 @@ h1 {
     0 4px 12px rgba(17, 24, 39, 0.22);
 }
 .tool-nav {
-  margin-bottom: 1rem;
+  margin-bottom: 0.9rem;
   position: sticky;
   top: 0;
   z-index: 10;
   background: #f5f5f5;
-  padding: 8px 0 0.75rem;
+  padding: 8px 0 0.65rem;
 }
 
 .tool-nav-bar {
@@ -550,6 +591,7 @@ h1 {
 .tool-nav-trigger:hover {
   background: #f9fafb;
   border-color: #9ca3af;
+  transform: translateY(-1px);
 }
 
 .tool-nav-trigger.active,
@@ -599,6 +641,7 @@ h1 {
 .tool-nav-item:hover {
   background: #f8fafc;
   border-color: #e5e7eb;
+  transform: translateX(2px);
 }
 
 .tool-nav-item.active {
@@ -655,7 +698,8 @@ h1 {
 }
 
 .upgrade-cta:hover {
-  opacity: 0.9;
+  opacity: 0.94;
+  transform: translateY(-1px);
 }
 
 .locked-body p {
@@ -670,7 +714,8 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.9rem;
+  gap: 16px;
 }
 
 .tool-header h1 {
@@ -688,7 +733,7 @@ h1 {
 }
 
 .route-intro {
-  margin-bottom: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 .route-intro h1 {
@@ -700,7 +745,7 @@ h1 {
 }
 
 .route-intro p {
-  margin: 0.75rem 0 0;
+  margin: 0.65rem 0 0;
   max-width: 680px;
   color: #4b5563;
   font-size: 1rem;
@@ -725,7 +770,8 @@ h1 {
 
 .tool-sub {
   color: #6b7280;
-  margin-top: 0.25rem;
+  margin: 0.35rem 0 0;
+  line-height: 1.55;
 }
 
 .free-badge {
@@ -828,7 +874,7 @@ h1 {
 }
 
 .brand-bar {
-  margin-bottom: 1rem;
+  margin-bottom: 0.9rem;
 }
 
 .brand-lockup {
@@ -981,7 +1027,7 @@ h1 {
 
 .tool-workspace {
   scroll-margin-top: 18px;
-  margin-top: 0.25rem;
+  margin-top: 0;
 }
 
 .app-card-editor .route-intro p {
@@ -1822,6 +1868,7 @@ h1 {
 
 .hero-secondary-btn:hover {
   background: #e5e7eb;
+  transform: translateY(-1px);
 }
 
 .hero-trust {
@@ -1883,7 +1930,7 @@ h1 {
 .tool-preview-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
 .feature-card,
@@ -1914,7 +1961,37 @@ h1 {
 .tool-preview-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  min-height: 100%;
+  background: linear-gradient(180deg, #fcfcfd 0%, #f7f9fc 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    0 10px 22px rgba(15, 23, 42, 0.04);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.tool-preview-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 16px 32px rgba(15, 23, 42, 0.08);
+}
+
+.tool-preview-card h3 {
+  margin-bottom: 2px;
+  font-size: 1.12rem;
+  line-height: 1.2;
+}
+
+.tool-preview-card p {
+  color: #526071;
+  line-height: 1.55;
 }
 
 .tool-pair-callout {
@@ -1950,6 +2027,8 @@ h1 {
 
 .tool-preview-btn {
   align-self: flex-start;
+  margin-top: auto;
+  min-width: 168px;
 }
 
 .landing-cta {
@@ -1994,7 +2073,7 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #eef2f7;
 }
 
@@ -2006,6 +2085,7 @@ h1 {
 
 .back-home-btn:hover {
   background: #e5e7eb;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 640px) {
