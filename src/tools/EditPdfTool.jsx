@@ -59,8 +59,8 @@ const SortableThumbnailPage = memo(function SortableThumbnailPage({
     opacity: isDragging ? 0.68 : 1,
   };
 
-  function handleActivate() {
-    onActivate(page.pageNumber);
+  function handleActivate(event) {
+    onActivate(page.pageNumber, { shiftKey: event.shiftKey });
   }
 
   return (
@@ -102,7 +102,11 @@ const SortableThumbnailPage = memo(function SortableThumbnailPage({
           <input
             type="checkbox"
             checked={isSelected}
-            onChange={() => onToggleSelection(page.pageNumber)}
+            onChange={(event) =>
+              onToggleSelection(page.pageNumber, {
+                shiftKey: event.nativeEvent.shiftKey,
+              })
+            }
           />
           <span>Select</span>
         </label>
@@ -156,6 +160,7 @@ export default function EditPdfTool() {
   const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
+  const selectionAnchorPageRef = useRef(null);
   const isPremium = false;
   const selectedPageSet = useMemo(() => new Set(selectedPages), [selectedPages]);
   const pageIds = useMemo(() => pages.map((page) => page.id), [pages]);
@@ -248,6 +253,7 @@ export default function EditPdfTool() {
       clearTimeout(pageSwitchTimeoutRef.current);
       pageSwitchTimeoutRef.current = null;
     }
+    selectionAnchorPageRef.current = null;
   }
 
   function setSelectedFile(nextFile) {
@@ -361,7 +367,36 @@ export default function EditPdfTool() {
     }
   }
 
-  const togglePageSelection = useCallback((pageNumber) => {
+  const togglePageSelection = useCallback((pageNumber, options = {}) => {
+    const { shiftKey = false } = options;
+    const anchorPageNumber = selectionAnchorPageRef.current;
+
+    if (shiftKey && anchorPageNumber !== null && anchorPageNumber !== pageNumber) {
+      const currentPages = previewUrlsRef.current;
+      const anchorIndex = currentPages.findIndex(
+        (page) => page.pageNumber === anchorPageNumber,
+      );
+      const targetIndex = currentPages.findIndex(
+        (page) => page.pageNumber === pageNumber,
+      );
+
+      if (anchorIndex !== -1 && targetIndex !== -1) {
+        const rangePageNumbers = currentPages
+          .slice(
+            Math.min(anchorIndex, targetIndex),
+            Math.max(anchorIndex, targetIndex) + 1,
+          )
+          .map((page) => page.pageNumber);
+
+        setSelectedPages((prev) =>
+          Array.from(new Set([...prev, ...rangePageNumbers])).sort((a, b) => a - b),
+        );
+        selectionAnchorPageRef.current = pageNumber;
+        return;
+      }
+    }
+
+    selectionAnchorPageRef.current = pageNumber;
     setSelectedPages((prev) =>
       prev.includes(pageNumber)
         ? prev.filter((value) => value !== pageNumber)
@@ -369,16 +404,24 @@ export default function EditPdfTool() {
     );
   }, []);
 
-  const handleThumbnailActivate = useCallback((pageNumber) => {
+  const handleThumbnailActivate = useCallback((pageNumber, options = {}) => {
+    const { shiftKey = false } = options;
     setActivePageNumber(pageNumber);
-  }, []);
+    if (shiftKey) {
+      togglePageSelection(pageNumber, { shiftKey: true });
+      return;
+    }
+    selectionAnchorPageRef.current = pageNumber;
+  }, [togglePageSelection]);
 
   function selectAllPages() {
     setSelectedPages(pages.map((page) => page.pageNumber));
+    selectionAnchorPageRef.current = pages[0]?.pageNumber ?? null;
   }
 
   function clearPageSelection() {
     setSelectedPages([]);
+    selectionAnchorPageRef.current = null;
   }
 
   function rotatePage(pageNumber, delta) {
