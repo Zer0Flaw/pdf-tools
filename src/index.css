@@ -2846,6 +2846,27 @@ h1 {
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
+.edit-pdf-viewer-page-shell {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-pdf-viewer-page-stage {
+  width: 100%;
+  margin: 0 auto;
+  cursor: default;
+}
+
+.edit-pdf-viewer-page-transform {
+  position: relative;
+  width: 100%;
+  transform-origin: center center;
+  transition: transform 0.18s ease;
+}
+
 .edit-pdf-viewer-workspace.selection-active .edit-pdf-viewer-overlay-surface {
   border-color: rgba(196, 181, 253, 0.72);
   background:
@@ -2862,18 +2883,69 @@ h1 {
 
 .edit-pdf-viewer-image {
   display: block;
+  width: 100%;
   max-width: 100%;
-  max-height: 560px;
-  width: auto;
   height: auto;
   margin: 0 auto;
   object-fit: contain;
-  transform-origin: center center;
-  transition: transform 0.18s ease;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.92),
     0 16px 34px rgba(15, 23, 42, 0.14),
     0 4px 10px rgba(15, 23, 42, 0.08);
+}
+
+.edit-pdf-signature-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.edit-pdf-signature-object {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  padding: 0;
+  border: 1px solid rgba(191, 219, 254, 0.72);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow:
+    0 10px 22px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.46);
+  cursor: grab;
+  pointer-events: auto;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.edit-pdf-signature-object:hover {
+  border-color: rgba(96, 165, 250, 0.84);
+  box-shadow:
+    0 14px 28px rgba(15, 23, 42, 0.14),
+    0 0 0 3px rgba(96, 165, 250, 0.08);
+}
+
+.edit-pdf-signature-object.selected {
+  border-color: rgba(59, 130, 246, 0.96);
+  background: rgba(248, 251, 255, 0.98);
+  box-shadow:
+    0 16px 32px rgba(59, 130, 246, 0.12),
+    0 0 0 4px rgba(96, 165, 250, 0.1);
+}
+
+.edit-pdf-signature-object.dragging {
+  cursor: grabbing;
+  box-shadow:
+    0 18px 36px rgba(59, 130, 246, 0.16),
+    0 0 0 4px rgba(96, 165, 250, 0.12);
+}
+
+.edit-pdf-signature-object img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
 }
 
 .edit-pdf-viewer-actions {
@@ -2943,6 +3015,238 @@ h1 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.92),
     0 4px 10px rgba(59, 130, 246, 0.05);
+}
+
+.edit-pdf-fill-sign-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+  padding: 16px 18px;
+  border: 1px solid rgba(191, 219, 254, 0.72);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 251, 255, 0.96) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 24px rgba(15, 23, 42, 0.04);
+}
+
+.edit-pdf-fill-sign-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.edit-pdf-fill-sign-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.edit-pdf-fill-sign-copy strong {
+  color: #111827;
+  font-size: 1rem;
+}
+
+.edit-pdf-fill-sign-copy span:last-child {
+  color: #475569;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.edit-pdf-fill-sign-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.edit-pdf-fill-sign-metric {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+  border: 1px solid rgba(191, 219, 254, 0.92);
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.edit-pdf-fill-sign-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(191, 219, 254, 0.78);
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98) 0%, rgba(239, 246, 255, 0.96) 100%);
+}
+
+.edit-pdf-fill-sign-status strong {
+  color: #0f172a;
+  font-size: 0.88rem;
+}
+
+.edit-pdf-fill-sign-status span {
+  color: #475569;
+  font-size: 0.81rem;
+  line-height: 1.35;
+}
+
+.edit-pdf-fill-sign-status.active {
+  border-color: rgba(165, 180, 252, 0.88);
+  background: linear-gradient(180deg, rgba(250, 245, 255, 0.98) 0%, rgba(237, 233, 254, 0.96) 100%);
+}
+
+.edit-pdf-fill-sign-status.empty {
+  border-style: dashed;
+}
+
+.edit-pdf-fill-sign-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.edit-pdf-fill-sign-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(203, 213, 225, 0.88);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+}
+
+.edit-pdf-fill-sign-block-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.edit-pdf-fill-sign-block-head strong {
+  color: #111827;
+  font-size: 0.92rem;
+}
+
+.edit-pdf-fill-sign-block-head span,
+.edit-pdf-fill-sign-upload-row span {
+  color: #64748b;
+  font-size: 0.79rem;
+  line-height: 1.35;
+}
+
+.edit-pdf-fill-sign-type-row,
+.edit-pdf-fill-sign-upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.edit-pdf-fill-sign-input {
+  flex: 1 1 180px;
+  min-width: 0;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 12px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+}
+
+.edit-pdf-fill-sign-input:focus {
+  outline: none;
+  border-color: rgba(96, 165, 250, 0.92);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.12);
+}
+
+.edit-pdf-fill-sign-library {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-pdf-signature-card,
+.edit-pdf-fill-sign-active-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(203, 213, 225, 0.86);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.96) 100%);
+}
+
+.edit-pdf-signature-card-preview,
+.edit-pdf-fill-sign-active-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed rgba(191, 219, 254, 0.82);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(243, 248, 255, 0.98) 100%);
+}
+
+.edit-pdf-signature-card-preview img,
+.edit-pdf-fill-sign-active-preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 56px;
+  object-fit: contain;
+}
+
+.edit-pdf-signature-card-copy,
+.edit-pdf-fill-sign-active-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.edit-pdf-signature-card-copy strong,
+.edit-pdf-fill-sign-active-copy strong {
+  color: #111827;
+  font-size: 0.9rem;
+}
+
+.edit-pdf-signature-card-copy span,
+.edit-pdf-fill-sign-active-copy span {
+  color: #64748b;
+  font-size: 0.79rem;
+  line-height: 1.35;
+}
+
+.edit-pdf-fill-sign-empty {
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px dashed rgba(203, 213, 225, 0.92);
+  background: rgba(248, 250, 252, 0.82);
+  color: #64748b;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.edit-pdf-fill-sign-scale-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.edit-pdf-fill-sign-scale-control input[type="range"] {
+  width: 100%;
+  accent-color: #2563eb;
 }
 
 .edit-pdf-toolbar .hero-secondary-btn:disabled,
@@ -3452,7 +3756,10 @@ h1 {
   .edit-pdf-viewer-action-group,
   .edit-pdf-viewer-head,
   .edit-pdf-viewer-chip-row,
-  .edit-pdf-viewer-actions {
+  .edit-pdf-viewer-actions,
+  .edit-pdf-fill-sign-head,
+  .edit-pdf-fill-sign-type-row,
+  .edit-pdf-fill-sign-upload-row {
     flex-direction: column;
   }
 
@@ -3483,6 +3790,10 @@ h1 {
   .edit-pdf-viewer-stage {
     min-height: 320px;
     padding: 16px;
+  }
+
+  .edit-pdf-fill-sign-grid {
+    grid-template-columns: 1fr;
   }
 
   .edit-pdf-flow.loaded .edit-pdf-setup-panel {
@@ -3530,6 +3841,10 @@ h1 {
   .edit-pdf-viewer-canvas {
     width: 100%;
     padding: 20px 16px;
+  }
+
+  .edit-pdf-fill-sign-panel {
+    padding: 14px;
   }
 
   .landing-cta-card,
