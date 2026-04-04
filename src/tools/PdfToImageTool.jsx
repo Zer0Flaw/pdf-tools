@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import UpgradeBanner from "../components/UpgradeBanner";
@@ -45,6 +45,18 @@ export default function PdfToImageTool() {
   const fileInputRef = useRef(null);
   const imageUrlsRef = useRef([]);
   const isPremium = false;
+  const hasImages = images.length > 0;
+  const totalImageBytes = useMemo(
+    () => images.reduce((sum, image) => sum + image.size, 0),
+    [images],
+  );
+  const pageCountLabel = `${images.length} PNG image${images.length === 1 ? "" : "s"}`;
+  const totalImageBytesLabel = formatBytes(totalImageBytes);
+  const convertButtonLabel = isProcessing
+    ? "Converting..."
+    : hasImages
+      ? "Reconvert PDF to Images"
+      : "Convert PDF to Images";
 
   useEffect(() => {
     imageUrlsRef.current = images;
@@ -211,7 +223,6 @@ export default function PdfToImageTool() {
 
       setImages(nextImages);
       setShowExportAd(true);
-
       const totalBytes = nextImages.reduce((sum, image) => sum + image.size, 0);
 
       trackEvent("process_completed", {
@@ -269,7 +280,7 @@ export default function PdfToImageTool() {
   }
 
   return (
-    <>
+    <div className={`pdf-image-tool ${hasImages ? "loaded" : "empty"}`}>
       <div className="tool-header">
         <div>
           <h2>PDF to Image</h2>
@@ -293,127 +304,162 @@ export default function PdfToImageTool() {
         upgradeReason={PDF_TO_IMAGE_FEATURE.upgradeReason}
       />
 
-      <div
-        className={`drop-zone ${isDragOver ? "drag-over" : ""} ${isProcessing ? "disabled" : ""}`}
-        role="button"
-        tabIndex={isProcessing ? -1 : 0}
-        aria-label={`Upload a PDF for PDF to Image. Free plan includes one PDF up to ${FILE_SIZE_LIMIT_LABEL}.`}
-        aria-disabled={isProcessing}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => {
-          if (!isProcessing) fileInputRef.current?.click();
-        }}
-        onKeyDown={(event) => {
-          if (isProcessing) return;
-          activateOnEnterOrSpace(event, () => fileInputRef.current?.click());
-        }}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="application/pdf"
-          onChange={handleFileChange}
-          hidden
-        />
+      <div className={`pdf-image-flow ${hasImages ? "loaded" : "empty"}`}>
+        <div className="pdf-image-setup-panel">
+          <div
+            className={`drop-zone pdf-image-drop-zone ${isDragOver ? "drag-over" : ""} ${isProcessing ? "disabled" : ""}`}
+            role="button"
+            tabIndex={isProcessing ? -1 : 0}
+            aria-label={`Upload a PDF for PDF to Image. Free plan includes one PDF up to ${FILE_SIZE_LIMIT_LABEL}.`}
+            aria-disabled={isProcessing}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => {
+              if (!isProcessing) fileInputRef.current?.click();
+            }}
+            onKeyDown={(event) => {
+              if (isProcessing) return;
+              activateOnEnterOrSpace(event, () => fileInputRef.current?.click());
+            }}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileChange}
+              hidden
+            />
 
-        <div className="drop-zone-title">Select or Drop PDF Here</div>
-        <div className="drop-zone-sub">
-          Free plan includes one PDF up to {FILE_SIZE_LIMIT_LABEL}
-        </div>
-      </div>
-
-      {file && (
-        <div className="file-selection-card">
-          <div className="file-meta">
-            <p className="file-name">{file.name}</p>
-            <p className="file-size">{formatBytes(file.size)}</p>
+            <div className="drop-zone-title">Select or Drop PDF Here</div>
+            <div className="drop-zone-sub">
+              Free plan includes one PDF up to {FILE_SIZE_LIMIT_LABEL}
+            </div>
           </div>
 
-          <button type="button" className="remove-btn" onClick={clearSelectedFile}>
-            Remove
+          {file && (
+            <div className="file-selection-card pdf-image-file-card">
+              <div className="file-meta">
+                <p className="file-name">{file.name}</p>
+                <p className="file-size">{formatBytes(file.size)}</p>
+              </div>
+
+              <button type="button" className="remove-btn" onClick={clearSelectedFile}>
+                Remove
+              </button>
+            </div>
+          )}
+
+          {file && (
+            <div className="usage-indicator">
+              {MAX_FILES} / {MAX_FILES} PDF selected
+            </div>
+          )}
+
+          <div className="usage-indicator trust-indicator">
+            {PDF_TO_IMAGE_FEATURE.privacyMessage}
+          </div>
+
+          {isProcessing && (
+            <div className="usage-indicator processing-indicator">
+              {PDF_TO_IMAGE_FEATURE.processingMessage}
+            </div>
+          )}
+
+          {message && (
+            <div className={`inline-message ${message.type}`}>{message.text}</div>
+          )}
+
+          <AdSlot
+            placement={PDF_TO_IMAGE_FEATURE.adPlacement}
+            isVisible={showExportAd}
+          />
+
+          <button
+            className="merge-btn pdf-image-convert-btn"
+            disabled={!file || isProcessing}
+            onClick={convertPdfToImages}
+          >
+            {convertButtonLabel}
           </button>
         </div>
-      )}
 
-      {file && (
-        <div className="usage-indicator">
-          {MAX_FILES} / {MAX_FILES} PDF selected
-        </div>
-      )}
+        {hasImages && (
+          <div className="tool-workspace pdf-image-workspace">
+            <div className="pdf-image-workspace-head">
+              <div className="pdf-image-workspace-copy">
+                <p className="section-eyebrow">PNG Workspace</p>
+                <h3>Converted pages ready</h3>
+                <p>
+                  Review each page preview, then download PNGs individually or export the
+                  full image set in one pass.
+                </p>
+              </div>
 
-      <div className="usage-indicator trust-indicator">
-        {PDF_TO_IMAGE_FEATURE.privacyMessage}
-      </div>
-
-      {isProcessing && (
-        <div className="usage-indicator processing-indicator">
-          {PDF_TO_IMAGE_FEATURE.processingMessage}
-        </div>
-      )}
-
-      {message && (
-        <div className={`inline-message ${message.type}`}>{message.text}</div>
-      )}
-
-      <AdSlot
-        placement={PDF_TO_IMAGE_FEATURE.adPlacement}
-        isVisible={showExportAd}
-      />
-
-      {images.length > 0 && (
-        <div className="pdf-image-results">
-          <div className="pdf-image-results-header">
-            <div>
-              <h3>Converted pages</h3>
-              <p>Download each page as a PNG image or grab the whole set.</p>
+              <div className="pdf-image-workspace-metrics" aria-label="PDF to Image export summary">
+                <span className="pdf-image-workspace-metric">
+                  <strong>{images.length}</strong>
+                  pages
+                </span>
+                <span className="pdf-image-workspace-metric">
+                  <strong>{totalImageBytesLabel}</strong>
+                  total size
+                </span>
+              </div>
             </div>
 
-            <button
-              type="button"
-              className="hero-secondary-btn"
-              onClick={downloadAllImages}
-            >
-              Download All Images
-            </button>
+            <div className="pdf-image-export-bar">
+              <div className="pdf-image-export-copy">
+                <strong>Download the full PNG export set</strong>
+                <span>
+                  {pageCountLabel} from {file.name} are ready as separate downloads.
+                </span>
+              </div>
+
+              <div className="pdf-image-export-actions">
+                <button
+                  type="button"
+                  className="hero-primary-btn"
+                  onClick={downloadAllImages}
+                >
+                  Download All PNGs
+                </button>
+              </div>
+            </div>
+
+            <div className="pdf-image-results">
+              <div className="pdf-image-grid">
+                {images.map((image) => (
+                  <article key={image.name} className="pdf-image-card">
+                    <div className="pdf-image-preview-shell">
+                      <img
+                        className="pdf-image-preview"
+                        src={image.url}
+                        alt={`Preview of page ${image.pageNumber}`}
+                      />
+                    </div>
+                    <div className="pdf-image-card-body">
+                      <div className="pdf-image-card-copy">
+                        <span className="pdf-image-card-kicker">Page {image.pageNumber}</span>
+                        <h4>{image.name}</h4>
+                        <p>{formatBytes(image.size)}</p>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="hero-secondary-btn tool-preview-btn pdf-image-download-btn"
+                        onClick={() => downloadImage(image)}
+                      >
+                        Download PNG
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
-
-          <div className="pdf-image-grid">
-            {images.map((image) => (
-              <article key={image.name} className="pdf-image-card">
-                <img
-                  className="pdf-image-preview"
-                  src={image.url}
-                  alt={`Preview of page ${image.pageNumber}`}
-                />
-                <div className="pdf-image-card-body">
-                  <div>
-                    <h4>Page {image.pageNumber}</h4>
-                    <p>{formatBytes(image.size)}</p>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="hero-secondary-btn tool-preview-btn"
-                    onClick={() => downloadImage(image)}
-                  >
-                    Download PNG
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <button
-        className="merge-btn"
-        disabled={!file || isProcessing}
-        onClick={convertPdfToImages}
-      >
-        {isProcessing ? "Converting..." : "Convert PDF to Images"}
-      </button>
-    </>
+        )}
+      </div>
+    </div>
   );
 }
