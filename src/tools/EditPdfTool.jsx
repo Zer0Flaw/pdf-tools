@@ -28,6 +28,7 @@ const MAX_ZOOM = 2;
 const ZOOM_STEP = 0.15;
 const MIN_PLACED_OBJECT_WIDTH_RATIO = 0.14;
 const MAX_PLACED_OBJECT_WIDTH_RATIO = 0.48;
+const PLACED_OBJECT_EDGE_GUTTER_PX = 14;
 const DEFAULT_SIGNATURE_WIDTH_RATIO = 0.26;
 const DEFAULT_TEXT_WIDTH_RATIO = 0.3;
 const DEFAULT_DATE_WIDTH_RATIO = 0.25;
@@ -90,6 +91,26 @@ function getFillAssetSourceLabel(type, source) {
   if (type === "initials") return "Initials field";
   if (type === "date") return "Date field";
   return "Text field";
+}
+
+function getFillObjectTypeLabel(type) {
+  if (type === "signature") return "Signature";
+  if (type === "initials") return "Initials";
+  if (type === "date") return "Date";
+  return "Text";
+}
+
+function clampPlacedObjectRatio(nextRatio, objectRatio, stageSize) {
+  const baseMax = Math.max(0, 1 - objectRatio);
+  if (!stageSize || !Number.isFinite(stageSize) || stageSize <= 0) {
+    return clampValue(nextRatio, 0, baseMax);
+  }
+
+  const edgeGutterRatio = Math.min(PLACED_OBJECT_EDGE_GUTTER_PX / stageSize, 0.08);
+  const minRatio = Math.min(edgeGutterRatio, baseMax / 2);
+  const maxRatio = Math.max(minRatio, baseMax - edgeGutterRatio);
+
+  return clampValue(nextRatio, minRatio, maxRatio);
 }
 
 function readFileAsDataUrl(file) {
@@ -1311,8 +1332,12 @@ export default function EditPdfTool() {
       type: asset.type,
       assetId,
       pageNumber: activePageNumber,
-      xRatio: clampValue(0.12 + existingCount * 0.03, 0.04, 0.72),
-      yRatio: clampValue(0.14 + existingCount * 0.04, 0.06, 1 - defaultHeightRatio - 0.08),
+      xRatio: clampPlacedObjectRatio(0.12 + existingCount * 0.03, widthRatio, stageWidth),
+      yRatio: clampPlacedObjectRatio(
+        0.14 + existingCount * 0.04,
+        defaultHeightRatio,
+        stageHeight,
+      ),
       widthRatio,
     };
 
@@ -1347,8 +1372,12 @@ export default function EditPdfTool() {
       objectId: selectedPlacedObject.id,
       updates: {
         widthRatio,
-        xRatio: clampValue(selectedPlacedObject.xRatio, 0, 1 - widthRatio),
-        yRatio: clampValue(selectedPlacedObject.yRatio, 0, 1 - nextHeightRatio),
+        xRatio: clampPlacedObjectRatio(selectedPlacedObject.xRatio, widthRatio, stageWidth),
+        yRatio: clampPlacedObjectRatio(
+          selectedPlacedObject.yRatio,
+          nextHeightRatio,
+          stageHeight,
+        ),
       },
     });
   }
@@ -1372,14 +1401,22 @@ export default function EditPdfTool() {
       dragStateRef.zoomLevel,
     );
     const nextXRatio = clampValue(
-      dragStateRef.startXRatio + deltaX / dragStateRef.stageWidth,
+      clampPlacedObjectRatio(
+        dragStateRef.startXRatio + deltaX / dragStateRef.stageWidth,
+        dragStateRef.widthRatio,
+        dragStateRef.stageWidth,
+      ),
       0,
-      1 - dragStateRef.widthRatio,
+      1,
     );
     const nextYRatio = clampValue(
-      dragStateRef.startYRatio + deltaY / dragStateRef.stageHeight,
+      clampPlacedObjectRatio(
+        dragStateRef.startYRatio + deltaY / dragStateRef.stageHeight,
+        dragStateRef.heightRatio,
+        dragStateRef.stageHeight,
+      ),
       0,
-      1 - dragStateRef.heightRatio,
+      1,
     );
 
     if (placedObjectDragFrameRef.current) {
@@ -1412,6 +1449,7 @@ export default function EditPdfTool() {
   }, [handlePlacedObjectPointerMove]);
 
   function handlePlacedObjectPointerDown(event, placedObject) {
+    if (isProcessing) return;
     const fillAsset = fillAssetMap.get(placedObject.assetId);
     if (!fillAsset || activePageNumber === null) return;
 
@@ -1652,14 +1690,20 @@ export default function EditPdfTool() {
         ? selectedPlacedObject
         : null;
     const selectedPlacedObjectTypeLabel = selectedPlacedObjectOnActivePage
-      ? selectedPlacedObjectOnActivePage.type === "signature"
-        ? "Signature"
-        : selectedPlacedObjectOnActivePage.type === "initials"
-          ? "Initials"
-          : selectedPlacedObjectOnActivePage.type === "date"
-            ? "Date"
-            : "Text"
+      ? getFillObjectTypeLabel(selectedPlacedObjectOnActivePage.type)
       : null;
+    const selectedPlacedObjectIndex = selectedPlacedObjectOnActivePage
+      ? activePagePlacedObjects.findIndex(
+          (placedObject) => placedObject.id === selectedPlacedObjectOnActivePage.id,
+        ) + 1
+      : 0;
+    const allPagesSelected = pages.length > 0 && selectedPages.length === pages.length;
+    const exportablePageNumbers = new Set(
+      pages.filter((page) => !page.markedForDeletion).map((page) => page.pageNumber),
+    );
+    const exportableFillObjectCount = placedObjects.filter((placedObject) =>
+      exportablePageNumbers.has(placedObject.pageNumber)
+    ).length;
     const selectedPagesLabel =
       selectedPages.length === 1
         ? "1 selected page"
@@ -1688,12 +1732,33 @@ export default function EditPdfTool() {
             }
           : {
               tone: "ready",
-              title: `${selectedIncludedCount} page${selectedIncludedCount === 1 ? "" : "s"} ready for batch actions`,
-              text: "Rotate, keep, delete, or extract the current selection from one command area.",
-            };
+            title: `${selectedIncludedCount} page${selectedIncludedCount === 1 ? "" : "s"} ready for batch actions`,
+            text: "Rotate, keep, delete, or extract the current selection from one command area.",
+          };
     const hasLoadedEditor = pages.length > 0 && activePage;
     const activePagePosition = activeRailState.position;
     const activeThumbnailPageNumber = activePage?.pageNumber ?? null;
+    const exportStatus = !remainingCount
+      ? {
+          tone: "warning",
+          title: "Nothing is ready to export",
+          text: "Keep at least one page in the document before exporting.",
+        }
+      : placedObjects.length
+        ? {
+            tone:
+              exportableFillObjectCount === placedObjects.length ? "ready" : "mixed",
+            title: `${remainingCount} page${remainingCount === 1 ? "" : "s"} ready for export`,
+            text:
+              exportableFillObjectCount === placedObjects.length
+                ? `${exportableFillObjectCount} Fill & Sign item${exportableFillObjectCount === 1 ? "" : "s"} will be flattened into the downloaded PDF.`
+                : `${exportableFillObjectCount} of ${placedObjects.length} Fill & Sign item${placedObjects.length === 1 ? "" : "s"} will export now; keep removed pages to include the rest.`,
+          }
+        : {
+            tone: "ready",
+            title: `${remainingCount} page${remainingCount === 1 ? "" : "s"} ready for export`,
+            text: "Current page order, rotation, and keep/delete changes are ready to download.",
+          };
     const railAssistant = railDragState.isDragging
       ? railDragState.isBatchCandidate
         ? {
@@ -1745,20 +1810,80 @@ export default function EditPdfTool() {
       : selectedPlacedObjectOnActivePage
         ? {
             tone: "active",
-            title: `${selectedPlacedObjectTypeLabel} selected on this page`,
-            text: "Drag it to reposition, adjust its size, or remove it from the page.",
+            title:
+              activePageFillObjectCount > 1
+                ? `${selectedPlacedObjectTypeLabel} selected (${selectedPlacedObjectIndex} of ${activePageFillObjectCount})`
+                : `${selectedPlacedObjectTypeLabel} selected on this page`,
+            text: activePage.markedForDeletion
+              ? "This page is removed from export. Keep the page to include the selected item in the final PDF."
+              : "Drag it to reposition, adjust its size, or remove it from the page.",
           }
-        : activePageFillObjectCount
+        : activePageFillObjectCount > 1
           ? {
               tone: "ready",
-              title: `${activePageFillObjectCount} fill item${activePageFillObjectCount === 1 ? "" : "s"} on this page`,
-              text: "Add another item or select one on the page to fine-tune it.",
+              title: `${activePageFillObjectCount} fill items layered on this page`,
+              text: "Select an item in the viewer to bring it forward, then move or resize it.",
+            }
+          : activePageFillObjectCount
+            ? {
+                tone: "ready",
+                title: "1 fill item on this page",
+                text: "Select it in the viewer to reposition, resize, or remove it.",
+              }
+            : {
+                tone: "ready",
+                title: `${fillAssets.length} saved fill item${fillAssets.length === 1 ? "" : "s"} ready`,
+                text: "Place a saved item on this page to continue completing the document.",
+              };
+    const viewerObjectGuide = !hasFillAssets
+      ? {
+          tone: "empty",
+          title: "Fill & Sign is ready when you are",
+          text: "Create a signature, text, date, or initials item below, then place it on this page.",
+        }
+      : selectedPlacedObjectOnActivePage
+        ? {
+            tone: activePage.markedForDeletion ? "warning" : "active",
+            title:
+              activePageFillObjectCount > 1
+                ? `${selectedPlacedObjectTypeLabel} selected (${selectedPlacedObjectIndex} of ${activePageFillObjectCount})`
+                : `${selectedPlacedObjectTypeLabel} selected`,
+            text: activePage.markedForDeletion
+              ? "Keep this page to include the selected item in export."
+              : "Drag to reposition. Resize from the panel below. The item stays inside export bounds near the page edges.",
+          }
+        : activePageFillObjectCount > 1
+          ? {
+              tone: "ready",
+              title: `${activePageFillObjectCount} items are layered on this page`,
+              text: "Select one in the viewer to bring it forward and make precise adjustments.",
             }
           : {
               tone: "ready",
-              title: `${fillAssets.length} saved fill item${fillAssets.length === 1 ? "" : "s"} ready`,
-              text: "Place a saved item on this page to continue completing the document.",
+              title:
+                activePageFillObjectCount === 1
+                  ? "1 fill item is already on this page"
+                  : `${fillAssets.length} saved item${fillAssets.length === 1 ? "" : "s"} ready to place`,
+              text:
+                activePageFillObjectCount === 1
+                  ? "Select it in the viewer to fine-tune its size or position."
+                  : "Use Place on Page below to add one to the active page.",
             };
+    const viewerActionStatus = activePage.markedForDeletion
+      ? "Page actions affect this page, but removed pages stay out of export until you keep them."
+      : activePageSelected
+        ? "Page actions apply to this page and it is also included in the current selection."
+        : "Page actions apply only to the active page. Batch actions stay in the selected-pages panel.";
+    const selectionActionStatus = !hasSelection
+      ? "Select pages in the rail to enable batch actions."
+      : selectedDeletedCount > 0
+        ? `${selectedDeletedCount} selected page${selectedDeletedCount === 1 ? " is" : "s are"} removed from export.`
+        : "Batch actions are ready for the current selection.";
+    const fillActionStatus = selectedPlacedObjectOnActivePage
+      ? `${selectedPlacedObjectTypeLabel} controls are active below.`
+      : activePageFillObjectCount
+        ? "Select a fill item on the page to adjust it."
+        : "No fill item is selected on this page.";
     const viewerStatusItems = activePage
       ? [
           `Page ${activePage.pageNumber} / ${pages.length}`,
@@ -1781,13 +1906,20 @@ export default function EditPdfTool() {
       selectedPagesLabel,
       selectedIncludedLabel,
       batchStatus,
+      exportStatus,
       fillSignStatus,
+      viewerObjectGuide,
+      viewerActionStatus,
+      selectionActionStatus,
+      fillActionStatus,
       hasFillAssets,
       hasLoadedEditor,
       activePagePosition,
       activeThumbnailPageNumber,
+      allPagesSelected,
       railAssistant,
       selectedPlacedObjectOnActivePage,
+      selectedPlacedObjectTypeLabel,
       viewerSelectionLabel,
       viewerStatusItems,
     };
@@ -1795,7 +1927,9 @@ export default function EditPdfTool() {
     activeRailState,
     activePagePlacedObjects.length,
     deletedCount,
+    includedPages,
     pages.length,
+    placedObjects,
     railDragState,
     selectedPlacedObject,
     selectedIncludedPages.length,
@@ -1812,13 +1946,20 @@ export default function EditPdfTool() {
     selectedPagesLabel,
     selectedIncludedLabel,
     batchStatus,
+    exportStatus,
     fillSignStatus,
+    viewerObjectGuide,
+    viewerActionStatus,
+    selectionActionStatus,
+    fillActionStatus,
     hasFillAssets,
     hasLoadedEditor,
     activePagePosition,
     activeThumbnailPageNumber,
+    allPagesSelected,
     railAssistant,
     selectedPlacedObjectOnActivePage,
+    selectedPlacedObjectTypeLabel,
     viewerSelectionLabel,
     viewerStatusItems,
   } = editorDerivedState;
@@ -2059,6 +2200,7 @@ export default function EditPdfTool() {
                             type="button"
                             className="hero-secondary-btn"
                             onClick={selectAllPages}
+                            disabled={isProcessing || allPagesSelected}
                           >
                             Select All
                           </button>
@@ -2066,6 +2208,7 @@ export default function EditPdfTool() {
                             type="button"
                             className="hero-secondary-btn"
                             onClick={clearPageSelection}
+                            disabled={isProcessing || !selectedPages.length}
                           >
                             Clear Selection
                           </button>
@@ -2076,7 +2219,7 @@ export default function EditPdfTool() {
                         <div className="edit-pdf-toolbar-group-head">
                           <span className="edit-pdf-toolbar-label">Rotate</span>
                           <span className="edit-pdf-toolbar-group-context">
-                            Applies to selected pages
+                            {selectionActionStatus}
                           </span>
                         </div>
                         <div className="edit-pdf-toolbar-section">
@@ -2084,7 +2227,7 @@ export default function EditPdfTool() {
                             type="button"
                             className="hero-secondary-btn"
                             onClick={() => rotateSelectedPages(-90)}
-                            disabled={!selectedPages.length}
+                            disabled={!selectedPages.length || isProcessing}
                           >
                             Rotate Left
                           </button>
@@ -2092,7 +2235,7 @@ export default function EditPdfTool() {
                             type="button"
                             className="hero-secondary-btn"
                             onClick={() => rotateSelectedPages(90)}
-                            disabled={!selectedPages.length}
+                            disabled={!selectedPages.length || isProcessing}
                           >
                             Rotate Right
                           </button>
@@ -2103,7 +2246,9 @@ export default function EditPdfTool() {
                         <div className="edit-pdf-toolbar-group-head">
                           <span className="edit-pdf-toolbar-label">Page Actions</span>
                           <span className="edit-pdf-toolbar-group-context">
-                            Batch-ready page operations
+                            {selectedIncludedCount
+                              ? `${selectedIncludedCount} selected page${selectedIncludedCount === 1 ? "" : "s"} can export now`
+                              : "Keep selected pages to make them export-ready"}
                           </span>
                         </div>
                         <div className="edit-pdf-toolbar-section">
@@ -2111,7 +2256,7 @@ export default function EditPdfTool() {
                             type="button"
                             className="hero-secondary-btn"
                             onClick={markSelectedForDeletion}
-                            disabled={!selectedPages.length}
+                            disabled={!selectedPages.length || isProcessing}
                           >
                             Delete Selected
                           </button>
@@ -2119,7 +2264,7 @@ export default function EditPdfTool() {
                             type="button"
                             className="hero-secondary-btn"
                             onClick={keepSelectedPages}
-                            disabled={!selectedPages.length}
+                            disabled={!selectedPages.length || isProcessing}
                           >
                             Keep Selected
                           </button>
@@ -2143,8 +2288,17 @@ export default function EditPdfTool() {
                     <div className="edit-pdf-toolbar-group-head">
                       <span className="edit-pdf-toolbar-label">Export</span>
                       <span className="edit-pdf-toolbar-group-context">
-                        Whole document
+                        {placedObjects.length
+                          ? "Edited document + flattened Fill & Sign items"
+                          : "Whole document"}
                       </span>
+                    </div>
+                    <div
+                      className={`edit-pdf-toolbar-export-note ${exportStatus.tone}`}
+                      aria-live="polite"
+                    >
+                      <strong>{exportStatus.title}</strong>
+                      <span>{exportStatus.text}</span>
                     </div>
                     <div className="edit-pdf-toolbar-section edit-pdf-toolbar-section-right">
                       <button
@@ -2153,7 +2307,11 @@ export default function EditPdfTool() {
                         disabled={!pages.length || !remainingCount || isProcessing}
                         onClick={exportEditedDocument}
                       >
-                        {isProcessing ? "Exporting..." : "Export Document"}
+                        {isProcessing
+                          ? "Exporting..."
+                          : placedObjects.length
+                            ? "Export Flattened PDF"
+                            : "Export Document"}
                       </button>
                     </div>
                   </section>
@@ -2185,6 +2343,7 @@ export default function EditPdfTool() {
                     type="button"
                     className="hero-secondary-btn"
                     onClick={selectAllPages}
+                    disabled={isProcessing || allPagesSelected}
                   >
                     Select All
                   </button>
@@ -2192,6 +2351,7 @@ export default function EditPdfTool() {
                     type="button"
                     className="hero-secondary-btn"
                     onClick={clearPageSelection}
+                    disabled={isProcessing || !selectedPages.length}
                   >
                     Clear
                   </button>
@@ -2239,7 +2399,7 @@ export default function EditPdfTool() {
                     <p>
                       {activePage.markedForDeletion
                         ? "This page is currently removed from the edited PDF."
-                        : `Position ${activePagePosition} of ${pages.length}`}
+                        : `Position ${activePagePosition} of ${pages.length}. ${viewerActionStatus}`}
                     </p>
                   </div>
 
@@ -2261,6 +2421,23 @@ export default function EditPdfTool() {
                     <span className="edit-pdf-viewer-chip">
                       {`Rotation ${activePage.rotation}\u00B0`}
                     </span>
+                    {hasFillAssets && (
+                      <span
+                        className={`edit-pdf-viewer-chip ${
+                          selectedPlacedObjectOnActivePage
+                            ? "selected"
+                            : activePageFillObjectCount
+                              ? "ready"
+                              : "neutral"
+                        }`}
+                      >
+                        {selectedPlacedObjectOnActivePage
+                          ? `${selectedPlacedObjectTypeLabel} selected`
+                          : activePageFillObjectCount
+                            ? `${activePageFillObjectCount} fill item${activePageFillObjectCount === 1 ? "" : "s"} on page`
+                            : "No fill items on page"}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -2280,11 +2457,13 @@ export default function EditPdfTool() {
                           </strong>
                         </div>
                         <span className="edit-pdf-viewer-page-state">
-                          {activePage.markedForDeletion
-                            ? "Marked for deletion"
-                            : activePageSelected
-                              ? "Selected"
-                              : "Ready to edit"}
+                          {selectedPlacedObjectOnActivePage
+                            ? `${selectedPlacedObjectTypeLabel} selected`
+                            : activePage.markedForDeletion
+                              ? "Marked for deletion"
+                              : activePageSelected
+                                ? "Selected page"
+                                : "Ready to edit"}
                         </span>
                       </div>
                       <div className="edit-pdf-viewer-stage">
@@ -2315,20 +2494,20 @@ export default function EditPdfTool() {
                                           alt={`Preview of PDF page ${activePage.pageNumber}`}
                                         />
                                         <div className="edit-pdf-signature-layer">
-                                          {activePagePlacedObjects.map((placedObject) => {
+                                          {activePagePlacedObjects.map((placedObject, objectIndex) => {
                                             const fillAsset = fillAssetMap.get(
                                               placedObject.assetId,
                                             );
                                             if (!fillAsset) return null;
+                                            const isSelectedObject =
+                                              selectedPlacedObjectOnActivePage?.id === placedObject.id;
 
                                             return (
                                               <button
                                                 key={placedObject.id}
                                                 type="button"
                                                 className={`edit-pdf-signature-object ${
-                                                  selectedPlacedObjectOnActivePage?.id === placedObject.id
-                                                    ? "selected"
-                                                    : ""
+                                                  isSelectedObject ? "selected" : ""
                                                 } ${
                                                   draggingPlacedObjectId === placedObject.id
                                                     ? "dragging"
@@ -2338,8 +2517,15 @@ export default function EditPdfTool() {
                                                   left: `${placedObject.xRatio * 100}%`,
                                                   top: `${placedObject.yRatio * 100}%`,
                                                   width: `${placedObject.widthRatio * 100}%`,
+                                                  zIndex:
+                                                    draggingPlacedObjectId === placedObject.id
+                                                      ? 8
+                                                      : isSelectedObject
+                                                        ? 7
+                                                        : objectIndex + 2,
                                                 }}
                                                 aria-label={`Placed ${placedObject.type} ${fillAsset.label}`}
+                                                disabled={isProcessing}
                                                 onClick={(event) => {
                                                   event.stopPropagation();
                                                   dispatchEditorState({
@@ -2351,6 +2537,13 @@ export default function EditPdfTool() {
                                                   handlePlacedObjectPointerDown(event, placedObject)
                                                 }
                                               >
+                                                {(activePagePlacedObjects.length > 1 || isSelectedObject) && (
+                                                  <span className="edit-pdf-signature-object-badge">
+                                                    {isSelectedObject
+                                                      ? getFillObjectTypeLabel(placedObject.type)
+                                                      : objectIndex + 1}
+                                                  </span>
+                                                )}
                                                 <img
                                                   src={fillAsset.dataUrl}
                                                   alt={`${fillAsset.label} ${placedObject.type}`}
@@ -2368,6 +2561,13 @@ export default function EditPdfTool() {
                           </div>
                         </div>
                       </div>
+                      <div
+                        className={`edit-pdf-viewer-object-guide ${viewerObjectGuide.tone}`}
+                        aria-live="polite"
+                      >
+                        <strong>{viewerObjectGuide.title}</strong>
+                        <span>{viewerObjectGuide.text}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -2377,6 +2577,7 @@ export default function EditPdfTool() {
                       type="button"
                       className="hero-secondary-btn"
                       onClick={() => togglePageSelection(activePage.pageNumber)}
+                      disabled={isProcessing}
                     >
                       {activePageSelected ? "Unselect Page" : "Select Page"}
                     </button>
@@ -2387,6 +2588,7 @@ export default function EditPdfTool() {
                       type="button"
                       className="hero-secondary-btn"
                       onClick={() => rotateActivePage(-90)}
+                      disabled={isProcessing}
                     >
                       Rotate Left
                     </button>
@@ -2394,6 +2596,7 @@ export default function EditPdfTool() {
                       type="button"
                       className="hero-secondary-btn"
                       onClick={() => rotateActivePage(90)}
+                      disabled={isProcessing}
                     >
                       Rotate Right
                     </button>
@@ -2407,7 +2610,7 @@ export default function EditPdfTool() {
                       type="button"
                       className="hero-secondary-btn"
                       onClick={() => adjustZoom(-ZOOM_STEP)}
-                      disabled={zoomLevel <= MIN_ZOOM}
+                      disabled={zoomLevel <= MIN_ZOOM || isProcessing}
                     >
                       Zoom Out
                     </button>
@@ -2415,7 +2618,7 @@ export default function EditPdfTool() {
                       type="button"
                       className="hero-secondary-btn"
                       onClick={() => adjustZoom(ZOOM_STEP)}
-                      disabled={zoomLevel >= MAX_ZOOM}
+                      disabled={zoomLevel >= MAX_ZOOM || isProcessing}
                     >
                       Zoom In
                     </button>
@@ -2423,7 +2626,7 @@ export default function EditPdfTool() {
                       type="button"
                       className="hero-secondary-btn"
                       onClick={resetZoom}
-                      disabled={zoomLevel === 1}
+                      disabled={zoomLevel === 1 || isProcessing}
                     >
                       Reset Zoom
                     </button>
@@ -2434,6 +2637,7 @@ export default function EditPdfTool() {
                       type="button"
                       className="hero-secondary-btn"
                       onClick={toggleActivePageDeletion}
+                      disabled={isProcessing}
                     >
                       {activePage.markedForDeletion ? "Keep Page" : "Delete Page"}
                     </button>
@@ -2471,7 +2675,7 @@ export default function EditPdfTool() {
                     <div className="edit-pdf-fill-sign-block">
                       <div className="edit-pdf-fill-sign-block-head">
                         <strong>Create signature</strong>
-                        <span>Type or upload one signature at a time.</span>
+                        <span>Save a reusable signature asset, then place it on any page.</span>
                       </div>
 
                       <div className="edit-pdf-fill-sign-type-row">
@@ -2480,6 +2684,7 @@ export default function EditPdfTool() {
                           className="edit-pdf-fill-sign-input"
                           value={typedSignatureValue}
                           placeholder="Type your signature"
+                          disabled={isPreparingFillAsset || isProcessing}
                           onChange={(event) => setTypedSignatureValue(event.target.value)}
                           onKeyDown={(event) => {
                             if (event.key === "Enter") {
@@ -2492,7 +2697,7 @@ export default function EditPdfTool() {
                           type="button"
                           className="hero-secondary-btn"
                           onClick={handleCreateTypedSignature}
-                          disabled={!typedSignatureValue.trim() || isPreparingFillAsset}
+                          disabled={!typedSignatureValue.trim() || isPreparingFillAsset || isProcessing}
                         >
                           {isPreparingFillAsset ? "Creating..." : "Create"}
                         </button>
@@ -2503,7 +2708,7 @@ export default function EditPdfTool() {
                           type="button"
                           className="hero-secondary-btn"
                           onClick={() => signatureUploadInputRef.current?.click()}
-                          disabled={isPreparingFillAsset}
+                          disabled={isPreparingFillAsset || isProcessing}
                         >
                           Upload Signature Image
                         </button>
@@ -2523,6 +2728,7 @@ export default function EditPdfTool() {
                           className="edit-pdf-fill-sign-input"
                           value={fillTextValue}
                           placeholder="Add text"
+                          disabled={isPreparingFillAsset || isProcessing}
                           onChange={(event) => setFillTextValue(event.target.value)}
                           onKeyDown={(event) => {
                             if (event.key === "Enter") {
@@ -2535,7 +2741,7 @@ export default function EditPdfTool() {
                           type="button"
                           className="hero-secondary-btn"
                           onClick={handleCreateTextObject}
-                          disabled={!fillTextValue.trim() || isPreparingFillAsset}
+                          disabled={!fillTextValue.trim() || isPreparingFillAsset || isProcessing}
                         >
                           Add Text
                         </button>
@@ -2547,6 +2753,7 @@ export default function EditPdfTool() {
                           className="edit-pdf-fill-sign-input"
                           value={dateValue}
                           placeholder="Add date"
+                          disabled={isPreparingFillAsset || isProcessing}
                           onChange={(event) => setDateValue(event.target.value)}
                           onKeyDown={(event) => {
                             if (event.key === "Enter") {
@@ -2559,6 +2766,7 @@ export default function EditPdfTool() {
                           type="button"
                           className="hero-secondary-btn"
                           onClick={() => setDateValue(getCurrentDateLabel())}
+                          disabled={isPreparingFillAsset || isProcessing}
                         >
                           Today
                         </button>
@@ -2566,7 +2774,7 @@ export default function EditPdfTool() {
                           type="button"
                           className="hero-secondary-btn"
                           onClick={handleCreateDateObject}
-                          disabled={!dateValue.trim() || isPreparingFillAsset}
+                          disabled={!dateValue.trim() || isPreparingFillAsset || isProcessing}
                         >
                           Add Date
                         </button>
@@ -2579,6 +2787,7 @@ export default function EditPdfTool() {
                           value={initialsValue}
                           maxLength={6}
                           placeholder="Add initials"
+                          disabled={isPreparingFillAsset || isProcessing}
                           onChange={(event) => setInitialsValue(event.target.value.toUpperCase())}
                           onKeyDown={(event) => {
                             if (event.key === "Enter") {
@@ -2591,7 +2800,7 @@ export default function EditPdfTool() {
                           type="button"
                           className="hero-secondary-btn"
                           onClick={handleCreateInitialsObject}
-                          disabled={!initialsValue.trim() || isPreparingFillAsset}
+                          disabled={!initialsValue.trim() || isPreparingFillAsset || isProcessing}
                         >
                           Add Initials
                         </button>
@@ -2623,6 +2832,7 @@ export default function EditPdfTool() {
                                 type="button"
                                 className="hero-secondary-btn"
                                 onClick={() => placeFillAssetOnActivePage(asset.id)}
+                                disabled={isProcessing}
                               >
                                 Place on Page
                               </button>
@@ -2641,8 +2851,10 @@ export default function EditPdfTool() {
                         <strong>Selected item</strong>
                         <span>
                           {selectedPlacedObjectOnActivePage
-                            ? "Adjust the active item without leaving the viewer."
-                            : "Select a placed item on the page to resize or remove it."}
+                            ? `${fillActionStatus} Adjust the active item without leaving the viewer.`
+                            : activePageFillObjectCount
+                              ? `${fillActionStatus} Select a placed item on the page to resize or remove it.`
+                              : "Use Place on Page or create a new item below to start filling this page."}
                         </span>
                       </div>
 
@@ -2674,6 +2886,7 @@ export default function EditPdfTool() {
                               max={MAX_PLACED_OBJECT_WIDTH_RATIO}
                               step="0.01"
                               value={selectedPlacedObjectOnActivePage.widthRatio}
+                              disabled={isProcessing}
                               onChange={(event) =>
                                 updateSelectedPlacedObjectWidth(Number(event.target.value))
                               }
@@ -2683,6 +2896,7 @@ export default function EditPdfTool() {
                             type="button"
                             className="hero-secondary-btn"
                             onClick={removeSelectedPlacedObject}
+                            disabled={isProcessing}
                           >
                             Remove Item
                           </button>

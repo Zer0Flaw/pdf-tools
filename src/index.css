@@ -1924,6 +1924,43 @@ h1 {
   margin-left: auto;
 }
 
+.edit-pdf-toolbar-export-note {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(203, 213, 225, 0.92);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.98) 100%);
+}
+
+.edit-pdf-toolbar-export-note strong {
+  color: #0f172a;
+  font-size: 0.86rem;
+}
+
+.edit-pdf-toolbar-export-note span {
+  color: #475569;
+  font-size: 0.79rem;
+  line-height: 1.35;
+}
+
+.edit-pdf-toolbar-export-note.ready {
+  border-color: rgba(191, 219, 254, 0.95);
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98) 0%, rgba(239, 246, 255, 0.98) 100%);
+}
+
+.edit-pdf-toolbar-export-note.mixed {
+  border-color: rgba(196, 181, 253, 0.92);
+  background: linear-gradient(180deg, rgba(250, 245, 255, 0.98) 0%, rgba(237, 233, 254, 0.98) 100%);
+}
+
+.edit-pdf-toolbar-export-note.warning {
+  border-color: rgba(253, 186, 116, 0.92);
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.98) 0%, rgba(255, 237, 213, 0.98) 100%);
+}
+
 .edit-pdf-toolbar-label {
   flex: 0 0 auto;
   color: #64748b;
@@ -2916,7 +2953,10 @@ h1 {
   transition:
     border-color 0.18s ease,
     box-shadow 0.18s ease,
-    background 0.18s ease;
+    background 0.18s ease,
+    transform 0.18s ease;
+  touch-action: none;
+  will-change: transform;
 }
 
 .edit-pdf-signature-object:hover {
@@ -2946,6 +2986,33 @@ h1 {
   width: 100%;
   height: auto;
   pointer-events: none;
+}
+
+.edit-pdf-signature-object-badge {
+  position: absolute;
+  top: -9px;
+  left: -9px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(191, 219, 254, 0.96);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  color: #1d4ed8;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+}
+
+.edit-pdf-signature-object.selected .edit-pdf-signature-object-badge {
+  border-color: rgba(147, 197, 253, 0.98);
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.98) 0%, rgba(219, 234, 254, 0.98) 100%);
 }
 
 .edit-pdf-signature-object.edit-pdf-fill-object-signature {
@@ -3014,6 +3081,47 @@ h1 {
   font-size: 0.8rem;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.edit-pdf-viewer-object-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.98) 100%);
+}
+
+.edit-pdf-viewer-object-guide strong {
+  color: #0f172a;
+  font-size: 0.88rem;
+}
+
+.edit-pdf-viewer-object-guide span {
+  color: #475569;
+  font-size: 0.8rem;
+  line-height: 1.38;
+}
+
+.edit-pdf-viewer-object-guide.ready {
+  border-color: rgba(191, 219, 254, 0.95);
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98) 0%, rgba(239, 246, 255, 0.98) 100%);
+}
+
+.edit-pdf-viewer-object-guide.active {
+  border-color: rgba(165, 180, 252, 0.92);
+  background: linear-gradient(180deg, rgba(250, 245, 255, 0.98) 0%, rgba(237, 233, 254, 0.98) 100%);
+}
+
+.edit-pdf-viewer-object-guide.warning {
+  border-color: rgba(253, 186, 116, 0.92);
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.98) 0%, rgba(255, 237, 213, 0.98) 100%);
+}
+
+.edit-pdf-viewer-object-guide.empty {
+  border-style: dashed;
 }
 
 .edit-pdf-viewer-status {
