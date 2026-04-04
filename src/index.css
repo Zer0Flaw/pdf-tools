@@ -1840,6 +1840,49 @@ h1 {
   line-height: 1;
 }
 
+.edit-pdf-batch-panel-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(203, 213, 225, 0.92);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.98) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 10px 22px rgba(15, 23, 42, 0.04);
+}
+
+.edit-pdf-batch-panel-status strong {
+  color: #111827;
+  font-size: 0.9rem;
+}
+
+.edit-pdf-batch-panel-status span {
+  color: #475569;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.edit-pdf-batch-panel-status.ready {
+  border-color: rgba(191, 219, 254, 0.95);
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98) 0%, rgba(239, 246, 255, 0.98) 100%);
+}
+
+.edit-pdf-batch-panel-status.warning {
+  border-color: rgba(253, 224, 71, 0.9);
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.98) 0%, rgba(254, 243, 199, 0.96) 100%);
+}
+
+.edit-pdf-batch-panel-status.mixed {
+  border-color: rgba(196, 181, 253, 0.88);
+  background: linear-gradient(180deg, rgba(250, 245, 255, 0.98) 0%, rgba(237, 233, 254, 0.98) 100%);
+}
+
+.edit-pdf-batch-panel-status.empty {
+  border-style: dashed;
+}
+
 .edit-pdf-toolbar-groups {
   flex: 1 1 auto;
   min-width: 0;
@@ -2064,12 +2107,51 @@ h1 {
   padding: 0 2px;
 }
 
+.edit-pdf-sidebar-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 250, 252, 0.98) 100%);
+}
+
+.edit-pdf-sidebar-feedback strong {
+  color: #111827;
+  font-size: 0.86rem;
+}
+
+.edit-pdf-sidebar-feedback span {
+  color: #475569;
+  font-size: 0.79rem;
+  line-height: 1.35;
+}
+
+.edit-pdf-sidebar-feedback.dragging {
+  border-color: rgba(96, 165, 250, 0.88);
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98) 0%, rgba(239, 246, 255, 0.98) 100%);
+}
+
+.edit-pdf-sidebar-feedback.complete {
+  border-color: rgba(129, 140, 248, 0.82);
+  background: linear-gradient(180deg, rgba(245, 243, 255, 0.98) 0%, rgba(238, 242, 255, 0.98) 100%);
+}
+
+.edit-pdf-sidebar-feedback.ready {
+  border-color: rgba(191, 219, 254, 0.92);
+}
+
 .edit-pdf-thumbnail-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
   overflow: auto;
   padding: 2px 10px 2px 2px;
+}
+
+.edit-pdf-thumbnail-list[data-drag-active="true"] {
+  gap: 10px;
 }
 
 .edit-pdf-thumb {
@@ -2206,6 +2288,71 @@ h1 {
   color: #4338ca;
 }
 
+.edit-pdf-thumb.batch-dragging:not(.dragging) {
+  border-color: rgba(129, 140, 248, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(129, 140, 248, 0.14),
+    0 10px 22px rgba(99, 102, 241, 0.08);
+}
+
+.edit-pdf-thumb.drop-target {
+  border-color: #60a5fa;
+  background: linear-gradient(180deg, #ffffff 0%, #eef6ff 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(96, 165, 250, 0.2),
+    0 0 0 4px rgba(96, 165, 250, 0.08),
+    0 14px 28px rgba(59, 130, 246, 0.1);
+  transform: translateX(4px);
+}
+
+.edit-pdf-thumb.drop-target .edit-pdf-thumb-preview {
+  border-color: #93c5fd;
+  box-shadow:
+    inset 0 0 0 1px rgba(96, 165, 250, 0.18),
+    0 10px 18px rgba(59, 130, 246, 0.08);
+}
+
+.edit-pdf-thumb.drop-target .edit-pdf-thumb-meta span {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.edit-pdf-thumb.drop-complete {
+  animation: edit-pdf-thumb-drop-complete 0.65s ease;
+}
+
+.edit-pdf-thumb.drop-complete .edit-pdf-thumb-preview {
+  border-color: rgba(96, 165, 250, 0.92);
+}
+
+.edit-pdf-thumb.drop-complete .edit-pdf-thumb-meta span {
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+@keyframes edit-pdf-thumb-drop-complete {
+  0% {
+    transform: translateX(4px) scale(1);
+    box-shadow:
+      inset 0 0 0 1px rgba(96, 165, 250, 0.16),
+      0 10px 22px rgba(59, 130, 246, 0.08);
+  }
+
+  45% {
+    transform: translateX(2px) scale(1.01);
+    box-shadow:
+      inset 0 0 0 1px rgba(96, 165, 250, 0.2),
+      0 14px 30px rgba(59, 130, 246, 0.12);
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+    box-shadow:
+      inset 0 0 0 1px rgba(96, 165, 250, 0.08),
+      0 8px 18px rgba(59, 130, 246, 0.06);
+  }
+}
+
 .edit-pdf-thumb.deleted {
   background: linear-gradient(180deg, #fff7f7 0%, #fff1f2 100%);
   border-color: #fecaca;
@@ -2235,6 +2382,12 @@ h1 {
 
 .edit-pdf-thumb-handle:active {
   cursor: grabbing;
+}
+
+.edit-pdf-thumb.dragging .edit-pdf-thumb-handle {
+  border-color: rgba(96, 165, 250, 0.82);
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 .edit-pdf-thumb-check {
@@ -2380,6 +2533,36 @@ h1 {
     0 4px 10px rgba(59, 130, 246, 0.05);
 }
 
+.edit-pdf-viewer-chip.neutral {
+  border-color: rgba(203, 213, 225, 0.92);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  color: #475569;
+}
+
+.edit-pdf-viewer-chip.selected {
+  border-color: rgba(165, 180, 252, 0.92);
+  background: linear-gradient(180deg, rgba(250, 245, 255, 0.98) 0%, rgba(238, 242, 255, 0.98) 100%);
+  color: #3730a3;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 6px 12px rgba(99, 102, 241, 0.08);
+}
+
+.edit-pdf-viewer-chip.ready {
+  border-color: rgba(191, 219, 254, 0.94);
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98) 0%, rgba(239, 246, 255, 0.98) 100%);
+  color: #1d4ed8;
+}
+
+.edit-pdf-viewer-chip.warning {
+  border-color: rgba(253, 224, 71, 0.92);
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.98) 0%, rgba(254, 243, 199, 0.98) 100%);
+  color: #92400e;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 6px 12px rgba(217, 119, 6, 0.08);
+}
+
 .edit-pdf-viewer-body {
   flex: 1;
   min-height: 0;
@@ -2413,6 +2596,28 @@ h1 {
 
 .edit-pdf-viewer-workspace.page-switching {
   background: linear-gradient(180deg, rgba(248, 251, 255, 0.9) 0%, rgba(239, 246, 255, 0.94) 100%);
+}
+
+.edit-pdf-viewer-workspace.selection-active {
+  background: linear-gradient(180deg, rgba(250, 245, 255, 0.62) 0%, rgba(245, 247, 255, 0.9) 100%);
+}
+
+.edit-pdf-viewer-workspace.selection-active .edit-pdf-viewer-page-header {
+  border-color: rgba(196, 181, 253, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 24px rgba(99, 102, 241, 0.08);
+}
+
+.edit-pdf-viewer-workspace.page-removed {
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.56) 0%, rgba(255, 247, 237, 0.88) 100%);
+}
+
+.edit-pdf-viewer-workspace.page-removed .edit-pdf-viewer-stage {
+  border-color: rgba(253, 186, 116, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 18px 36px rgba(251, 146, 60, 0.08);
 }
 
 .edit-pdf-viewer-workspace.page-switching .edit-pdf-viewer-page-header {
@@ -2498,6 +2703,24 @@ h1 {
     0 4px 12px rgba(59, 130, 246, 0.08);
 }
 
+.edit-pdf-viewer-workspace.selection-active .edit-pdf-viewer-page-state {
+  border-color: rgba(165, 180, 252, 0.92);
+  background: linear-gradient(180deg, rgba(250, 245, 255, 0.98) 0%, rgba(238, 242, 255, 0.98) 100%);
+  color: #4338ca;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 6px 14px rgba(99, 102, 241, 0.1);
+}
+
+.edit-pdf-viewer-workspace.page-removed .edit-pdf-viewer-page-state {
+  border-color: rgba(253, 186, 116, 0.92);
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.98) 0%, rgba(254, 243, 199, 0.98) 100%);
+  color: #9a3412;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 6px 14px rgba(234, 88, 12, 0.08);
+}
+
 .edit-pdf-viewer-stage {
   flex: 1;
   min-width: 0;
@@ -2550,6 +2773,18 @@ h1 {
   padding: 10px 12px;
 }
 
+.edit-pdf-viewer-surface {
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: 12px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(244, 247, 252, 0.96) 100%);
+  border: 1px solid rgba(203, 213, 225, 0.82);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 18px 38px rgba(15, 23, 42, 0.06);
+}
+
 .edit-pdf-viewer-preview-frame {
   width: min(100%, 680px);
   min-height: 100%;
@@ -2566,7 +2801,36 @@ h1 {
     0 18px 40px rgba(15, 23, 42, 0.06);
 }
 
+.edit-pdf-viewer-document-shell {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.74) 0%, rgba(248, 250, 252, 0.98) 100%);
+  border: 1px solid rgba(226, 232, 240, 0.96);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.84),
+    0 10px 22px rgba(15, 23, 42, 0.05);
+}
+
+.edit-pdf-viewer-overlay-surface {
+  position: absolute;
+  inset: 12px;
+  border-radius: 18px;
+  pointer-events: none;
+  border: 1px dashed rgba(191, 219, 254, 0.72);
+  background:
+    radial-gradient(circle at top, rgba(219, 234, 254, 0.24) 0%, rgba(255, 255, 255, 0) 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(241, 245, 249, 0.16) 100%);
+  opacity: 0.9;
+}
+
 .edit-pdf-viewer-canvas {
+  position: relative;
+  z-index: 1;
   width: min(100%, 560px);
   max-width: 100%;
   display: flex;
@@ -2580,6 +2844,20 @@ h1 {
   box-shadow:
     0 22px 44px rgba(15, 23, 42, 0.09),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.edit-pdf-viewer-workspace.selection-active .edit-pdf-viewer-overlay-surface {
+  border-color: rgba(196, 181, 253, 0.72);
+  background:
+    radial-gradient(circle at top, rgba(224, 231, 255, 0.3) 0%, rgba(255, 255, 255, 0) 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(238, 242, 255, 0.18) 100%);
+}
+
+.edit-pdf-viewer-workspace.page-removed .edit-pdf-viewer-overlay-surface {
+  border-color: rgba(253, 186, 116, 0.72);
+  background:
+    radial-gradient(circle at top, rgba(254, 215, 170, 0.28) 0%, rgba(255, 255, 255, 0) 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 247, 237, 0.18) 100%);
 }
 
 .edit-pdf-viewer-image {
@@ -2665,6 +2943,18 @@ h1 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.92),
     0 4px 10px rgba(59, 130, 246, 0.05);
+}
+
+.edit-pdf-toolbar .hero-secondary-btn:disabled,
+.edit-pdf-sidebar .hero-secondary-btn:disabled,
+.edit-pdf-viewer-actions .hero-secondary-btn:disabled,
+.edit-pdf-viewer-actions .hero-primary-btn:disabled {
+  opacity: 0.58;
+  border-color: rgba(203, 213, 225, 0.88);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.98) 100%);
+  color: #94a3b8;
+  box-shadow: none;
+  transform: none;
 }
 
 @media (max-width: 1080px) {

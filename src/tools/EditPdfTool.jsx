@@ -42,7 +42,12 @@ function createInitialEditorState() {
     activePageNumber: null,
     zoomLevel: 1,
     isPageSwitching: false,
-    dragState: { activeId: null },
+    dragState: {
+      activeId: null,
+      overId: null,
+      completedId: null,
+      completedOverId: null,
+    },
   };
 }
 
@@ -85,10 +90,60 @@ function editPdfEditorReducer(state, action) {
       return state.isPageSwitching === action.value
         ? state
         : { ...state, isPageSwitching: action.value };
-    case "set_drag_state":
-      return state.dragState.activeId === action.dragState.activeId
+    case "begin_drag":
+      return {
+        ...state,
+        dragState: {
+          ...state.dragState,
+          activeId: action.activeId,
+          overId: action.activeId,
+          completedId: null,
+          completedOverId: null,
+        },
+      };
+    case "update_drag_over":
+      return state.dragState.overId === action.overId
         ? state
-        : { ...state, dragState: action.dragState };
+        : {
+            ...state,
+            dragState: {
+              ...state.dragState,
+              overId: action.overId,
+            },
+          };
+    case "reset_drag_state":
+      return state.dragState.activeId === null && state.dragState.overId === null
+        ? state
+        : {
+            ...state,
+            dragState: {
+              ...state.dragState,
+              activeId: null,
+              overId: null,
+            },
+          };
+    case "set_reorder_feedback":
+      return {
+        ...state,
+        dragState: {
+          activeId: null,
+          overId: null,
+          completedId: action.completedId,
+          completedOverId: action.completedOverId,
+        },
+      };
+    case "clear_reorder_feedback":
+      return state.dragState.completedId === null &&
+        state.dragState.completedOverId === null
+        ? state
+        : {
+            ...state,
+            dragState: {
+              ...state.dragState,
+              completedId: null,
+              completedOverId: null,
+            },
+          };
     case "reorder_pages": {
       const oldIndex = state.pages.findIndex((page) => page.id === action.activeId);
       const newIndex = state.pages.findIndex((page) => page.id === action.overId);
@@ -113,6 +168,9 @@ const SortableThumbnailPage = memo(function SortableThumbnailPage({
   totalPages,
   isActive,
   isSelected,
+  isDropTarget,
+  isBatchDragActive,
+  isDropComplete,
   onActivate,
   onToggleSelection,
 }) {
@@ -138,6 +196,14 @@ const SortableThumbnailPage = memo(function SortableThumbnailPage({
     onActivate(page.pageNumber, { shiftKey: Boolean(event.shiftKey) });
   }
 
+  const thumbnailMetaLabel = page.markedForDeletion
+    ? "Deleted from export"
+    : isDropComplete
+      ? "Moved into place"
+      : isDropTarget
+        ? "Release to place here"
+        : `Position ${index + 1} of ${totalPages}`;
+
   return (
     <article
       ref={setNodeRef}
@@ -145,7 +211,11 @@ const SortableThumbnailPage = memo(function SortableThumbnailPage({
       data-page-number={page.pageNumber}
       className={`edit-pdf-thumb ${isActive ? "active" : ""} ${
         isSelected ? "selected" : ""
-      } ${page.markedForDeletion ? "deleted" : ""} ${
+      } ${isDropTarget ? "drop-target" : ""} ${
+        isBatchDragActive ? "batch-dragging" : ""
+      } ${isDropComplete ? "drop-complete" : ""} ${
+        page.markedForDeletion ? "deleted" : ""
+      } ${
         isDragging ? "dragging" : ""
       }`}
       aria-current={isActive ? "page" : undefined}
@@ -200,11 +270,7 @@ const SortableThumbnailPage = memo(function SortableThumbnailPage({
 
       <div className="edit-pdf-thumb-meta">
         <strong>Page {page.pageNumber}</strong>
-        <span>
-          {page.markedForDeletion
-            ? "Deleted from export"
-            : `Position ${index + 1} of ${totalPages}`}
-        </span>
+        <span>{thumbnailMetaLabel}</span>
       </div>
     </article>
   );
@@ -216,7 +282,10 @@ function areThumbnailPropsEqual(prevProps, nextProps) {
     prevProps.index === nextProps.index &&
     prevProps.totalPages === nextProps.totalPages &&
     prevProps.isActive === nextProps.isActive &&
-    prevProps.isSelected === nextProps.isSelected
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.isDropTarget === nextProps.isDropTarget &&
+    prevProps.isBatchDragActive === nextProps.isBatchDragActive &&
+    prevProps.isDropComplete === nextProps.isDropComplete
   );
 }
 
@@ -327,26 +396,51 @@ export default function EditPdfTool() {
     if (!dragState.activeId) {
       return {
         activeId: null,
+        completedId: dragState.completedId,
         activePage: null,
+        overId: dragState.overId,
+        overPage: null,
         isBatchCandidate: false,
+        isDragging: false,
+        completedPage: dragState.completedId ? pageIdMap.get(dragState.completedId) || null : null,
+        completedTargetPage: dragState.completedOverId
+          ? pageIdMap.get(dragState.completedOverId) || null
+          : null,
         selectedPageIds: [],
         selectedCount: 0,
       };
     }
 
     const activePage = pageIdMap.get(dragState.activeId) || null;
+    const overPage = dragState.overId ? pageIdMap.get(dragState.overId) || null : null;
     const isBatchCandidate = activePage
       ? selectedPageSet.has(activePage.pageNumber)
       : false;
 
     return {
       activeId: dragState.activeId,
+      completedId: dragState.completedId,
       activePage,
+      overId: dragState.overId,
+      overPage,
       isBatchCandidate,
+      isDragging: true,
+      completedPage: dragState.completedId ? pageIdMap.get(dragState.completedId) || null : null,
+      completedTargetPage: dragState.completedOverId
+        ? pageIdMap.get(dragState.completedOverId) || null
+        : null,
       selectedPageIds: isBatchCandidate ? selectedRailSelection.pageIds : [],
       selectedCount: isBatchCandidate ? selectedRailSelection.count : 0,
     };
-  }, [dragState.activeId, pageIdMap, selectedPageSet, selectedRailSelection]);
+  }, [
+    dragState.activeId,
+    dragState.completedId,
+    dragState.completedOverId,
+    dragState.overId,
+    pageIdMap,
+    selectedPageSet,
+    selectedRailSelection,
+  ]);
 
   useEffect(() => {
     previewUrlsRef.current = pages;
@@ -364,6 +458,16 @@ export default function EditPdfTool() {
 
     return () => clearTimeout(timer);
   }, [message]);
+
+  useEffect(() => {
+    if (!dragState.completedId) return undefined;
+
+    const timer = setTimeout(() => {
+      dispatchEditorState({ type: "clear_reorder_feedback" });
+    }, 900);
+
+    return () => clearTimeout(timer);
+  }, [dragState.completedId]);
 
   useEffect(() => {
     return () => {
@@ -476,7 +580,7 @@ export default function EditPdfTool() {
     event.target.value = "";
   }
 
-  function handleDragOver(event) {
+  function handleUploadDragOver(event) {
     if (isProcessing) return;
     event.preventDefault();
     setIsDragOver(true);
@@ -590,7 +694,7 @@ export default function EditPdfTool() {
   }, [togglePageSelection]);
 
   const resetDragState = useCallback(() => {
-    dispatchEditorState({ type: "set_drag_state", dragState: { activeId: null } });
+    dispatchEditorState({ type: "reset_drag_state" });
   }, []);
 
   function selectAllPages() {
@@ -692,9 +796,13 @@ export default function EditPdfTool() {
   }
 
   const handleDragStart = useCallback((event) => {
+    dispatchEditorState({ type: "begin_drag", activeId: event.active.id });
+  }, []);
+
+  const handleDragOver = useCallback((event) => {
     dispatchEditorState({
-      type: "set_drag_state",
-      dragState: { activeId: event.active.id },
+      type: "update_drag_over",
+      overId: event.over?.id ?? null,
     });
   }, []);
 
@@ -704,10 +812,16 @@ export default function EditPdfTool() {
 
   function handleDragEnd(event) {
     const { active, over } = event;
-    resetDragState();
+    if (!over || active.id === over.id) {
+      resetDragState();
+      return;
+    }
 
-    if (!over || active.id === over.id) return;
-
+    dispatchEditorState({
+      type: "set_reorder_feedback",
+      completedId: active.id,
+      completedOverId: over.id,
+    });
     dispatchEditorState({
       type: "reorder_pages",
       activeId: active.id,
@@ -830,7 +944,10 @@ export default function EditPdfTool() {
     const activePage = activeRailState.page;
     const remainingCount = pages.length - deletedCount;
     const selectedIncludedCount = selectedIncludedPages.length;
+    const selectedDeletedCount = selectedPages.length - selectedIncludedCount;
     const activePageSelected = activeRailState.isSelected;
+    const hasSelection = selectedPages.length > 0;
+    const hasIncludedSelection = selectedIncludedCount > 0;
     const selectedPagesLabel =
       selectedPages.length === 1
         ? "1 selected page"
@@ -839,13 +956,78 @@ export default function EditPdfTool() {
       selectedIncludedCount === 1
         ? "1 selected in export"
         : `${selectedIncludedCount} selected in export`;
+    const batchStatus = !hasSelection
+      ? {
+          tone: "empty",
+          title: "No pages selected",
+          text: "Select pages in the rail to enable batch rotation, keep, delete, or extraction.",
+        }
+      : !hasIncludedSelection
+        ? {
+            tone: "warning",
+            title: "Selection is excluded from export",
+            text: "Keep selected pages or reselect included pages before extracting them.",
+          }
+        : selectedDeletedCount > 0
+          ? {
+              tone: "mixed",
+              title: `${selectedIncludedCount} page${selectedIncludedCount === 1 ? "" : "s"} ready for extraction`,
+              text: `${selectedDeletedCount} selected page${selectedDeletedCount === 1 ? " is" : "s are"} currently removed from export.`,
+            }
+          : {
+              tone: "ready",
+              title: `${selectedIncludedCount} page${selectedIncludedCount === 1 ? "" : "s"} ready for batch actions`,
+              text: "Rotate, keep, delete, or extract the current selection from one command area.",
+            };
     const hasLoadedEditor = pages.length > 0 && activePage;
     const activePagePosition = activeRailState.position;
     const activeThumbnailPageNumber = activePage?.pageNumber ?? null;
+    const railAssistant = railDragState.isDragging
+      ? railDragState.isBatchCandidate
+        ? {
+            tone: "dragging",
+            title: `Dragging a selected page from a ${railDragState.selectedCount}-page selection`,
+            text: railDragState.overPage
+              ? `Release to place the dragged page near page ${railDragState.overPage.pageNumber}.`
+              : "Move through the rail and release to reorder the current selection context.",
+          }
+        : {
+            tone: "dragging",
+            title: railDragState.activePage
+              ? `Dragging page ${railDragState.activePage.pageNumber}`
+              : "Dragging page",
+            text: railDragState.overPage
+              ? `Release to place it near page ${railDragState.overPage.pageNumber}.`
+              : "Move through the rail and release to reorder this page.",
+          }
+      : railDragState.completedPage
+        ? {
+            tone: "complete",
+            title: `Moved page ${railDragState.completedPage.pageNumber}`,
+            text: railDragState.completedTargetPage
+              ? `Reordered near page ${railDragState.completedTargetPage.pageNumber}.`
+              : "The page order has been updated.",
+          }
+        : hasSelection
+          ? {
+              tone: "ready",
+              title: `${selectedPages.length} page${selectedPages.length === 1 ? "" : "s"} selected`,
+              text: "Shift-click to extend a range, or drag thumbnails to change page order.",
+            }
+          : {
+              tone: "idle",
+              title: "Rail navigation is ready",
+              text: "Select pages, shift-click a range, or drag thumbnails to reorder the document.",
+            };
+    const viewerSelectionLabel = activePageSelected
+      ? selectedPages.length > 1
+        ? `In ${selectedPages.length}-page selection`
+        : "Selected page"
+      : "Active page only";
     const viewerStatusItems = activePage
       ? [
           `Page ${activePage.pageNumber} / ${pages.length}`,
-          activePage.rotation ? `Rotation: ${activePage.rotation}°` : null,
+          activePage.rotation ? `Rotation: ${activePage.rotation}\u00B0` : null,
           zoomLevel !== 1 ? `Zoom: ${Math.round(zoomLevel * 100)}%` : null,
           activePageSelected ? "Selected" : null,
           activePage.markedForDeletion ? "Marked for Deletion" : null,
@@ -859,15 +1041,19 @@ export default function EditPdfTool() {
       activePageSelected,
       selectedPagesLabel,
       selectedIncludedLabel,
+      batchStatus,
       hasLoadedEditor,
       activePagePosition,
       activeThumbnailPageNumber,
+      railAssistant,
+      viewerSelectionLabel,
       viewerStatusItems,
     };
   }, [
     activeRailState,
     deletedCount,
     pages.length,
+    railDragState,
     selectedIncludedPages.length,
     selectedPages.length,
     zoomLevel,
@@ -879,9 +1065,12 @@ export default function EditPdfTool() {
     activePageSelected,
     selectedPagesLabel,
     selectedIncludedLabel,
+    batchStatus,
     hasLoadedEditor,
     activePagePosition,
     activeThumbnailPageNumber,
+    railAssistant,
+    viewerSelectionLabel,
     viewerStatusItems,
   } = editorDerivedState;
 
@@ -906,6 +1095,17 @@ export default function EditPdfTool() {
           totalPages={pages.length}
           isActive={activeThumbnailPageNumber === page.pageNumber}
           isSelected={selectedPageSet.has(page.pageNumber)}
+          isDropTarget={
+            railDragState.isDragging &&
+            railDragState.overId === page.id &&
+            railDragState.activeId !== page.id
+          }
+          isBatchDragActive={
+            railDragState.isDragging &&
+            railDragState.isBatchCandidate &&
+            selectedPageSet.has(page.pageNumber)
+          }
+          isDropComplete={railDragState.completedId === page.id}
           onActivate={handleThumbnailActivate}
           onToggleSelection={togglePageSelection}
         />
@@ -914,6 +1114,11 @@ export default function EditPdfTool() {
       activeThumbnailPageNumber,
       handleThumbnailActivate,
       pages,
+      railDragState.activeId,
+      railDragState.completedId,
+      railDragState.isBatchCandidate,
+      railDragState.isDragging,
+      railDragState.overId,
       selectedPageSet,
       togglePageSelection,
     ],
@@ -955,7 +1160,7 @@ export default function EditPdfTool() {
             tabIndex={isProcessing ? -1 : 0}
             aria-label={`Upload a PDF for Edit PDF. Free plan includes one PDF up to ${FILE_SIZE_LIMIT_LABEL}.`}
             aria-disabled={isProcessing}
-            onDragOver={handleDragOver}
+            onDragOver={handleUploadDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => {
@@ -1026,6 +1231,7 @@ export default function EditPdfTool() {
         <DndContext
           collisionDetection={closestCenter}
           onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
           onDragCancel={handleDragCancel}
           onDragEnd={handleDragEnd}
         >
@@ -1081,6 +1287,14 @@ export default function EditPdfTool() {
                           {selectedIncludedLabel}
                         </span>
                       </div>
+                    </div>
+
+                    <div
+                      className={`edit-pdf-batch-panel-status ${batchStatus.tone}`}
+                      aria-live="polite"
+                    >
+                      <strong>{batchStatus.title}</strong>
+                      <span>{batchStatus.text}</span>
                     </div>
 
                     <div className="edit-pdf-toolbar-groups">
@@ -1234,6 +1448,14 @@ export default function EditPdfTool() {
                   </button>
                 </div>
 
+                <div
+                  className={`edit-pdf-sidebar-feedback ${railAssistant.tone}`}
+                  aria-live="polite"
+                >
+                  <strong>{railAssistant.title}</strong>
+                  <span>{railAssistant.text}</span>
+                </div>
+
                 <SortableContext
                   items={pageIds}
                   strategy={verticalListSortingStrategy}
@@ -1242,8 +1464,10 @@ export default function EditPdfTool() {
                     ref={thumbnailListRef}
                     className="edit-pdf-thumbnail-list"
                     data-selected-count={selectedRailSelection.count}
+                    data-drag-active={railDragState.isDragging}
                     data-drag-batch-ready={railDragState.isBatchCandidate}
                     data-drag-selection-count={railDragState.selectedCount}
+                    data-drop-complete={Boolean(railDragState.completedPage)}
                   >
                     {thumbnailItems}
                   </div>
@@ -1263,11 +1487,22 @@ export default function EditPdfTool() {
                   </div>
 
                   <div className="edit-pdf-viewer-chip-row">
-                    <span className="edit-pdf-viewer-chip">
-                      {activePageSelected ? "Selected" : "Not selected"}
+                    <span
+                      className={`edit-pdf-viewer-chip ${
+                        activePageSelected ? "selected" : "neutral"
+                      }`}
+                    >
+                      {viewerSelectionLabel}
+                    </span>
+                    <span
+                      className={`edit-pdf-viewer-chip ${
+                        activePage.markedForDeletion ? "warning" : "ready"
+                      }`}
+                    >
+                      {activePage.markedForDeletion ? "Removed from export" : "Included in export"}
                     </span>
                     <span className="edit-pdf-viewer-chip">
-                      Rotation {activePage.rotation}°
+                      {`Rotation ${activePage.rotation}\u00B0`}
                     </span>
                   </div>
                 </div>
@@ -1276,6 +1511,8 @@ export default function EditPdfTool() {
                     <div
                       className={`edit-pdf-viewer-workspace ${
                         isPageSwitching ? "page-switching" : ""
+                      } ${activePageSelected ? "selection-active" : ""} ${
+                        activePage.markedForDeletion ? "page-removed" : ""
                       }`}
                     >
                     <div className="edit-pdf-viewer-page-header" aria-label="Active page context">
@@ -1295,16 +1532,24 @@ export default function EditPdfTool() {
                     </div>
                     <div className="edit-pdf-viewer-stage">
                       <div className="edit-pdf-viewer-canvas-shell">
-                        <div className="edit-pdf-viewer-preview-frame">
-                          <div className="edit-pdf-viewer-canvas">
-                            <img
-                              className="edit-pdf-viewer-image"
-                              src={activePage.previewUrl}
-                              alt={`Preview of PDF page ${activePage.pageNumber}`}
-                              style={{
-                                transform: `rotate(${activePage.rotation}deg) scale(${zoomLevel})`,
-                              }}
-                            />
+                        <div className="edit-pdf-viewer-surface">
+                          <div className="edit-pdf-viewer-preview-frame">
+                            <div className="edit-pdf-viewer-document-shell">
+                              <div
+                                className="edit-pdf-viewer-overlay-surface"
+                                aria-hidden="true"
+                              />
+                              <div className="edit-pdf-viewer-canvas">
+                                <img
+                                  className="edit-pdf-viewer-image"
+                                  src={activePage.previewUrl}
+                                  alt={`Preview of PDF page ${activePage.pageNumber}`}
+                                  style={{
+                                    transform: `rotate(${activePage.rotation}deg) scale(${zoomLevel})`,
+                                  }}
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
