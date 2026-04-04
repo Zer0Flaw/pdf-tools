@@ -2948,6 +2948,34 @@ h1 {
   pointer-events: none;
 }
 
+.edit-pdf-signature-object.edit-pdf-fill-object-signature {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.edit-pdf-signature-object.edit-pdf-fill-object-text,
+.edit-pdf-signature-object.edit-pdf-fill-object-date,
+.edit-pdf-signature-object.edit-pdf-fill-object-initials {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.96) 100%);
+}
+
+.edit-pdf-signature-object.edit-pdf-fill-object-text {
+  border-color: rgba(148, 163, 184, 0.88);
+}
+
+.edit-pdf-signature-object.edit-pdf-fill-object-date {
+  border-color: rgba(129, 140, 248, 0.82);
+  box-shadow:
+    0 12px 24px rgba(79, 70, 229, 0.08),
+    0 0 0 1px rgba(224, 231, 255, 0.65);
+}
+
+.edit-pdf-signature-object.edit-pdf-fill-object-initials {
+  border-color: rgba(94, 234, 212, 0.86);
+  box-shadow:
+    0 12px 24px rgba(20, 184, 166, 0.08),
+    0 0 0 1px rgba(204, 251, 241, 0.7);
+}
+
 .edit-pdf-viewer-actions {
   display: flex;
   flex-wrap: wrap;
@@ -3203,6 +3231,12 @@ h1 {
   max-width: 100%;
   max-height: 56px;
   object-fit: contain;
+}
+
+.edit-pdf-fill-sign-preview-image-text,
+.edit-pdf-fill-sign-preview-image-date,
+.edit-pdf-fill-sign-preview-image-initials {
+  filter: saturate(0.98) contrast(1.03);
 }
 
 .edit-pdf-signature-card-copy,

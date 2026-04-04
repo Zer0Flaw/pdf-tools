@@ -26,15 +26,23 @@ const FILE_SIZE_LIMIT_LABEL = formatFeatureFileSize(MAX_FILE_SIZE);
 const MIN_ZOOM = 0.75;
 const MAX_ZOOM = 2;
 const ZOOM_STEP = 0.15;
-const MIN_SIGNATURE_WIDTH_RATIO = 0.16;
-const MAX_SIGNATURE_WIDTH_RATIO = 0.42;
+const MIN_PLACED_OBJECT_WIDTH_RATIO = 0.14;
+const MAX_PLACED_OBJECT_WIDTH_RATIO = 0.48;
 const DEFAULT_SIGNATURE_WIDTH_RATIO = 0.26;
+const DEFAULT_TEXT_WIDTH_RATIO = 0.3;
+const DEFAULT_DATE_WIDTH_RATIO = 0.25;
+const DEFAULT_INITIALS_WIDTH_RATIO = 0.18;
 const SIGNATURE_UPLOAD_MAX_WIDTH = 900;
 const SIGNATURE_UPLOAD_MAX_HEIGHT = 280;
 const TYPED_SIGNATURE_PADDING_X = 36;
 const TYPED_SIGNATURE_PADDING_Y = 24;
 const TYPED_SIGNATURE_FONT_SIZE = 68;
 const SIGNATURE_FONT_STACK = '"Segoe Script", "Brush Script MT", "Lucida Handwriting", cursive';
+const FILL_TEXT_FONT_STACK = '"Segoe UI", "Helvetica Neue", Arial, sans-serif';
+const FILL_TEXT_FONT_SIZE = 42;
+const FILL_TEXT_PADDING_X = 22;
+const FILL_TEXT_PADDING_Y = 18;
+const INITIALS_FONT_SIZE = 58;
 
 function normalizeRotation(value) {
   const normalized = value % 360;
@@ -51,6 +59,37 @@ function clampZoom(value) {
 
 function createEditorLocalId(prefix) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function getCurrentDateLabel() {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date());
+}
+
+function getDefaultPlacedObjectWidthRatio(type) {
+  switch (type) {
+    case "initials":
+      return DEFAULT_INITIALS_WIDTH_RATIO;
+    case "date":
+      return DEFAULT_DATE_WIDTH_RATIO;
+    case "text":
+      return DEFAULT_TEXT_WIDTH_RATIO;
+    default:
+      return DEFAULT_SIGNATURE_WIDTH_RATIO;
+  }
+}
+
+function getFillAssetSourceLabel(type, source) {
+  if (type === "signature") {
+    return source === "upload" ? "Uploaded signature" : "Typed signature";
+  }
+
+  if (type === "initials") return "Initials field";
+  if (type === "date") return "Date field";
+  return "Text field";
 }
 
 function readFileAsDataUrl(file) {
@@ -110,6 +149,51 @@ async function createTypedSignatureAsset(signatureText) {
   };
 }
 
+async function createTextFillAsset({ type, text }) {
+  const normalizedText = text.trim();
+  if (!normalizedText) {
+    throw new Error("Please enter text before creating this fill item.");
+  }
+
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("Canvas is not supported for Fill & Sign text.");
+  }
+
+  const isInitials = type === "initials";
+  const fontSize = isInitials ? INITIALS_FONT_SIZE : FILL_TEXT_FONT_SIZE;
+  const fontFamily = isInitials ? SIGNATURE_FONT_STACK : FILL_TEXT_FONT_STACK;
+  const fontWeight = isInitials ? 700 : 600;
+  const paddingX = isInitials ? 28 : FILL_TEXT_PADDING_X;
+  const paddingY = isInitials ? 20 : FILL_TEXT_PADDING_Y;
+
+  context.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+  const textMetrics = context.measureText(normalizedText);
+  const textWidth = Math.ceil(textMetrics.width);
+  const canvasWidth = Math.max(isInitials ? 180 : 220, textWidth + paddingX * 2);
+  const canvasHeight = Math.max(isInitials ? 112 : 96, fontSize + paddingY * 2);
+
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  context.clearRect(0, 0, canvasWidth, canvasHeight);
+  context.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+  context.textBaseline = "middle";
+  context.textAlign = "left";
+  context.fillStyle = "#0f172a";
+  context.fillText(normalizedText, paddingX, canvasHeight / 2);
+
+  return {
+    id: createEditorLocalId(`${type}-asset`),
+    type,
+    source: "typed",
+    label: normalizedText,
+    dataUrl: canvas.toDataURL("image/png"),
+    width: canvasWidth,
+    height: canvasHeight,
+  };
+}
+
 async function createUploadedSignatureAsset(file) {
   const sourceDataUrl = await readFileAsDataUrl(file);
   const image = await loadImageElement(sourceDataUrl);
@@ -159,17 +243,17 @@ function mapScreenDeltaToPageDelta(deltaX, deltaY, rotation, zoomLevel) {
   }
 }
 
-function getSignatureHeightRatio(signature, asset, pageWidth, pageHeight) {
-  if (!signature || !asset || !pageWidth || !pageHeight || !asset.width || !asset.height) {
+function getPlacedObjectHeightRatio(placedObject, asset, pageWidth, pageHeight) {
+  if (!placedObject || !asset || !pageWidth || !pageHeight || !asset.width || !asset.height) {
     return 0;
   }
 
-  const signatureWidth = pageWidth * signature.widthRatio;
-  const signatureHeight = signatureWidth * (asset.height / asset.width);
-  return signatureHeight / pageHeight;
+  const objectWidth = pageWidth * placedObject.widthRatio;
+  const objectHeight = objectWidth * (asset.height / asset.width);
+  return objectHeight / pageHeight;
 }
 
-async function buildFlattenedPdfWithSignatures(bytes, pageStates, signatureAssets, placedSignatures) {
+async function buildFlattenedPdfWithFillObjects(bytes, pageStates, fillAssets, placedObjects) {
   const exportablePages = pageStates.filter((page) => !page.markedForDeletion);
   const sourcePdf = await PDFDocument.load(bytes);
   const nextPdf = await PDFDocument.create();
@@ -177,7 +261,7 @@ async function buildFlattenedPdfWithSignatures(bytes, pageStates, signatureAsset
     sourcePdf,
     exportablePages.map((page) => page.pageNumber - 1),
   );
-  const signatureAssetMap = new Map(signatureAssets.map((asset) => [asset.id, asset]));
+  const fillAssetMap = new Map(fillAssets.map((asset) => [asset.id, asset]));
   const embeddedImageCache = new Map();
 
   async function getEmbeddedImage(asset) {
@@ -195,26 +279,26 @@ async function buildFlattenedPdfWithSignatures(bytes, pageStates, signatureAsset
     const nextPage = copiedPages[index];
     const pageState = exportablePages[index];
     const { width: pageWidth, height: pageHeight } = nextPage.getSize();
-    const pagePlacedSignatures = placedSignatures.filter(
-      (signature) => signature.pageNumber === pageState.pageNumber,
+    const pagePlacedObjects = placedObjects.filter(
+      (placedObject) => placedObject.pageNumber === pageState.pageNumber,
     );
 
-    for (const signature of pagePlacedSignatures) {
-      const asset = signatureAssetMap.get(signature.signatureAssetId);
+    for (const placedObject of pagePlacedObjects) {
+      const asset = fillAssetMap.get(placedObject.assetId);
       if (!asset) continue;
 
       const embeddedImage = await getEmbeddedImage(asset);
-      const signatureWidth = pageWidth * signature.widthRatio;
-      const signatureHeight = signatureWidth * (asset.height / asset.width);
-      const x = clampValue(signature.xRatio, 0, 1) * pageWidth;
-      const yFromTop = clampValue(signature.yRatio, 0, 1) * pageHeight;
-      const y = pageHeight - yFromTop - signatureHeight;
+      const objectWidth = pageWidth * placedObject.widthRatio;
+      const objectHeight = objectWidth * (asset.height / asset.width);
+      const x = clampValue(placedObject.xRatio, 0, 1) * pageWidth;
+      const yFromTop = clampValue(placedObject.yRatio, 0, 1) * pageHeight;
+      const y = pageHeight - yFromTop - objectHeight;
 
       nextPage.drawImage(embeddedImage, {
-        x: clampValue(x, 0, Math.max(0, pageWidth - signatureWidth)),
-        y: clampValue(y, 0, Math.max(0, pageHeight - signatureHeight)),
-        width: signatureWidth,
-        height: signatureHeight,
+        x: clampValue(x, 0, Math.max(0, pageWidth - objectWidth)),
+        y: clampValue(y, 0, Math.max(0, pageHeight - objectHeight)),
+        width: objectWidth,
+        height: objectHeight,
       });
     }
 
@@ -230,9 +314,9 @@ function createInitialEditorState() {
     pages: [],
     selectedPages: [],
     activePageNumber: null,
-    signatureAssets: [],
-    placedSignatures: [],
-    selectedPlacedSignatureId: null,
+    fillAssets: [],
+    placedObjects: [],
+    selectedPlacedObjectId: null,
     zoomLevel: 1,
     isPageSwitching: false,
     dragState: {
@@ -255,41 +339,41 @@ function editPdfEditorReducer(state, action) {
         selectedPages: action.selectedPages,
         activePageNumber: action.activePageNumber,
       };
-    case "add_signature_asset":
+    case "add_fill_asset":
       return {
         ...state,
-        signatureAssets: [action.asset, ...state.signatureAssets],
+        fillAssets: [action.asset, ...state.fillAssets],
       };
-    case "add_placed_signature":
+    case "add_placed_object":
       return {
         ...state,
-        placedSignatures: [...state.placedSignatures, action.signature],
-        selectedPlacedSignatureId: action.signature.id,
+        placedObjects: [...state.placedObjects, action.placedObject],
+        selectedPlacedObjectId: action.placedObject.id,
       };
-    case "update_placed_signature":
+    case "update_placed_object":
       return {
         ...state,
-        placedSignatures: state.placedSignatures.map((signature) =>
-          signature.id === action.signatureId
-            ? { ...signature, ...action.updates }
-            : signature,
+        placedObjects: state.placedObjects.map((placedObject) =>
+          placedObject.id === action.objectId
+            ? { ...placedObject, ...action.updates }
+            : placedObject,
         ),
       };
-    case "remove_placed_signature":
+    case "remove_placed_object":
       return {
         ...state,
-        placedSignatures: state.placedSignatures.filter(
-          (signature) => signature.id !== action.signatureId,
+        placedObjects: state.placedObjects.filter(
+          (placedObject) => placedObject.id !== action.objectId,
         ),
-        selectedPlacedSignatureId:
-          state.selectedPlacedSignatureId === action.signatureId
+        selectedPlacedObjectId:
+          state.selectedPlacedObjectId === action.objectId
             ? null
-            : state.selectedPlacedSignatureId,
+            : state.selectedPlacedObjectId,
       };
-    case "set_selected_placed_signature":
-      return state.selectedPlacedSignatureId === action.signatureId
+    case "set_selected_placed_object":
+      return state.selectedPlacedObjectId === action.objectId
         ? state
-        : { ...state, selectedPlacedSignatureId: action.signatureId };
+        : { ...state, selectedPlacedObjectId: action.objectId };
     case "set_active_page":
       return state.activePageNumber === action.pageNumber
         ? state
@@ -524,12 +608,15 @@ export default function EditPdfTool() {
   const pageStageRef = useRef(null);
   const pageSwitchTimeoutRef = useRef(null);
   const previousActivePageRef = useRef(null);
-  const signatureDragRef = useRef(null);
-  const signatureDragFrameRef = useRef(null);
+  const placedObjectDragRef = useRef(null);
+  const placedObjectDragFrameRef = useRef(null);
   const [file, setFile] = useState(null);
   const [typedSignatureValue, setTypedSignatureValue] = useState("");
-  const [isPreparingSignature, setIsPreparingSignature] = useState(false);
-  const [draggingPlacedSignatureId, setDraggingPlacedSignatureId] = useState(null);
+  const [fillTextValue, setFillTextValue] = useState("");
+  const [dateValue, setDateValue] = useState(getCurrentDateLabel);
+  const [initialsValue, setInitialsValue] = useState("");
+  const [isPreparingFillAsset, setIsPreparingFillAsset] = useState(false);
+  const [draggingPlacedObjectId, setDraggingPlacedObjectId] = useState(null);
   const [editorState, dispatchEditorState] = useReducer(
     editPdfEditorReducer,
     undefined,
@@ -548,17 +635,17 @@ export default function EditPdfTool() {
     pages,
     selectedPages,
     activePageNumber,
-    signatureAssets,
-    placedSignatures,
-    selectedPlacedSignatureId,
+    fillAssets,
+    placedObjects,
+    selectedPlacedObjectId,
     zoomLevel,
     isPageSwitching,
     dragState,
   } = editorState;
   const selectedPageSet = useMemo(() => new Set(selectedPages), [selectedPages]);
-  const signatureAssetMap = useMemo(
-    () => new Map(signatureAssets.map((asset) => [asset.id, asset])),
-    [signatureAssets],
+  const fillAssetMap = useMemo(
+    () => new Map(fillAssets.map((asset) => [asset.id, asset])),
+    [fillAssets],
   );
   const railDerivedState = useMemo(() => {
     const pageIds = [];
@@ -634,22 +721,22 @@ export default function EditPdfTool() {
     activeRailState,
     deletedCount,
   } = railDerivedState;
-  const placedSignatureMap = useMemo(
-    () => new Map(placedSignatures.map((signature) => [signature.id, signature])),
-    [placedSignatures],
+  const placedObjectMap = useMemo(
+    () => new Map(placedObjects.map((placedObject) => [placedObject.id, placedObject])),
+    [placedObjects],
   );
-  const activePagePlacedSignatures = useMemo(
+  const activePagePlacedObjects = useMemo(
     () =>
       activePageNumber === null
         ? []
-        : placedSignatures.filter((signature) => signature.pageNumber === activePageNumber),
-    [activePageNumber, placedSignatures],
+        : placedObjects.filter((placedObject) => placedObject.pageNumber === activePageNumber),
+    [activePageNumber, placedObjects],
   );
-  const selectedPlacedSignature = selectedPlacedSignatureId
-    ? placedSignatureMap.get(selectedPlacedSignatureId) || null
+  const selectedPlacedObject = selectedPlacedObjectId
+    ? placedObjectMap.get(selectedPlacedObjectId) || null
     : null;
-  const selectedPlacedSignatureAsset = selectedPlacedSignature
-    ? signatureAssetMap.get(selectedPlacedSignature.signatureAssetId) || null
+  const selectedPlacedObjectAsset = selectedPlacedObject
+    ? fillAssetMap.get(selectedPlacedObject.assetId) || null
     : null;
   const railDragState = useMemo(() => {
     if (!dragState.activeId) {
@@ -780,21 +867,21 @@ export default function EditPdfTool() {
 
   useEffect(() => {
     if (
-      selectedPlacedSignature &&
+      selectedPlacedObject &&
       activePageNumber !== null &&
-      selectedPlacedSignature.pageNumber !== activePageNumber
+      selectedPlacedObject.pageNumber !== activePageNumber
     ) {
       dispatchEditorState({
-        type: "set_selected_placed_signature",
-        signatureId: null,
+        type: "set_selected_placed_object",
+        objectId: null,
       });
     }
-  }, [activePageNumber, selectedPlacedSignature]);
+  }, [activePageNumber, selectedPlacedObject]);
 
   useEffect(() => {
     return () => {
-      if (signatureDragFrameRef.current) {
-        cancelAnimationFrame(signatureDragFrameRef.current);
+      if (placedObjectDragFrameRef.current) {
+        cancelAnimationFrame(placedObjectDragFrameRef.current);
       }
     };
   }, []);
@@ -1076,12 +1163,12 @@ export default function EditPdfTool() {
   }
 
   async function handleCreateTypedSignature() {
-    if (isPreparingSignature) return;
+    if (isPreparingFillAsset) return;
 
-    setIsPreparingSignature(true);
+    setIsPreparingFillAsset(true);
     try {
       const asset = await createTypedSignatureAsset(typedSignatureValue);
-      dispatchEditorState({ type: "add_signature_asset", asset });
+      dispatchEditorState({ type: "add_fill_asset", asset });
       setTypedSignatureValue("");
       setMessage({
         type: "success",
@@ -1095,19 +1182,19 @@ export default function EditPdfTool() {
           : "Something went wrong while creating your signature.",
       });
     } finally {
-      setIsPreparingSignature(false);
+      setIsPreparingFillAsset(false);
     }
   }
 
   async function handleSignatureUpload(event) {
     const selectedFile = event.target.files?.[0];
     event.target.value = "";
-    if (!selectedFile || isPreparingSignature) return;
+    if (!selectedFile || isPreparingFillAsset) return;
 
-    setIsPreparingSignature(true);
+    setIsPreparingFillAsset(true);
     try {
       const asset = await createUploadedSignatureAsset(selectedFile);
-      dispatchEditorState({ type: "add_signature_asset", asset });
+      dispatchEditorState({ type: "add_fill_asset", asset });
       setMessage({
         type: "success",
         text: `Uploaded signature "${asset.label}" and added it to your signature tray.`,
@@ -1118,33 +1205,111 @@ export default function EditPdfTool() {
         text: "Something went wrong while processing your uploaded signature.",
       });
     } finally {
-      setIsPreparingSignature(false);
+      setIsPreparingFillAsset(false);
     }
   }
 
-  function addSignatureToActivePage(signatureAssetId) {
+  async function handleCreateTextObject() {
+    if (isPreparingFillAsset) return;
+
+    setIsPreparingFillAsset(true);
+    try {
+      const asset = await createTextFillAsset({ type: "text", text: fillTextValue });
+      dispatchEditorState({ type: "add_fill_asset", asset });
+      setFillTextValue("");
+      placeFillAssetOnActivePage(asset.id);
+      setMessage({
+        type: "success",
+        text: `Added text "${asset.label}" to page ${activePageNumber}.`,
+      });
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error
+          ? error.message
+          : "Something went wrong while creating this text object.",
+      });
+    } finally {
+      setIsPreparingFillAsset(false);
+    }
+  }
+
+  async function handleCreateDateObject() {
+    if (isPreparingFillAsset) return;
+
+    setIsPreparingFillAsset(true);
+    try {
+      const asset = await createTextFillAsset({
+        type: "date",
+        text: dateValue || getCurrentDateLabel(),
+      });
+      dispatchEditorState({ type: "add_fill_asset", asset });
+      placeFillAssetOnActivePage(asset.id);
+      setMessage({
+        type: "success",
+        text: `Added date "${asset.label}" to page ${activePageNumber}.`,
+      });
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error
+          ? error.message
+          : "Something went wrong while creating this date object.",
+      });
+    } finally {
+      setIsPreparingFillAsset(false);
+    }
+  }
+
+  async function handleCreateInitialsObject() {
+    if (isPreparingFillAsset) return;
+
+    setIsPreparingFillAsset(true);
+    try {
+      const asset = await createTextFillAsset({ type: "initials", text: initialsValue });
+      dispatchEditorState({ type: "add_fill_asset", asset });
+      setInitialsValue("");
+      placeFillAssetOnActivePage(asset.id);
+      setMessage({
+        type: "success",
+        text: `Added initials "${asset.label}" to page ${activePageNumber}.`,
+      });
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error
+          ? error.message
+          : "Something went wrong while creating these initials.",
+      });
+    } finally {
+      setIsPreparingFillAsset(false);
+    }
+  }
+
+  function placeFillAssetOnActivePage(assetId) {
     if (activePageNumber === null) return;
-    const asset = signatureAssetMap.get(signatureAssetId);
+    const asset = fillAssetMap.get(assetId);
     if (!asset) return;
 
-    const existingCount = placedSignatures.filter(
-      (signature) => signature.pageNumber === activePageNumber,
+    const existingCount = placedObjects.filter(
+      (placedObject) => placedObject.pageNumber === activePageNumber,
     ).length;
-    const widthRatio = DEFAULT_SIGNATURE_WIDTH_RATIO;
+    const widthRatio = getDefaultPlacedObjectWidthRatio(asset.type);
     const stageWidth = pageStageRef.current?.clientWidth || 0;
     const stageHeight = pageStageRef.current?.clientHeight || 0;
     const defaultHeightRatio =
       stageWidth && stageHeight
-        ? getSignatureHeightRatio(
+        ? getPlacedObjectHeightRatio(
             { widthRatio },
             asset,
             stageWidth,
             stageHeight,
           )
         : 0.12;
-    const nextSignature = {
-      id: createEditorLocalId("placed-signature"),
-      signatureAssetId,
+    const nextPlacedObject = {
+      id: createEditorLocalId(`placed-${asset.type}`),
+      type: asset.type,
+      assetId,
       pageNumber: activePageNumber,
       xRatio: clampValue(0.12 + existingCount * 0.03, 0.04, 0.72),
       yRatio: clampValue(0.14 + existingCount * 0.04, 0.06, 1 - defaultHeightRatio - 0.08),
@@ -1152,14 +1317,14 @@ export default function EditPdfTool() {
     };
 
     dispatchEditorState({
-      type: "add_placed_signature",
-      signature: nextSignature,
+      type: "add_placed_object",
+      placedObject: nextPlacedObject,
     });
     setMessage(null);
   }
 
-  function updateSelectedPlacedSignatureWidth(nextWidthRatio) {
-    if (!selectedPlacedSignature || !selectedPlacedSignatureAsset || activePageNumber === null) {
+  function updateSelectedPlacedObjectWidth(nextWidthRatio) {
+    if (!selectedPlacedObject || !selectedPlacedObjectAsset || activePageNumber === null) {
       return;
     }
 
@@ -1167,37 +1332,37 @@ export default function EditPdfTool() {
     const stageHeight = pageStageRef.current?.clientHeight || 1;
     const widthRatio = clampValue(
       nextWidthRatio,
-      MIN_SIGNATURE_WIDTH_RATIO,
-      MAX_SIGNATURE_WIDTH_RATIO,
+      MIN_PLACED_OBJECT_WIDTH_RATIO,
+      MAX_PLACED_OBJECT_WIDTH_RATIO,
     );
-    const nextHeightRatio = getSignatureHeightRatio(
+    const nextHeightRatio = getPlacedObjectHeightRatio(
       { widthRatio },
-      selectedPlacedSignatureAsset,
+      selectedPlacedObjectAsset,
       stageWidth,
       stageHeight,
     );
 
     dispatchEditorState({
-      type: "update_placed_signature",
-      signatureId: selectedPlacedSignature.id,
+      type: "update_placed_object",
+      objectId: selectedPlacedObject.id,
       updates: {
         widthRatio,
-        xRatio: clampValue(selectedPlacedSignature.xRatio, 0, 1 - widthRatio),
-        yRatio: clampValue(selectedPlacedSignature.yRatio, 0, 1 - nextHeightRatio),
+        xRatio: clampValue(selectedPlacedObject.xRatio, 0, 1 - widthRatio),
+        yRatio: clampValue(selectedPlacedObject.yRatio, 0, 1 - nextHeightRatio),
       },
     });
   }
 
-  function removeSelectedPlacedSignature() {
-    if (!selectedPlacedSignature) return;
+  function removeSelectedPlacedObject() {
+    if (!selectedPlacedObject) return;
     dispatchEditorState({
-      type: "remove_placed_signature",
-      signatureId: selectedPlacedSignature.id,
+      type: "remove_placed_object",
+      objectId: selectedPlacedObject.id,
     });
   }
 
-  const handlePlacedSignaturePointerMove = useCallback((event) => {
-    const dragStateRef = signatureDragRef.current;
+  const handlePlacedObjectPointerMove = useCallback((event) => {
+    const dragStateRef = placedObjectDragRef.current;
     if (!dragStateRef) return;
 
     const { deltaX, deltaY } = mapScreenDeltaToPageDelta(
@@ -1217,14 +1382,14 @@ export default function EditPdfTool() {
       1 - dragStateRef.heightRatio,
     );
 
-    if (signatureDragFrameRef.current) {
-      cancelAnimationFrame(signatureDragFrameRef.current);
+    if (placedObjectDragFrameRef.current) {
+      cancelAnimationFrame(placedObjectDragFrameRef.current);
     }
 
-    signatureDragFrameRef.current = requestAnimationFrame(() => {
+    placedObjectDragFrameRef.current = requestAnimationFrame(() => {
       dispatchEditorState({
-        type: "update_placed_signature",
-        signatureId: dragStateRef.signatureId,
+        type: "update_placed_object",
+        objectId: dragStateRef.objectId,
         updates: {
           xRatio: nextXRatio,
           yRatio: nextYRatio,
@@ -1233,74 +1398,74 @@ export default function EditPdfTool() {
     });
   }, []);
 
-  const handlePlacedSignaturePointerUp = useCallback(() => {
-    window.removeEventListener("pointermove", handlePlacedSignaturePointerMove);
-    window.removeEventListener("pointerup", handlePlacedSignaturePointerUp);
-    window.removeEventListener("pointercancel", handlePlacedSignaturePointerUp);
-    signatureDragRef.current = null;
-    setDraggingPlacedSignatureId(null);
+  const handlePlacedObjectPointerUp = useCallback(() => {
+    window.removeEventListener("pointermove", handlePlacedObjectPointerMove);
+    window.removeEventListener("pointerup", handlePlacedObjectPointerUp);
+    window.removeEventListener("pointercancel", handlePlacedObjectPointerUp);
+    placedObjectDragRef.current = null;
+    setDraggingPlacedObjectId(null);
 
-    if (signatureDragFrameRef.current) {
-      cancelAnimationFrame(signatureDragFrameRef.current);
-      signatureDragFrameRef.current = null;
+    if (placedObjectDragFrameRef.current) {
+      cancelAnimationFrame(placedObjectDragFrameRef.current);
+      placedObjectDragFrameRef.current = null;
     }
-  }, [handlePlacedSignaturePointerMove]);
+  }, [handlePlacedObjectPointerMove]);
 
-  function handlePlacedSignaturePointerDown(event, signature) {
-    const signatureAsset = signatureAssetMap.get(signature.signatureAssetId);
-    if (!signatureAsset || activePageNumber === null) return;
+  function handlePlacedObjectPointerDown(event, placedObject) {
+    const fillAsset = fillAssetMap.get(placedObject.assetId);
+    if (!fillAsset || activePageNumber === null) return;
 
     event.preventDefault();
     event.stopPropagation();
     dispatchEditorState({
-      type: "set_selected_placed_signature",
-      signatureId: signature.id,
+      type: "set_selected_placed_object",
+      objectId: placedObject.id,
     });
 
     const stageWidth = pageStageRef.current?.clientWidth || 0;
     const stageHeight = pageStageRef.current?.clientHeight || 0;
     if (!stageWidth || !stageHeight) return;
 
-    const heightRatio = getSignatureHeightRatio(
-      signature,
-      signatureAsset,
+    const heightRatio = getPlacedObjectHeightRatio(
+      placedObject,
+      fillAsset,
       stageWidth,
       stageHeight,
     );
 
-    signatureDragRef.current = {
-      signatureId: signature.id,
+    placedObjectDragRef.current = {
+      objectId: placedObject.id,
       startClientX: event.clientX,
       startClientY: event.clientY,
-      startXRatio: signature.xRatio,
-      startYRatio: signature.yRatio,
-      widthRatio: signature.widthRatio,
+      startXRatio: placedObject.xRatio,
+      startYRatio: placedObject.yRatio,
+      widthRatio: placedObject.widthRatio,
       heightRatio,
       stageWidth,
       stageHeight,
       rotation: activePage?.rotation || 0,
       zoomLevel,
     };
-    setDraggingPlacedSignatureId(signature.id);
-    window.addEventListener("pointermove", handlePlacedSignaturePointerMove);
-    window.addEventListener("pointerup", handlePlacedSignaturePointerUp);
-    window.addEventListener("pointercancel", handlePlacedSignaturePointerUp);
+    setDraggingPlacedObjectId(placedObject.id);
+    window.addEventListener("pointermove", handlePlacedObjectPointerMove);
+    window.addEventListener("pointerup", handlePlacedObjectPointerUp);
+    window.addEventListener("pointercancel", handlePlacedObjectPointerUp);
   }
 
-  function clearSelectedPlacedSignature() {
+  function clearSelectedPlacedObject() {
     dispatchEditorState({
-      type: "set_selected_placed_signature",
-      signatureId: null,
+      type: "set_selected_placed_object",
+      objectId: null,
     });
   }
 
   useEffect(() => {
     return () => {
-      window.removeEventListener("pointermove", handlePlacedSignaturePointerMove);
-      window.removeEventListener("pointerup", handlePlacedSignaturePointerUp);
-      window.removeEventListener("pointercancel", handlePlacedSignaturePointerUp);
+      window.removeEventListener("pointermove", handlePlacedObjectPointerMove);
+      window.removeEventListener("pointerup", handlePlacedObjectPointerUp);
+      window.removeEventListener("pointercancel", handlePlacedObjectPointerUp);
     };
-  }, [handlePlacedSignaturePointerMove, handlePlacedSignaturePointerUp]);
+  }, [handlePlacedObjectPointerMove, handlePlacedObjectPointerUp]);
 
   const handleDragStart = useCallback((event) => {
     dispatchEditorState({ type: "begin_drag", activeId: event.active.id });
@@ -1409,12 +1574,12 @@ export default function EditPdfTool() {
     }
 
     await runPdfExport(async (bytes) => {
-      const pdfBytes = placedSignatures.length
-        ? await buildFlattenedPdfWithSignatures(
+      const pdfBytes = placedObjects.length
+        ? await buildFlattenedPdfWithFillObjects(
             bytes,
             pages,
-            signatureAssets,
-            placedSignatures,
+            fillAssets,
+            placedObjects,
           )
         : await editPdfPages(bytes, pages);
       await downloadPdfDocument(
@@ -1425,7 +1590,7 @@ export default function EditPdfTool() {
           fileCount: includedPages.length,
           extra: {
             export_kind: "edited_pdf",
-            signature_count: placedSignatures.length,
+            fill_item_count: placedObjects.length,
           },
         },
       );
@@ -1444,12 +1609,12 @@ export default function EditPdfTool() {
     }
 
     await runPdfExport(async (bytes) => {
-      const pdfBytes = placedSignatures.length
-        ? await buildFlattenedPdfWithSignatures(
+      const pdfBytes = placedObjects.length
+        ? await buildFlattenedPdfWithFillObjects(
             bytes,
             pages.filter((page) => selectedPages.includes(page.pageNumber)),
-            signatureAssets,
-            placedSignatures,
+            fillAssets,
+            placedObjects,
           )
         : await extractEditedPdfPages(bytes, pages, selectedPages);
       await downloadPdfDocument(
@@ -1460,8 +1625,8 @@ export default function EditPdfTool() {
           fileCount: selectedIncludedPages.length,
           extra: {
             export_kind: "selected_pages",
-            signature_count: placedSignatures.filter((signature) =>
-              selectedPages.includes(signature.pageNumber),
+            fill_item_count: placedObjects.filter((placedObject) =>
+              selectedPages.includes(placedObject.pageNumber),
             ).length,
           },
         },
@@ -1475,17 +1640,26 @@ export default function EditPdfTool() {
     const selectedIncludedCount = selectedIncludedPages.length;
     const selectedDeletedCount = selectedPages.length - selectedIncludedCount;
     const activePageSelected = activeRailState.isSelected;
-    const activePageSignatureCount = activePage
-      ? activePagePlacedSignatures.length
+    const activePageFillObjectCount = activePage
+      ? activePagePlacedObjects.length
       : 0;
     const hasSelection = selectedPages.length > 0;
     const hasIncludedSelection = selectedIncludedCount > 0;
-    const hasSignatureAssets = signatureAssets.length > 0;
-    const selectedPlacedSignatureOnActivePage = selectedPlacedSignature &&
+    const hasFillAssets = fillAssets.length > 0;
+    const selectedPlacedObjectOnActivePage = selectedPlacedObject &&
       activePage &&
-      selectedPlacedSignature.pageNumber === activePage.pageNumber
-        ? selectedPlacedSignature
+      selectedPlacedObject.pageNumber === activePage.pageNumber
+        ? selectedPlacedObject
         : null;
+    const selectedPlacedObjectTypeLabel = selectedPlacedObjectOnActivePage
+      ? selectedPlacedObjectOnActivePage.type === "signature"
+        ? "Signature"
+        : selectedPlacedObjectOnActivePage.type === "initials"
+          ? "Initials"
+          : selectedPlacedObjectOnActivePage.type === "date"
+            ? "Date"
+            : "Text"
+      : null;
     const selectedPagesLabel =
       selectedPages.length === 1
         ? "1 selected page"
@@ -1562,36 +1736,36 @@ export default function EditPdfTool() {
         ? `In ${selectedPages.length}-page selection`
         : "Selected page"
       : "Active page only";
-    const fillSignStatus = !hasSignatureAssets
+    const fillSignStatus = !hasFillAssets
       ? {
           tone: "empty",
-          title: "Create your first signature",
-          text: "Type a signature or upload one, then place it on the active page.",
+          title: "Create your first Fill & Sign item",
+          text: "Add a signature, text, date, or initials item, then place it on the active page.",
         }
-      : selectedPlacedSignatureOnActivePage
+      : selectedPlacedObjectOnActivePage
         ? {
             tone: "active",
-            title: "Signature selected on this page",
+            title: `${selectedPlacedObjectTypeLabel} selected on this page`,
             text: "Drag it to reposition, adjust its size, or remove it from the page.",
           }
-        : activePageSignatureCount
+        : activePageFillObjectCount
           ? {
               tone: "ready",
-              title: `${activePageSignatureCount} signature${activePageSignatureCount === 1 ? "" : "s"} on this page`,
-              text: "Add another signature or select one on the page to fine-tune it.",
+              title: `${activePageFillObjectCount} fill item${activePageFillObjectCount === 1 ? "" : "s"} on this page`,
+              text: "Add another item or select one on the page to fine-tune it.",
             }
           : {
               tone: "ready",
-              title: `${signatureAssets.length} saved signature${signatureAssets.length === 1 ? "" : "s"} ready`,
-              text: "Place a saved signature on this page to start signing the document.",
+              title: `${fillAssets.length} saved fill item${fillAssets.length === 1 ? "" : "s"} ready`,
+              text: "Place a saved item on this page to continue completing the document.",
             };
     const viewerStatusItems = activePage
       ? [
           `Page ${activePage.pageNumber} / ${pages.length}`,
           activePage.rotation ? `Rotation: ${activePage.rotation}\u00B0` : null,
           zoomLevel !== 1 ? `Zoom: ${Math.round(zoomLevel * 100)}%` : null,
-          activePageSignatureCount
-            ? `${activePageSignatureCount} signature${activePageSignatureCount === 1 ? "" : "s"} on page`
+          activePageFillObjectCount
+            ? `${activePageFillObjectCount} fill item${activePageFillObjectCount === 1 ? "" : "s"} on page`
             : null,
           activePageSelected ? "Selected" : null,
           activePage.markedForDeletion ? "Marked for Deletion" : null,
@@ -1603,30 +1777,30 @@ export default function EditPdfTool() {
       remainingCount,
       selectedIncludedCount,
       activePageSelected,
-      activePageSignatureCount,
+      activePageFillObjectCount,
       selectedPagesLabel,
       selectedIncludedLabel,
       batchStatus,
       fillSignStatus,
-      hasSignatureAssets,
+      hasFillAssets,
       hasLoadedEditor,
       activePagePosition,
       activeThumbnailPageNumber,
       railAssistant,
-      selectedPlacedSignatureOnActivePage,
+      selectedPlacedObjectOnActivePage,
       viewerSelectionLabel,
       viewerStatusItems,
     };
   }, [
     activeRailState,
-    activePagePlacedSignatures.length,
+    activePagePlacedObjects.length,
     deletedCount,
     pages.length,
     railDragState,
-    selectedPlacedSignature,
+    selectedPlacedObject,
     selectedIncludedPages.length,
     selectedPages.length,
-    signatureAssets.length,
+    fillAssets.length,
     zoomLevel,
   ]);
   const {
@@ -1634,17 +1808,17 @@ export default function EditPdfTool() {
     remainingCount,
     selectedIncludedCount,
     activePageSelected,
-    activePageSignatureCount,
+    activePageFillObjectCount,
     selectedPagesLabel,
     selectedIncludedLabel,
     batchStatus,
     fillSignStatus,
-    hasSignatureAssets,
+    hasFillAssets,
     hasLoadedEditor,
     activePagePosition,
     activeThumbnailPageNumber,
     railAssistant,
-    selectedPlacedSignatureOnActivePage,
+    selectedPlacedObjectOnActivePage,
     viewerSelectionLabel,
     viewerStatusItems,
   } = editorDerivedState;
@@ -2127,7 +2301,7 @@ export default function EditPdfTool() {
                                     <div
                                       ref={pageStageRef}
                                       className="edit-pdf-viewer-page-stage"
-                                      onClick={clearSelectedPlacedSignature}
+                                      onClick={clearSelectedPlacedObject}
                                     >
                                       <div
                                         className="edit-pdf-viewer-page-transform"
@@ -2141,45 +2315,45 @@ export default function EditPdfTool() {
                                           alt={`Preview of PDF page ${activePage.pageNumber}`}
                                         />
                                         <div className="edit-pdf-signature-layer">
-                                          {activePagePlacedSignatures.map((signature) => {
-                                            const signatureAsset = signatureAssetMap.get(
-                                              signature.signatureAssetId,
+                                          {activePagePlacedObjects.map((placedObject) => {
+                                            const fillAsset = fillAssetMap.get(
+                                              placedObject.assetId,
                                             );
-                                            if (!signatureAsset) return null;
+                                            if (!fillAsset) return null;
 
                                             return (
                                               <button
-                                                key={signature.id}
+                                                key={placedObject.id}
                                                 type="button"
                                                 className={`edit-pdf-signature-object ${
-                                                  selectedPlacedSignatureOnActivePage?.id === signature.id
+                                                  selectedPlacedObjectOnActivePage?.id === placedObject.id
                                                     ? "selected"
                                                     : ""
                                                 } ${
-                                                  draggingPlacedSignatureId === signature.id
+                                                  draggingPlacedObjectId === placedObject.id
                                                     ? "dragging"
                                                     : ""
-                                                }`}
+                                                } edit-pdf-fill-object-${placedObject.type}`}
                                                 style={{
-                                                  left: `${signature.xRatio * 100}%`,
-                                                  top: `${signature.yRatio * 100}%`,
-                                                  width: `${signature.widthRatio * 100}%`,
+                                                  left: `${placedObject.xRatio * 100}%`,
+                                                  top: `${placedObject.yRatio * 100}%`,
+                                                  width: `${placedObject.widthRatio * 100}%`,
                                                 }}
-                                                aria-label={`Placed signature ${signatureAsset.label}`}
+                                                aria-label={`Placed ${placedObject.type} ${fillAsset.label}`}
                                                 onClick={(event) => {
                                                   event.stopPropagation();
                                                   dispatchEditorState({
-                                                    type: "set_selected_placed_signature",
-                                                    signatureId: signature.id,
+                                                    type: "set_selected_placed_object",
+                                                    objectId: placedObject.id,
                                                   });
                                                 }}
                                                 onPointerDown={(event) =>
-                                                  handlePlacedSignaturePointerDown(event, signature)
+                                                  handlePlacedObjectPointerDown(event, placedObject)
                                                 }
                                               >
                                                 <img
-                                                  src={signatureAsset.dataUrl}
-                                                  alt={`${signatureAsset.label} signature`}
+                                                  src={fillAsset.dataUrl}
+                                                  alt={`${fillAsset.label} ${placedObject.type}`}
                                                 />
                                               </button>
                                             );
@@ -2270,19 +2444,19 @@ export default function EditPdfTool() {
                   <div className="edit-pdf-fill-sign-head">
                     <div className="edit-pdf-fill-sign-copy">
                       <span className="edit-pdf-toolbar-label">Fill &amp; Sign</span>
-                      <strong>Signature placement</strong>
+                      <strong>Page completion workflow</strong>
                       <span>
-                        Create a signature, place it on the active page, and keep it aligned through export.
+                        Create signatures, text, date, and initials items, then place them on the active page and flatten them on export.
                       </span>
                     </div>
 
                     <div className="edit-pdf-fill-sign-metrics">
                       <span className="edit-pdf-fill-sign-metric">
-                        <strong>{signatureAssets.length}</strong>
+                        <strong>{fillAssets.length}</strong>
                         saved
                       </span>
                       <span className="edit-pdf-fill-sign-metric">
-                        <strong>{activePageSignatureCount}</strong>
+                        <strong>{activePageFillObjectCount}</strong>
                         on page
                       </span>
                     </div>
@@ -2318,9 +2492,9 @@ export default function EditPdfTool() {
                           type="button"
                           className="hero-secondary-btn"
                           onClick={handleCreateTypedSignature}
-                          disabled={!typedSignatureValue.trim() || isPreparingSignature}
+                          disabled={!typedSignatureValue.trim() || isPreparingFillAsset}
                         >
-                          {isPreparingSignature ? "Creating..." : "Create"}
+                          {isPreparingFillAsset ? "Creating..." : "Create"}
                         </button>
                       </div>
 
@@ -2329,7 +2503,7 @@ export default function EditPdfTool() {
                           type="button"
                           className="hero-secondary-btn"
                           onClick={() => signatureUploadInputRef.current?.click()}
-                          disabled={isPreparingSignature}
+                          disabled={isPreparingFillAsset}
                         >
                           Upload Signature Image
                         </button>
@@ -2339,30 +2513,116 @@ export default function EditPdfTool() {
 
                     <div className="edit-pdf-fill-sign-block">
                       <div className="edit-pdf-fill-sign-block-head">
-                        <strong>Saved signatures</strong>
-                        <span>Place any saved signature on page {activePage.pageNumber}.</span>
+                        <strong>Quick fill items</strong>
+                        <span>Create and place text, date, or initials on page {activePage.pageNumber}.</span>
                       </div>
 
-                      {hasSignatureAssets ? (
+                      <div className="edit-pdf-fill-sign-type-row">
+                        <input
+                          type="text"
+                          className="edit-pdf-fill-sign-input"
+                          value={fillTextValue}
+                          placeholder="Add text"
+                          onChange={(event) => setFillTextValue(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              handleCreateTextObject();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={handleCreateTextObject}
+                          disabled={!fillTextValue.trim() || isPreparingFillAsset}
+                        >
+                          Add Text
+                        </button>
+                      </div>
+
+                      <div className="edit-pdf-fill-sign-type-row">
+                        <input
+                          type="text"
+                          className="edit-pdf-fill-sign-input"
+                          value={dateValue}
+                          placeholder="Add date"
+                          onChange={(event) => setDateValue(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              handleCreateDateObject();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={() => setDateValue(getCurrentDateLabel())}
+                        >
+                          Today
+                        </button>
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={handleCreateDateObject}
+                          disabled={!dateValue.trim() || isPreparingFillAsset}
+                        >
+                          Add Date
+                        </button>
+                      </div>
+
+                      <div className="edit-pdf-fill-sign-type-row">
+                        <input
+                          type="text"
+                          className="edit-pdf-fill-sign-input"
+                          value={initialsValue}
+                          maxLength={6}
+                          placeholder="Add initials"
+                          onChange={(event) => setInitialsValue(event.target.value.toUpperCase())}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              handleCreateInitialsObject();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="hero-secondary-btn"
+                          onClick={handleCreateInitialsObject}
+                          disabled={!initialsValue.trim() || isPreparingFillAsset}
+                        >
+                          Add Initials
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="edit-pdf-fill-sign-block">
+                      <div className="edit-pdf-fill-sign-block-head">
+                        <strong>Saved fill items</strong>
+                        <span>Place any saved item on page {activePage.pageNumber}.</span>
+                      </div>
+
+                      {hasFillAssets ? (
                         <div className="edit-pdf-fill-sign-library">
-                          {signatureAssets.map((asset) => (
+                          {fillAssets.map((asset) => (
                             <article key={asset.id} className="edit-pdf-signature-card">
                               <div className="edit-pdf-signature-card-preview">
                                 <img
+                                  className={`edit-pdf-fill-sign-preview-image edit-pdf-fill-sign-preview-image-${asset.type}`}
                                   src={asset.dataUrl}
-                                  alt={`${asset.label} signature preview`}
+                                  alt={`${asset.label} ${asset.type} preview`}
                                 />
                               </div>
                               <div className="edit-pdf-signature-card-copy">
                                 <strong>{asset.label}</strong>
-                                <span>
-                                  {asset.source === "typed" ? "Typed signature" : "Uploaded signature"}
-                                </span>
+                                <span>{getFillAssetSourceLabel(asset.type, asset.source)}</span>
                               </div>
                               <button
                                 type="button"
                                 className="hero-secondary-btn"
-                                onClick={() => addSignatureToActivePage(asset.id)}
+                                onClick={() => placeFillAssetOnActivePage(asset.id)}
                               >
                                 Place on Page
                               </button>
@@ -2371,59 +2631,65 @@ export default function EditPdfTool() {
                         </div>
                       ) : (
                         <div className="edit-pdf-fill-sign-empty">
-                          Create a typed signature or upload one to start placing signatures.
+                          Create a signature, text, date, or initials item to start placing Fill &amp; Sign objects.
                         </div>
                       )}
                     </div>
 
                     <div className="edit-pdf-fill-sign-block">
                       <div className="edit-pdf-fill-sign-block-head">
-                        <strong>Selected signature</strong>
+                        <strong>Selected item</strong>
                         <span>
-                          {selectedPlacedSignatureOnActivePage
-                            ? "Adjust the active signature without leaving the viewer."
-                            : "Select a placed signature on the page to resize or remove it."}
+                          {selectedPlacedObjectOnActivePage
+                            ? "Adjust the active item without leaving the viewer."
+                            : "Select a placed item on the page to resize or remove it."}
                         </span>
                       </div>
 
-                      {selectedPlacedSignatureOnActivePage && selectedPlacedSignatureAsset ? (
+                      {selectedPlacedObjectOnActivePage && selectedPlacedObjectAsset ? (
                         <div className="edit-pdf-fill-sign-active-card">
                           <div className="edit-pdf-fill-sign-active-preview">
                             <img
-                              src={selectedPlacedSignatureAsset.dataUrl}
-                              alt={`${selectedPlacedSignatureAsset.label} selected signature`}
+                              className={`edit-pdf-fill-sign-preview-image edit-pdf-fill-sign-preview-image-${selectedPlacedObjectOnActivePage.type}`}
+                              src={selectedPlacedObjectAsset.dataUrl}
+                              alt={`${selectedPlacedObjectAsset.label} selected ${selectedPlacedObjectOnActivePage.type}`}
                             />
                           </div>
                           <div className="edit-pdf-fill-sign-active-copy">
-                            <strong>{selectedPlacedSignatureAsset.label}</strong>
-                            <span>Drag on the page to reposition this signature.</span>
+                            <strong>{selectedPlacedObjectAsset.label}</strong>
+                            <span>
+                              {getFillAssetSourceLabel(
+                                selectedPlacedObjectOnActivePage.type,
+                                selectedPlacedObjectAsset.source,
+                              )} selected. Drag on the page to reposition it.
+                            </span>
                           </div>
                           <label className="edit-pdf-fill-sign-scale-control">
                             <span>
-                              Size {Math.round(selectedPlacedSignatureOnActivePage.widthRatio * 100)}%
+                              Size {Math.round(selectedPlacedObjectOnActivePage.widthRatio * 100)}%
                             </span>
                             <input
                               type="range"
-                              min={MIN_SIGNATURE_WIDTH_RATIO}
-                              max={MAX_SIGNATURE_WIDTH_RATIO}
+                              min={MIN_PLACED_OBJECT_WIDTH_RATIO}
+                              max={MAX_PLACED_OBJECT_WIDTH_RATIO}
                               step="0.01"
-                              value={selectedPlacedSignatureOnActivePage.widthRatio}
+                              value={selectedPlacedObjectOnActivePage.widthRatio}
                               onChange={(event) =>
-                                updateSelectedPlacedSignatureWidth(Number(event.target.value))
+                                updateSelectedPlacedObjectWidth(Number(event.target.value))
                               }
                             />
                           </label>
                           <button
                             type="button"
                             className="hero-secondary-btn"
-                            onClick={removeSelectedPlacedSignature}
+                            onClick={removeSelectedPlacedObject}
                           >
-                            Remove Signature
+                            Remove Item
                           </button>
                         </div>
                       ) : (
                         <div className="edit-pdf-fill-sign-empty">
-                          No placed signature is selected on this page yet.
+                          No placed Fill &amp; Sign item is selected on this page yet.
                         </div>
                       )}
                     </div>
