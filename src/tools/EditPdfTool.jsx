@@ -2467,96 +2467,80 @@ export default function EditPdfTool() {
                         </span>
                       </div>
                       <div className="edit-pdf-viewer-stage">
-                        <div className="edit-pdf-viewer-canvas-shell">
-                          <div className="edit-pdf-viewer-surface">
-                            <div className="edit-pdf-viewer-preview-frame">
-                              <div className="edit-pdf-viewer-document-shell">
-                                <div
-                                  className="edit-pdf-viewer-overlay-surface"
-                                  aria-hidden="true"
-                                />
-                                <div className="edit-pdf-viewer-canvas">
-                                  <div className="edit-pdf-viewer-page-shell">
-                                    <div
-                                      ref={pageStageRef}
-                                      className="edit-pdf-viewer-page-stage"
-                                      onClick={clearSelectedPlacedObject}
-                                    >
-                                      <div
-                                        className="edit-pdf-viewer-page-transform"
-                                        style={{
-                                          transform: `rotate(${activePage.rotation}deg) scale(${zoomLevel})`,
-                                        }}
-                                      >
-                                        <img
-                                          className="edit-pdf-viewer-image"
-                                          src={activePage.previewUrl}
-                                          alt={`Preview of PDF page ${activePage.pageNumber}`}
-                                        />
-                                        <div className="edit-pdf-signature-layer">
-                                          {activePagePlacedObjects.map((placedObject, objectIndex) => {
-                                            const fillAsset = fillAssetMap.get(
-                                              placedObject.assetId,
-                                            );
-                                            if (!fillAsset) return null;
-                                            const isSelectedObject =
-                                              selectedPlacedObjectOnActivePage?.id === placedObject.id;
+                        <div
+                          ref={pageStageRef}
+                          className="edit-pdf-viewer-page-stage"
+                          onClick={clearSelectedPlacedObject}
+                        >
+                          <div
+                            className="edit-pdf-viewer-page-transform"
+                            style={{
+                              transform: `rotate(${activePage.rotation}deg) scale(${zoomLevel})`,
+                            }}
+                          >
+                            <img
+                              className="edit-pdf-viewer-image"
+                              src={activePage.previewUrl}
+                              alt={`Preview of PDF page ${activePage.pageNumber}`}
+                            />
+                            <div className="edit-pdf-signature-layer">
+                              {activePagePlacedObjects.map((placedObject, objectIndex) => {
+                                const fillAsset = fillAssetMap.get(
+                                  placedObject.assetId,
+                                );
+                                if (!fillAsset) return null;
+                                const isSelectedObject =
+                                  selectedPlacedObjectOnActivePage?.id === placedObject.id;
 
-                                            return (
-                                              <button
-                                                key={placedObject.id}
-                                                type="button"
-                                                className={`edit-pdf-signature-object ${
-                                                  isSelectedObject ? "selected" : ""
-                                                } ${
-                                                  draggingPlacedObjectId === placedObject.id
-                                                    ? "dragging"
-                                                    : ""
-                                                } edit-pdf-fill-object-${placedObject.type}`}
-                                                style={{
-                                                  left: `${placedObject.xRatio * 100}%`,
-                                                  top: `${placedObject.yRatio * 100}%`,
-                                                  width: `${placedObject.widthRatio * 100}%`,
-                                                  zIndex:
-                                                    draggingPlacedObjectId === placedObject.id
-                                                      ? 8
-                                                      : isSelectedObject
-                                                        ? 7
-                                                        : objectIndex + 2,
-                                                }}
-                                                aria-label={`Placed ${placedObject.type} ${fillAsset.label}`}
-                                                disabled={isProcessing}
-                                                onClick={(event) => {
-                                                  event.stopPropagation();
-                                                  dispatchEditorState({
-                                                    type: "set_selected_placed_object",
-                                                    objectId: placedObject.id,
-                                                  });
-                                                }}
-                                                onPointerDown={(event) =>
-                                                  handlePlacedObjectPointerDown(event, placedObject)
-                                                }
-                                              >
-                                                {(activePagePlacedObjects.length > 1 || isSelectedObject) && (
-                                                  <span className="edit-pdf-signature-object-badge">
-                                                    {isSelectedObject
-                                                      ? getFillObjectTypeLabel(placedObject.type)
-                                                      : objectIndex + 1}
-                                                  </span>
-                                                )}
-                                                <img
-                                                  src={fillAsset.dataUrl}
-                                                  alt={`${fillAsset.label} ${placedObject.type}`}
-                                                />
-                                              </button>
-                                            );
-                                          })}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
+                                return (
+                                  <button
+                                    key={placedObject.id}
+                                    type="button"
+                                    className={`edit-pdf-signature-object ${
+                                      isSelectedObject ? "selected" : ""
+                                    } ${
+                                      draggingPlacedObjectId === placedObject.id
+                                        ? "dragging"
+                                        : ""
+                                    } edit-pdf-fill-object-${placedObject.type}`}
+                                    style={{
+                                      left: `${placedObject.xRatio * 100}%`,
+                                      top: `${placedObject.yRatio * 100}%`,
+                                      width: `${placedObject.widthRatio * 100}%`,
+                                      zIndex:
+                                        draggingPlacedObjectId === placedObject.id
+                                          ? 8
+                                          : isSelectedObject
+                                            ? 7
+                                            : objectIndex + 2,
+                                    }}
+                                    aria-label={`Placed ${placedObject.type} ${fillAsset.label}`}
+                                    disabled={isProcessing}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      dispatchEditorState({
+                                        type: "set_selected_placed_object",
+                                        objectId: placedObject.id,
+                                      });
+                                    }}
+                                    onPointerDown={(event) =>
+                                      handlePlacedObjectPointerDown(event, placedObject)
+                                    }
+                                  >
+                                    {(activePagePlacedObjects.length > 1 || isSelectedObject) && (
+                                      <span className="edit-pdf-signature-object-badge">
+                                        {isSelectedObject
+                                          ? getFillObjectTypeLabel(placedObject.type)
+                                          : objectIndex + 1}
+                                      </span>
+                                    )}
+                                    <img
+                                      src={fillAsset.dataUrl}
+                                      alt={`${fillAsset.label} ${placedObject.type}`}
+                                    />
+                                  </button>
+                                );
+                              })}
                             </div>
                           </div>
                         </div>
