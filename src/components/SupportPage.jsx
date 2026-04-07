@@ -199,31 +199,68 @@ export const SUPPORT_PAGES = {
       {
         title: "Are my files uploaded to a server?",
         paragraphs: [
-          "No. ProjectStack's current core tools process files locally in your browser, so your PDFs and images do not need to leave your device during normal use.",
+          "No. ProjectStack's current core tools process files locally in your browser, so your PDFs and images do not need to leave your device during normal use. This means common tasks like merging, splitting, rotating, and converting files happen on your device rather than passing through a server. The result downloads directly from your browser when you are done.",
         ],
       },
       {
         title: "Do I need to create an account?",
         paragraphs: [
-          "No. ProjectStack is designed to be usable immediately without sign-in, which keeps file work fast and low-friction.",
+          "No. ProjectStack is designed to be usable immediately without sign-in, which keeps file work fast and low-friction. You can open any tool, load a file, and start working without providing an email address or creating a profile. Free-tier limits apply to some tools, but those are enforced automatically without needing an account to track them.",
         ],
       },
       {
         title: "Why are there free limits or watermarks?",
         paragraphs: [
-          "ProjectStack includes intentional free-plan limits and upgrade messaging so the free experience stays useful while still leaving room for premium features over time.",
+          "ProjectStack includes intentional free-plan limits and upgrade messaging so the free experience stays useful while still leaving room for premium features over time. Limits like the number of files per operation and the watermark on certain exports help distinguish the free experience from a paid tier that would remove those constraints. The current free tools are fully functional for individual one-time tasks within those limits.",
         ],
       },
       {
         title: "What browsers does ProjectStack rely on?",
         paragraphs: [
-          "ProjectStack works best in modern browsers with current support for client-side file APIs, canvas processing, and browser storage.",
+          "ProjectStack works best in modern browsers with current support for client-side file APIs, canvas processing, and browser storage. Chrome, Edge, Firefox, and Safari in their recent versions should all support the core workflows. Older browsers or those with restricted JavaScript environments may not work as expected, since all processing depends on browser-native capabilities.",
+        ],
+      },
+      {
+        title: "What file types does ProjectStack support?",
+        paragraphs: [
+          "ProjectStack currently supports PDF files for most tools, including Edit PDF, Merge PDF, Split PDF, Rotate, Delete, Reorder, and Extract pages. The Images to PDF and Compress tools accept JPG and PNG images, and PDF to Image converts PDF pages into downloadable PNG files. File support is tied to what browsers handle natively, so exotic or password-protected formats may not work in every case.",
+        ],
+      },
+      {
+        title: "Is there a file size limit?",
+        paragraphs: [
+          "Yes. Free-tier file processing is capped at 5 MB per file to keep browser-based operations fast and stable. Some tools also limit the number of files per session — for example, Merge PDF allows up to 3 PDFs in the free tier and Images to PDF allows up to 5 images. These limits are enforced at file selection, so you will see a message before you begin if a file exceeds them.",
+        ],
+      },
+      {
+        title: "What happens to my files after I close the browser?",
+        paragraphs: [
+          "Nothing is retained. Because ProjectStack processes files locally in your browser, your documents are never stored on a server or saved to a ProjectStack database. When you close the tab or browser window, the session ends and your files are no longer accessible through the app. Nothing from your session persists beyond what your own browser may keep in its own temporary cache.",
+        ],
+      },
+      {
+        title: "Can I use ProjectStack on my phone or tablet?",
+        paragraphs: [
+          "Yes, ProjectStack is designed to work on mobile browsers and tablets. The layout adapts to smaller screens, and the core file processing runs in any modern mobile browser the same way it does on a desktop. Some tools with drag-and-drop interfaces work best with a mouse or trackpad, but the essential workflows are accessible on touch devices.",
+        ],
+      },
+      {
+        title: "What is Fill & Sign in the Edit PDF tool?",
+        paragraphs: [
+          "Fill & Sign is a feature inside Edit PDF that lets you add signatures, typed text, dates, and initials directly onto PDF pages before exporting. You can create a signature by typing your name in a handwriting-style font or by uploading an image, then drag it into position on the active page. Everything is applied locally in your browser and flattened into the final PDF when you export.",
+        ],
+      },
+      {
+        title: "Will ProjectStack add more tools in the future?",
+        paragraphs: [
+          "Yes. ProjectStack is built as an expanding platform rather than a fixed set of tools. The current tool set covers common PDF and image tasks, and the architecture is designed so new tools can be added without disrupting the existing workspace. Future additions may include new file formats, additional editing capabilities, and tools that go beyond PDF and image workflows.",
         ],
       },
     ],
     relatedLinks: [
       { type: "tool", id: "images", label: "Images to PDF" },
       { type: "support", id: "privacy", label: "Privacy Policy" },
+      { type: "tool", id: "edit", label: "Edit PDF" },
     ],
   },
 };
