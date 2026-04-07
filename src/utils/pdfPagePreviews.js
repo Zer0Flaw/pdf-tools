@@ -22,10 +22,11 @@ export function revokePreviewUrls(pages) {
   });
 }
 
-export async function buildPdfPagePreviews(bytes, scale = 0.55) {
+export async function buildPdfPagePreviews(bytes, scale = 1.5) {
   const loadingTask = getDocument({ data: new Uint8Array(bytes) });
   const pdf = await loadingTask.promise;
   const nextPages = [];
+  const dpr = window.devicePixelRatio || 1;
 
   for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
     const page = await pdf.getPage(pageNumber);
@@ -37,8 +38,9 @@ export async function buildPdfPagePreviews(bytes, scale = 0.55) {
       throw new Error("Canvas is not supported.");
     }
 
-    canvas.width = Math.ceil(viewport.width);
-    canvas.height = Math.ceil(viewport.height);
+    canvas.width = Math.ceil(viewport.width * dpr);
+    canvas.height = Math.ceil(viewport.height * dpr);
+    context.scale(dpr, dpr);
 
     await page.render({
       canvasContext: context,

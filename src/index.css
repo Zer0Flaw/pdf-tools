@@ -2490,6 +2490,7 @@ h1 {
   width: auto;
   height: auto;
   object-fit: contain;
+  image-rendering: auto;
   transition: transform 0.18s ease;
 }
 
@@ -2938,6 +2939,7 @@ h1 {
   height: auto;
   margin: 0 auto;
   object-fit: contain;
+  image-rendering: auto;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.92),
     0 16px 34px rgba(15, 23, 42, 0.14),
