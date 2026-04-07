@@ -46,6 +46,8 @@ const TOOL_METADATA = {
     heading: "Edit PDF Online",
     intro:
       "Organize and clean up PDF pages in one browser-based editor built for reordering, rotating, deleting, extracting, and exporting without sending files away for core processing.",
+    contextNote:
+      "Upload a PDF to reorder, rotate, delete, or extract pages in one workspace. Your file stays in your browser during the entire session — nothing is sent to a server at any point. When you are finished, download the edited PDF directly to your device.",
   },
   merge: {
     title: "Merge PDF Files Online | ProjectStack",
@@ -54,6 +56,8 @@ const TOOL_METADATA = {
     heading: "Merge PDF Files Online",
     intro:
       "Combine multiple PDF files into one organized document with fast browser-based processing, local file handling, and simple order control before export.",
+    contextNote:
+      "Add multiple PDF files and arrange them in the order you want before combining. ProjectStack merges them into a single document using your browser's built-in processing, so your files stay on your device from start to finish. Download the merged PDF when you are ready.",
   },
   rotate: {
     title: "Rotate PDF Pages Online | ProjectStack",
@@ -62,6 +66,8 @@ const TOOL_METADATA = {
     heading: "Rotate PDF Pages Online",
     intro:
       "Rotate individual PDF pages in a browser-based workspace built for quick page fixes, simple orientation control, and privacy-respecting local processing.",
+    contextNote:
+      "Upload a PDF, then select which pages need rotating and apply the correction. The rotation is calculated and applied locally in your browser without sending your file to any server. Export the corrected PDF as soon as the orientation looks right.",
   },
   delete: {
     title: "Delete PDF Pages Online | ProjectStack",
@@ -70,6 +76,8 @@ const TOOL_METADATA = {
     heading: "Delete PDF Pages Online",
     intro:
       "Remove unwanted PDF pages in a browser-based workspace built for quick cleanup, clear page selection, and privacy-respecting local processing.",
+    contextNote:
+      "Upload a PDF and mark the pages you want to remove. ProjectStack rebuilds the document without those pages entirely in your browser, with no server involved in the process. Download the cleaned-up PDF directly when you are finished.",
   },
   reorder: {
     title: "Reorder PDF Pages Online | ProjectStack",
@@ -78,6 +86,8 @@ const TOOL_METADATA = {
     heading: "Reorder PDF Pages Online",
     intro:
       "Reorder PDF pages in a browser-based workspace built for quick organization, drag-and-drop page control, and privacy-respecting local processing.",
+    contextNote:
+      "Upload a PDF and drag pages into the sequence that makes sense for your document. The reordering happens locally in your browser without any file leaving your device. Export the reorganized PDF when the page order looks right.",
   },
   extract: {
     title: "Extract PDF Pages Online | ProjectStack",
@@ -86,6 +96,8 @@ const TOOL_METADATA = {
     heading: "Extract PDF Pages Online",
     intro:
       "Extract selected PDF pages in a browser-based workspace built for quick page selection, simple export, and privacy-respecting local processing.",
+    contextNote:
+      "Upload a PDF and select the pages you want to save as a separate document. ProjectStack builds the new PDF from your selection directly in your browser without uploading anything to a server. Download the extracted pages as a standalone PDF file.",
   },
   split: {
     title: "Split PDF Files Online | ProjectStack",
@@ -94,6 +106,8 @@ const TOOL_METADATA = {
     heading: "Split PDF Online",
     intro:
       "Break a PDF into smaller page files in a clean browser-based workspace designed for quick extraction, simpler sharing, and predictable downloads.",
+    contextNote:
+      "Upload a PDF and ProjectStack breaks it into individual page files — one per page. The entire split operation runs in your browser without uploading your document to any server. Each page downloads as its own self-contained PDF file.",
   },
   compress: {
     title: "Compress Images Online | ProjectStack",
@@ -102,6 +116,8 @@ const TOOL_METADATA = {
     heading: "Compress Images Online",
     intro:
       "Reduce image file size for sharing, uploads, and storage with a simple browser-based compression workflow that keeps the core process on your device.",
+    contextNote:
+      "Upload one or more images and ProjectStack reduces their file size using canvas-based compression that runs entirely in your browser. No image data is sent to any server during the process. Download the compressed files when you are satisfied with the results.",
   },
   images: {
     title: "Convert Images to PDF Online | ProjectStack",
@@ -110,6 +126,8 @@ const TOOL_METADATA = {
     heading: "Images to PDF Online",
     intro:
       "Turn JPG and PNG images into one clean PDF with a browser-based workflow built for fast conversion, simple reordering, and privacy-respecting processing.",
+    contextNote:
+      "Upload JPG or PNG images and arrange them in the order you want before converting. ProjectStack compiles them into a single PDF document entirely within your browser, with no server handling your files. Download the finished PDF when the layout looks right.",
   },
   pdfToImage: {
     title: "PDF to Image Online | ProjectStack",
@@ -118,6 +136,8 @@ const TOOL_METADATA = {
     heading: "PDF to Image Online",
     intro:
       "Turn PDF pages into clean PNG image downloads with browser-based processing built for quick exports, simple downloads, and privacy-respecting file handling.",
+    contextNote:
+      "Upload a PDF and ProjectStack converts each page into a clean PNG image file. The conversion runs locally in your browser using built-in rendering, so your document never leaves your device. Each page downloads as a separate image file ready to use anywhere.",
   },
 };
 
@@ -400,6 +420,10 @@ export default function App() {
                 Use {activeToolMetadata.heading.replace(" Online", "")}
               </button>
             </div>
+          </div>
+
+          <div className="tool-context-bar">
+            <p>{activeToolMetadata.contextNote}</p>
           </div>
 
           <div id="tool-workspace" className="tool-workspace">

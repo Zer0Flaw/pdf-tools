@@ -1067,6 +1067,19 @@ h1 {
   margin-top: 0;
 }
 
+.tool-context-bar {
+  max-width: 760px;
+  padding: 14px 0 4px;
+  border-top: 1px solid #eef2f7;
+}
+
+.tool-context-bar p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.93rem;
+  line-height: 1.65;
+}
+
 .app-card-editor .route-intro p {
   max-width: 760px;
 }
