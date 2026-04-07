@@ -1869,7 +1869,7 @@ export default function EditPdfTool() {
                   ? "Select it in the viewer to fine-tune its size or position."
                   : "Use Place on Page below to add one to the active page.",
             };
-    const viewerActionStatus = activePage.markedForDeletion
+    const viewerActionStatus = activePage?.markedForDeletion
       ? "Page actions affect this page, but removed pages stay out of export until you keep them."
       : activePageSelected
         ? "Page actions apply to this page and it is also included in the current selection."
