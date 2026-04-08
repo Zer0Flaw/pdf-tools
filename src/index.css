@@ -3131,6 +3131,119 @@ h1 {
   accent-color: #2563eb;
 }
 
+.edit-pdf-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 251, 255, 0.96) 100%);
+  border: 1px solid rgba(191, 219, 254, 0.72);
+}
+
+.edit-pdf-form-fields-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.edit-pdf-form-fields-head strong {
+  color: #111827;
+  font-size: 0.92rem;
+}
+
+.edit-pdf-form-field-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.1);
+  color: #4338ca;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.edit-pdf-form-field-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(248, 250, 252, 0.72);
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  flex-wrap: wrap;
+}
+
+.edit-pdf-form-field-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  min-width: 140px;
+  word-break: break-word;
+}
+
+.edit-pdf-form-field-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 0.88rem;
+}
+
+.edit-pdf-form-field-input:focus {
+  outline: none;
+  border-color: rgba(96, 165, 250, 0.92);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+}
+
+.edit-pdf-form-field-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.edit-pdf-form-field-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  color: #334155;
+  cursor: pointer;
+}
+
+.edit-pdf-form-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.edit-pdf-form-divider span {
+  color: #64748b;
+  font-size: 0.79rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.edit-pdf-form-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
 .edit-pdf-toolbar .hero-secondary-btn:disabled,
 .edit-pdf-sidebar .hero-secondary-btn:disabled {
   opacity: 0.58;
