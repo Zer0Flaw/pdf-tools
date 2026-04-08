@@ -717,6 +717,10 @@ export default function EditPdfTool() {
     () => new Map(fillAssets.map((asset) => [asset.id, asset])),
     [fillAssets],
   );
+  const activePageFormFields = useMemo(
+    () => formFields.filter((f) => f.pageNumber === activePageNumber && f.rect),
+    [formFields, activePageNumber],
+  );
   const railDerivedState = useMemo(() => {
     const pageIds = [];
     const pageIdMap = new Map();
@@ -1072,8 +1076,12 @@ export default function EditPdfTool() {
         const form = pdfDoc.getForm();
         const fields = form.getFields();
 
-        console.log("Form detection: found", fields.length, "fields");
-        fields.forEach((f) => console.log("  Field:", f.getName(), f.constructor.name));
+        // Build a ref → page-number map so we can look up each widget's page
+        const pageRefMap = new Map();
+        for (let i = 0; i < pdfDoc.getPageCount(); i++) {
+          const page = pdfDoc.getPage(i);
+          pageRefMap.set(page.ref.toString(), i + 1);
+        }
 
         for (const field of fields) {
           const name = field.getName();
@@ -1097,23 +1105,50 @@ export default function EditPdfTool() {
             options = field.getOptions();
           }
 
-          if (type) {
-            detectedFields.push({
-              id: createEditorLocalId("form-field"),
-              name,
-              type,
-              options,
-            });
-            detectedValues[name] = value;
+          if (!type) continue;
+
+          // Extract widget position — each field may have one widget per page
+          let pageNumber = null;
+          let rect = null;
+          let pageWidth = null;
+          let pageHeight = null;
+          try {
+            const widgets = field.acroField.getWidgets();
+            const widget = widgets[0];
+            if (widget) {
+              const widgetPageRef = widget.P?.();
+              if (widgetPageRef) {
+                pageNumber = pageRefMap.get(widgetPageRef.toString()) ?? null;
+              }
+              if (pageNumber) {
+                rect = widget.getRectangle();
+                const size = pdfDoc.getPage(pageNumber - 1).getSize();
+                pageWidth = size.width;
+                pageHeight = size.height;
+              }
+            }
+          } catch {
+            // Position extraction failed — field still usable in panel list
+            pageNumber = null;
+            rect = null;
           }
+
+          detectedFields.push({
+            id: createEditorLocalId("form-field"),
+            name,
+            type,
+            options,
+            pageNumber,
+            rect,
+            pageWidth,
+            pageHeight,
+          });
+          detectedValues[name] = value;
         }
-      } catch (err) {
-        console.warn("Form detection failed:", err);
+      } catch {
         detectedFields = [];
         detectedValues = {};
       }
-
-      console.log("Dispatching form fields:", detectedFields.length, detectedFields);
 
       dispatchEditorState({
         type: "initialize_document",
@@ -2956,6 +2991,83 @@ export default function EditPdfTool() {
                               src={activePage.previewUrl}
                               alt={`Preview of PDF page ${activePage.pageNumber}`}
                             />
+                            {activePageFormFields.length > 0 && (
+                              <div className="edit-pdf-form-layer">
+                                {activePageFormFields.map((field) => {
+                                  const xPercent = (field.rect.x / field.pageWidth) * 100;
+                                  const yPercent = ((field.pageHeight - field.rect.y - field.rect.height) / field.pageHeight) * 100;
+                                  const widthPercent = (field.rect.width / field.pageWidth) * 100;
+                                  const heightPercent = (field.rect.height / field.pageHeight) * 100;
+                                  return (
+                                    <div
+                                      key={field.id}
+                                      className={`edit-pdf-form-overlay-field edit-pdf-form-overlay-${field.type}`}
+                                      style={{
+                                        position: "absolute",
+                                        left: `${xPercent}%`,
+                                        top: `${yPercent}%`,
+                                        width: `${widthPercent}%`,
+                                        height: `${heightPercent}%`,
+                                      }}
+                                    >
+                                      {field.type === "text" && (
+                                        <input
+                                          type="text"
+                                          className="edit-pdf-form-overlay-input"
+                                          value={formFieldValues[field.name] || ""}
+                                          placeholder={field.name}
+                                          disabled={isProcessing}
+                                          onChange={(event) =>
+                                            dispatchEditorState({
+                                              type: "update_form_field_value",
+                                              fieldName: field.name,
+                                              value: event.target.value,
+                                            })
+                                          }
+                                          onClick={(event) => event.stopPropagation()}
+                                        />
+                                      )}
+                                      {field.type === "checkbox" && (
+                                        <input
+                                          type="checkbox"
+                                          className="edit-pdf-form-overlay-checkbox"
+                                          checked={!!formFieldValues[field.name]}
+                                          disabled={isProcessing}
+                                          onChange={(event) =>
+                                            dispatchEditorState({
+                                              type: "update_form_field_value",
+                                              fieldName: field.name,
+                                              value: event.target.checked,
+                                            })
+                                          }
+                                          onClick={(event) => event.stopPropagation()}
+                                        />
+                                      )}
+                                      {field.type === "dropdown" && (
+                                        <select
+                                          className="edit-pdf-form-overlay-input"
+                                          value={formFieldValues[field.name] || ""}
+                                          disabled={isProcessing}
+                                          onChange={(event) =>
+                                            dispatchEditorState({
+                                              type: "update_form_field_value",
+                                              fieldName: field.name,
+                                              value: event.target.value,
+                                            })
+                                          }
+                                          onClick={(event) => event.stopPropagation()}
+                                        >
+                                          <option value="">—</option>
+                                          {field.options?.map((opt) => (
+                                            <option key={opt} value={opt}>{opt}</option>
+                                          ))}
+                                        </select>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
                             <div className="edit-pdf-signature-layer">
                               {activePagePlacedObjects.map((placedObject, objectIndex) => {
                                 const fillAsset = fillAssetMap.get(
