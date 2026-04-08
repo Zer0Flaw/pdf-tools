@@ -647,6 +647,7 @@ export default function EditPdfTool() {
   const [message, setMessage] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [showExportAd, setShowExportAd] = useState(false);
+  const [activeEditorTab, setActiveEditorTab] = useState("pages");
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
   const pageNumberIndexRef = useRef(new Map());
@@ -2142,93 +2143,438 @@ export default function EditPdfTool() {
                   </span>
                 </div>
 
-                <div className="edit-pdf-toolbar-command-bar" aria-label="Edit PDF commands">
+                <div className="edit-pdf-tab-bar">
                   <button
                     type="button"
-                    className="hero-secondary-btn"
-                    onClick={selectAllPages}
-                    disabled={isProcessing || allPagesSelected}
+                    className={`edit-pdf-tab${activeEditorTab === "pages" ? " active" : ""}`}
+                    onClick={() => setActiveEditorTab("pages")}
                   >
-                    Select All
+                    Pages
                   </button>
                   <button
                     type="button"
-                    className="hero-secondary-btn"
-                    onClick={clearPageSelection}
-                    disabled={isProcessing || !selectedPages.length}
+                    className={`edit-pdf-tab${activeEditorTab === "fillSign" ? " active" : ""}`}
+                    onClick={() => setActiveEditorTab("fillSign")}
                   >
-                    Clear Selection
+                    Fill &amp; Sign
                   </button>
+                </div>
 
-                  <span className="edit-pdf-toolbar-divider" aria-hidden="true" />
-
-                  <button
-                    type="button"
-                    className="hero-secondary-btn"
-                    onClick={() => rotateSelectedPages(-90)}
-                    disabled={!selectedPages.length || isProcessing}
-                  >
-                    Rotate Left
-                  </button>
-                  <button
-                    type="button"
-                    className="hero-secondary-btn"
-                    onClick={() => rotateSelectedPages(90)}
-                    disabled={!selectedPages.length || isProcessing}
-                  >
-                    Rotate Right
-                  </button>
-
-                  <span className="edit-pdf-toolbar-divider" aria-hidden="true" />
-
-                  <button
-                    type="button"
-                    className="hero-secondary-btn"
-                    onClick={markSelectedForDeletion}
-                    disabled={!selectedPages.length || isProcessing}
-                  >
-                    Delete Selected
-                  </button>
-                  <button
-                    type="button"
-                    className="hero-secondary-btn"
-                    onClick={keepSelectedPages}
-                    disabled={!selectedPages.length || isProcessing}
-                  >
-                    Keep Selected
-                  </button>
-                  <button
-                    type="button"
-                    className="hero-secondary-btn"
-                    disabled={!selectedIncludedCount || isProcessing}
-                    onClick={exportSelectedPages}
-                  >
-                    Extract Selected
-                  </button>
-
-                  <section
-                    className="edit-pdf-toolbar-group-export"
-                    aria-label="Export commands"
-                  >
-                    <span className="edit-pdf-toolbar-export-status-inline">
-                      {placedObjects.length
-                        ? "Edited document + Fill & Sign"
-                        : `${remainingCount} page${remainingCount === 1 ? "" : "s"} ready`}
-                    </span>
+                {activeEditorTab === "pages" && (
+                  <div className="edit-pdf-toolbar-command-bar" aria-label="Page commands">
                     <button
                       type="button"
-                      className="hero-primary-btn edit-pdf-export-btn"
-                      disabled={!pages.length || !remainingCount || isProcessing}
-                      onClick={exportEditedDocument}
+                      className="hero-secondary-btn"
+                      onClick={selectAllPages}
+                      disabled={isProcessing || allPagesSelected}
                     >
-                      {isProcessing
-                        ? "Exporting..."
-                        : placedObjects.length
-                          ? "Export Flattened PDF"
-                          : "Export Document"}
+                      Select All
                     </button>
-                  </section>
-                </div>
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={clearPageSelection}
+                      disabled={isProcessing || !selectedPages.length}
+                    >
+                      Clear Selection
+                    </button>
+
+                    <span className="edit-pdf-toolbar-divider" aria-hidden="true" />
+
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => rotateSelectedPages(-90)}
+                      disabled={!selectedPages.length || isProcessing}
+                    >
+                      Rotate Left
+                    </button>
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => rotateSelectedPages(90)}
+                      disabled={!selectedPages.length || isProcessing}
+                    >
+                      Rotate Right
+                    </button>
+
+                    <span className="edit-pdf-toolbar-divider" aria-hidden="true" />
+
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={markSelectedForDeletion}
+                      disabled={!selectedPages.length || isProcessing}
+                    >
+                      Delete Selected
+                    </button>
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={keepSelectedPages}
+                      disabled={!selectedPages.length || isProcessing}
+                    >
+                      Keep Selected
+                    </button>
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      disabled={!selectedIncludedCount || isProcessing}
+                      onClick={exportSelectedPages}
+                    >
+                      Extract Selected
+                    </button>
+
+                    <span className="edit-pdf-toolbar-divider" aria-hidden="true" />
+
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => togglePageSelection(activePage.pageNumber)}
+                      disabled={isProcessing}
+                    >
+                      {activePageSelected ? "Unselect Page" : "Select Page"}
+                    </button>
+
+                    <span className="edit-pdf-toolbar-divider" aria-hidden="true" />
+
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => rotateActivePage(-90)}
+                      disabled={isProcessing}
+                    >
+                      Rotate Left
+                    </button>
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={() => rotateActivePage(90)}
+                      disabled={isProcessing}
+                    >
+                      Rotate Right
+                    </button>
+
+                    <span className="edit-pdf-toolbar-divider" aria-hidden="true" />
+
+                    <div className="edit-pdf-viewer-action-group edit-pdf-viewer-action-group-zoom">
+                      <span className="edit-pdf-viewer-action-label">
+                        Zoom {Math.round(zoomLevel * 100)}%
+                      </span>
+                      <button
+                        type="button"
+                        className="hero-secondary-btn"
+                        onClick={() => adjustZoom(-ZOOM_STEP)}
+                        disabled={zoomLevel <= MIN_ZOOM || isProcessing}
+                      >
+                        Zoom Out
+                      </button>
+                      <button
+                        type="button"
+                        className="hero-secondary-btn"
+                        onClick={() => adjustZoom(ZOOM_STEP)}
+                        disabled={zoomLevel >= MAX_ZOOM || isProcessing}
+                      >
+                        Zoom In
+                      </button>
+                      <button
+                        type="button"
+                        className="hero-secondary-btn"
+                        onClick={resetZoom}
+                        disabled={zoomLevel === 1 || isProcessing}
+                      >
+                        Reset Zoom
+                      </button>
+                    </div>
+
+                    <span className="edit-pdf-toolbar-divider" aria-hidden="true" />
+
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={toggleActivePageDeletion}
+                      disabled={isProcessing}
+                    >
+                      {activePage.markedForDeletion ? "Keep Page" : "Delete Page"}
+                    </button>
+                  </div>
+                )}
+
+                {activeEditorTab === "fillSign" && (
+                  <div className="edit-pdf-fill-sign-panel">
+                    <div className="edit-pdf-fill-sign-metrics">
+                      <span className="edit-pdf-fill-sign-metric">
+                        <strong>{fillAssets.length}</strong>
+                        saved
+                      </span>
+                      <span className="edit-pdf-fill-sign-metric">
+                        <strong>{activePageFillObjectCount}</strong>
+                        on page
+                      </span>
+                    </div>
+
+                    <div className="edit-pdf-fill-sign-grid">
+                      <div className="edit-pdf-fill-sign-block">
+                        <div className="edit-pdf-fill-sign-block-head">
+                          <strong>Create signature</strong>
+                          <span>Save a reusable signature asset, then place it on any page.</span>
+                        </div>
+
+                        <div className="edit-pdf-fill-sign-type-row">
+                          <input
+                            type="text"
+                            className="edit-pdf-fill-sign-input"
+                            value={typedSignatureValue}
+                            placeholder="Type your signature"
+                            disabled={isPreparingFillAsset || isProcessing}
+                            onChange={(event) => setTypedSignatureValue(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                handleCreateTypedSignature();
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="hero-secondary-btn"
+                            onClick={handleCreateTypedSignature}
+                            disabled={!typedSignatureValue.trim() || isPreparingFillAsset || isProcessing}
+                          >
+                            {isPreparingFillAsset ? "Creating..." : "Create"}
+                          </button>
+                        </div>
+
+                        <div className="edit-pdf-fill-sign-upload-row">
+                          <button
+                            type="button"
+                            className="hero-secondary-btn"
+                            onClick={() => signatureUploadInputRef.current?.click()}
+                            disabled={isPreparingFillAsset || isProcessing}
+                          >
+                            Upload Signature Image
+                          </button>
+                          <span>PNG, JPG, or other image formats are converted locally.</span>
+                        </div>
+                      </div>
+
+                      <div className="edit-pdf-fill-sign-block">
+                        <div className="edit-pdf-fill-sign-block-head">
+                          <strong>Quick fill items</strong>
+                          <span>Create and place text, date, or initials on page {activePage.pageNumber}.</span>
+                        </div>
+
+                        <div className="edit-pdf-fill-sign-type-row">
+                          <input
+                            type="text"
+                            className="edit-pdf-fill-sign-input"
+                            value={fillTextValue}
+                            placeholder="Add text"
+                            disabled={isPreparingFillAsset || isProcessing}
+                            onChange={(event) => setFillTextValue(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                handleCreateTextObject();
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="hero-secondary-btn"
+                            onClick={handleCreateTextObject}
+                            disabled={!fillTextValue.trim() || isPreparingFillAsset || isProcessing}
+                          >
+                            Add Text
+                          </button>
+                        </div>
+
+                        <div className="edit-pdf-fill-sign-type-row">
+                          <input
+                            type="text"
+                            className="edit-pdf-fill-sign-input"
+                            value={dateValue}
+                            placeholder="Add date"
+                            disabled={isPreparingFillAsset || isProcessing}
+                            onChange={(event) => setDateValue(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                handleCreateDateObject();
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="hero-secondary-btn"
+                            onClick={() => setDateValue(getCurrentDateLabel())}
+                            disabled={isPreparingFillAsset || isProcessing}
+                          >
+                            Today
+                          </button>
+                          <button
+                            type="button"
+                            className="hero-secondary-btn"
+                            onClick={handleCreateDateObject}
+                            disabled={!dateValue.trim() || isPreparingFillAsset || isProcessing}
+                          >
+                            Add Date
+                          </button>
+                        </div>
+
+                        <div className="edit-pdf-fill-sign-type-row">
+                          <input
+                            type="text"
+                            className="edit-pdf-fill-sign-input"
+                            value={initialsValue}
+                            maxLength={6}
+                            placeholder="Add initials"
+                            disabled={isPreparingFillAsset || isProcessing}
+                            onChange={(event) => setInitialsValue(event.target.value.toUpperCase())}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                handleCreateInitialsObject();
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="hero-secondary-btn"
+                            onClick={handleCreateInitialsObject}
+                            disabled={!initialsValue.trim() || isPreparingFillAsset || isProcessing}
+                          >
+                            Add Initials
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="edit-pdf-fill-sign-block">
+                        <div className="edit-pdf-fill-sign-block-head">
+                          <strong>Saved fill items</strong>
+                          <span>Place any saved item on page {activePage.pageNumber}.</span>
+                        </div>
+
+                        {hasFillAssets ? (
+                          <div className="edit-pdf-fill-sign-library">
+                            {fillAssets.map((asset) => (
+                              <article key={asset.id} className="edit-pdf-signature-card">
+                                <div className="edit-pdf-signature-card-preview">
+                                  <img
+                                    className={`edit-pdf-fill-sign-preview-image edit-pdf-fill-sign-preview-image-${asset.type}`}
+                                    src={asset.dataUrl}
+                                    alt={`${asset.label} ${asset.type} preview`}
+                                  />
+                                </div>
+                                <div className="edit-pdf-signature-card-copy">
+                                  <strong>{asset.label}</strong>
+                                  <span>{getFillAssetSourceLabel(asset.type, asset.source)}</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  className="hero-secondary-btn"
+                                  onClick={() => placeFillAssetOnActivePage(asset.id)}
+                                  disabled={isProcessing}
+                                >
+                                  Place on Page
+                                </button>
+                              </article>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="edit-pdf-fill-sign-empty">
+                            Create a signature, text, date, or initials item to start placing Fill &amp; Sign objects.
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="edit-pdf-fill-sign-block">
+                        <div className="edit-pdf-fill-sign-block-head">
+                          <strong>Selected item</strong>
+                          <span>
+                            {selectedPlacedObjectOnActivePage
+                              ? `${fillActionStatus} Adjust the active item without leaving the viewer.`
+                              : activePageFillObjectCount
+                                ? `${fillActionStatus} Select a placed item on the page to resize or remove it.`
+                                : "Use Place on Page or create a new item below to start filling this page."}
+                          </span>
+                        </div>
+
+                        {selectedPlacedObjectOnActivePage && selectedPlacedObjectAsset ? (
+                          <div className="edit-pdf-fill-sign-active-card">
+                            <div className="edit-pdf-fill-sign-active-preview">
+                              <img
+                                className={`edit-pdf-fill-sign-preview-image edit-pdf-fill-sign-preview-image-${selectedPlacedObjectOnActivePage.type}`}
+                                src={selectedPlacedObjectAsset.dataUrl}
+                                alt={`${selectedPlacedObjectAsset.label} selected ${selectedPlacedObjectOnActivePage.type}`}
+                              />
+                            </div>
+                            <div className="edit-pdf-fill-sign-active-copy">
+                              <strong>{selectedPlacedObjectAsset.label}</strong>
+                              <span>
+                                {getFillAssetSourceLabel(
+                                  selectedPlacedObjectOnActivePage.type,
+                                  selectedPlacedObjectAsset.source,
+                                )} selected. Drag on the page to reposition it.
+                              </span>
+                            </div>
+                            <label className="edit-pdf-fill-sign-scale-control">
+                              <span>
+                                Size {Math.round(selectedPlacedObjectOnActivePage.widthRatio * 100)}%
+                              </span>
+                              <input
+                                type="range"
+                                min={MIN_PLACED_OBJECT_WIDTH_RATIO}
+                                max={MAX_PLACED_OBJECT_WIDTH_RATIO}
+                                step="0.01"
+                                value={selectedPlacedObjectOnActivePage.widthRatio}
+                                disabled={isProcessing}
+                                onChange={(event) =>
+                                  updateSelectedPlacedObjectWidth(Number(event.target.value))
+                                }
+                              />
+                            </label>
+                            <button
+                              type="button"
+                              className="hero-secondary-btn"
+                              onClick={removeSelectedPlacedObject}
+                              disabled={isProcessing}
+                            >
+                              Remove Item
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="edit-pdf-fill-sign-empty">
+                            No placed Fill &amp; Sign item is selected on this page yet.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <section
+                  className="edit-pdf-toolbar-group-export"
+                  aria-label="Export commands"
+                >
+                  <span className="edit-pdf-toolbar-export-status-inline">
+                    {placedObjects.length
+                      ? "Edited document + Fill & Sign"
+                      : `${remainingCount} page${remainingCount === 1 ? "" : "s"} ready`}
+                  </span>
+                  <button
+                    type="button"
+                    className="hero-primary-btn edit-pdf-export-btn"
+                    disabled={!pages.length || !remainingCount || isProcessing}
+                    onClick={exportEditedDocument}
+                  >
+                    {isProcessing
+                      ? "Exporting..."
+                      : placedObjects.length
+                        ? "Export Flattened PDF"
+                        : "Export Document"}
+                  </button>
+                </section>
               </div>
 
             <div className="edit-pdf-workspace">
@@ -2467,345 +2813,6 @@ export default function EditPdfTool() {
                       </div>
                     </div>
                   </div>
-
-                <div className="edit-pdf-viewer-actions">
-                  <div className="edit-pdf-viewer-action-group">
-                    <button
-                      type="button"
-                      className="hero-secondary-btn"
-                      onClick={() => togglePageSelection(activePage.pageNumber)}
-                      disabled={isProcessing}
-                    >
-                      {activePageSelected ? "Unselect Page" : "Select Page"}
-                    </button>
-                  </div>
-
-                  <div className="edit-pdf-viewer-action-group">
-                    <button
-                      type="button"
-                      className="hero-secondary-btn"
-                      onClick={() => rotateActivePage(-90)}
-                      disabled={isProcessing}
-                    >
-                      Rotate Left
-                    </button>
-                    <button
-                      type="button"
-                      className="hero-secondary-btn"
-                      onClick={() => rotateActivePage(90)}
-                      disabled={isProcessing}
-                    >
-                      Rotate Right
-                    </button>
-                  </div>
-
-                  <div className="edit-pdf-viewer-action-group edit-pdf-viewer-action-group-zoom">
-                    <span className="edit-pdf-viewer-action-label">
-                      Zoom {Math.round(zoomLevel * 100)}%
-                    </span>
-                    <button
-                      type="button"
-                      className="hero-secondary-btn"
-                      onClick={() => adjustZoom(-ZOOM_STEP)}
-                      disabled={zoomLevel <= MIN_ZOOM || isProcessing}
-                    >
-                      Zoom Out
-                    </button>
-                    <button
-                      type="button"
-                      className="hero-secondary-btn"
-                      onClick={() => adjustZoom(ZOOM_STEP)}
-                      disabled={zoomLevel >= MAX_ZOOM || isProcessing}
-                    >
-                      Zoom In
-                    </button>
-                    <button
-                      type="button"
-                      className="hero-secondary-btn"
-                      onClick={resetZoom}
-                      disabled={zoomLevel === 1 || isProcessing}
-                    >
-                      Reset Zoom
-                    </button>
-                  </div>
-
-                  <div className="edit-pdf-viewer-action-group">
-                    <button
-                      type="button"
-                      className="hero-secondary-btn"
-                      onClick={toggleActivePageDeletion}
-                      disabled={isProcessing}
-                    >
-                      {activePage.markedForDeletion ? "Keep Page" : "Delete Page"}
-                    </button>
-                  </div>
-                </div>
-
-                <section className="edit-pdf-fill-sign-panel" aria-label="Fill and sign">
-                  <div className="edit-pdf-fill-sign-head">
-                    <div className="edit-pdf-fill-sign-copy">
-                      <span className="edit-pdf-toolbar-label">Fill &amp; Sign</span>
-                      <strong>Page completion workflow</strong>
-                      <span>
-                        Create signatures, text, date, and initials items, then place them on the active page and flatten them on export.
-                      </span>
-                    </div>
-
-                    <div className="edit-pdf-fill-sign-metrics">
-                      <span className="edit-pdf-fill-sign-metric">
-                        <strong>{fillAssets.length}</strong>
-                        saved
-                      </span>
-                      <span className="edit-pdf-fill-sign-metric">
-                        <strong>{activePageFillObjectCount}</strong>
-                        on page
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className={`edit-pdf-fill-sign-status ${fillSignStatus.tone}`}>
-                    <strong>{fillSignStatus.title}</strong>
-                    <span>{fillSignStatus.text}</span>
-                  </div>
-
-                  <div className="edit-pdf-fill-sign-grid">
-                    <div className="edit-pdf-fill-sign-block">
-                      <div className="edit-pdf-fill-sign-block-head">
-                        <strong>Create signature</strong>
-                        <span>Save a reusable signature asset, then place it on any page.</span>
-                      </div>
-
-                      <div className="edit-pdf-fill-sign-type-row">
-                        <input
-                          type="text"
-                          className="edit-pdf-fill-sign-input"
-                          value={typedSignatureValue}
-                          placeholder="Type your signature"
-                          disabled={isPreparingFillAsset || isProcessing}
-                          onChange={(event) => setTypedSignatureValue(event.target.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.preventDefault();
-                              handleCreateTypedSignature();
-                            }
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="hero-secondary-btn"
-                          onClick={handleCreateTypedSignature}
-                          disabled={!typedSignatureValue.trim() || isPreparingFillAsset || isProcessing}
-                        >
-                          {isPreparingFillAsset ? "Creating..." : "Create"}
-                        </button>
-                      </div>
-
-                      <div className="edit-pdf-fill-sign-upload-row">
-                        <button
-                          type="button"
-                          className="hero-secondary-btn"
-                          onClick={() => signatureUploadInputRef.current?.click()}
-                          disabled={isPreparingFillAsset || isProcessing}
-                        >
-                          Upload Signature Image
-                        </button>
-                        <span>PNG, JPG, or other image formats are converted locally.</span>
-                      </div>
-                    </div>
-
-                    <div className="edit-pdf-fill-sign-block">
-                      <div className="edit-pdf-fill-sign-block-head">
-                        <strong>Quick fill items</strong>
-                        <span>Create and place text, date, or initials on page {activePage.pageNumber}.</span>
-                      </div>
-
-                      <div className="edit-pdf-fill-sign-type-row">
-                        <input
-                          type="text"
-                          className="edit-pdf-fill-sign-input"
-                          value={fillTextValue}
-                          placeholder="Add text"
-                          disabled={isPreparingFillAsset || isProcessing}
-                          onChange={(event) => setFillTextValue(event.target.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.preventDefault();
-                              handleCreateTextObject();
-                            }
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="hero-secondary-btn"
-                          onClick={handleCreateTextObject}
-                          disabled={!fillTextValue.trim() || isPreparingFillAsset || isProcessing}
-                        >
-                          Add Text
-                        </button>
-                      </div>
-
-                      <div className="edit-pdf-fill-sign-type-row">
-                        <input
-                          type="text"
-                          className="edit-pdf-fill-sign-input"
-                          value={dateValue}
-                          placeholder="Add date"
-                          disabled={isPreparingFillAsset || isProcessing}
-                          onChange={(event) => setDateValue(event.target.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.preventDefault();
-                              handleCreateDateObject();
-                            }
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="hero-secondary-btn"
-                          onClick={() => setDateValue(getCurrentDateLabel())}
-                          disabled={isPreparingFillAsset || isProcessing}
-                        >
-                          Today
-                        </button>
-                        <button
-                          type="button"
-                          className="hero-secondary-btn"
-                          onClick={handleCreateDateObject}
-                          disabled={!dateValue.trim() || isPreparingFillAsset || isProcessing}
-                        >
-                          Add Date
-                        </button>
-                      </div>
-
-                      <div className="edit-pdf-fill-sign-type-row">
-                        <input
-                          type="text"
-                          className="edit-pdf-fill-sign-input"
-                          value={initialsValue}
-                          maxLength={6}
-                          placeholder="Add initials"
-                          disabled={isPreparingFillAsset || isProcessing}
-                          onChange={(event) => setInitialsValue(event.target.value.toUpperCase())}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.preventDefault();
-                              handleCreateInitialsObject();
-                            }
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="hero-secondary-btn"
-                          onClick={handleCreateInitialsObject}
-                          disabled={!initialsValue.trim() || isPreparingFillAsset || isProcessing}
-                        >
-                          Add Initials
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="edit-pdf-fill-sign-block">
-                      <div className="edit-pdf-fill-sign-block-head">
-                        <strong>Saved fill items</strong>
-                        <span>Place any saved item on page {activePage.pageNumber}.</span>
-                      </div>
-
-                      {hasFillAssets ? (
-                        <div className="edit-pdf-fill-sign-library">
-                          {fillAssets.map((asset) => (
-                            <article key={asset.id} className="edit-pdf-signature-card">
-                              <div className="edit-pdf-signature-card-preview">
-                                <img
-                                  className={`edit-pdf-fill-sign-preview-image edit-pdf-fill-sign-preview-image-${asset.type}`}
-                                  src={asset.dataUrl}
-                                  alt={`${asset.label} ${asset.type} preview`}
-                                />
-                              </div>
-                              <div className="edit-pdf-signature-card-copy">
-                                <strong>{asset.label}</strong>
-                                <span>{getFillAssetSourceLabel(asset.type, asset.source)}</span>
-                              </div>
-                              <button
-                                type="button"
-                                className="hero-secondary-btn"
-                                onClick={() => placeFillAssetOnActivePage(asset.id)}
-                                disabled={isProcessing}
-                              >
-                                Place on Page
-                              </button>
-                            </article>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="edit-pdf-fill-sign-empty">
-                          Create a signature, text, date, or initials item to start placing Fill &amp; Sign objects.
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="edit-pdf-fill-sign-block">
-                      <div className="edit-pdf-fill-sign-block-head">
-                        <strong>Selected item</strong>
-                        <span>
-                          {selectedPlacedObjectOnActivePage
-                            ? `${fillActionStatus} Adjust the active item without leaving the viewer.`
-                            : activePageFillObjectCount
-                              ? `${fillActionStatus} Select a placed item on the page to resize or remove it.`
-                              : "Use Place on Page or create a new item below to start filling this page."}
-                        </span>
-                      </div>
-
-                      {selectedPlacedObjectOnActivePage && selectedPlacedObjectAsset ? (
-                        <div className="edit-pdf-fill-sign-active-card">
-                          <div className="edit-pdf-fill-sign-active-preview">
-                            <img
-                              className={`edit-pdf-fill-sign-preview-image edit-pdf-fill-sign-preview-image-${selectedPlacedObjectOnActivePage.type}`}
-                              src={selectedPlacedObjectAsset.dataUrl}
-                              alt={`${selectedPlacedObjectAsset.label} selected ${selectedPlacedObjectOnActivePage.type}`}
-                            />
-                          </div>
-                          <div className="edit-pdf-fill-sign-active-copy">
-                            <strong>{selectedPlacedObjectAsset.label}</strong>
-                            <span>
-                              {getFillAssetSourceLabel(
-                                selectedPlacedObjectOnActivePage.type,
-                                selectedPlacedObjectAsset.source,
-                              )} selected. Drag on the page to reposition it.
-                            </span>
-                          </div>
-                          <label className="edit-pdf-fill-sign-scale-control">
-                            <span>
-                              Size {Math.round(selectedPlacedObjectOnActivePage.widthRatio * 100)}%
-                            </span>
-                            <input
-                              type="range"
-                              min={MIN_PLACED_OBJECT_WIDTH_RATIO}
-                              max={MAX_PLACED_OBJECT_WIDTH_RATIO}
-                              step="0.01"
-                              value={selectedPlacedObjectOnActivePage.widthRatio}
-                              disabled={isProcessing}
-                              onChange={(event) =>
-                                updateSelectedPlacedObjectWidth(Number(event.target.value))
-                              }
-                            />
-                          </label>
-                          <button
-                            type="button"
-                            className="hero-secondary-btn"
-                            onClick={removeSelectedPlacedObject}
-                            disabled={isProcessing}
-                          >
-                            Remove Item
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="edit-pdf-fill-sign-empty">
-                          No placed Fill &amp; Sign item is selected on this page yet.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </section>
 
                 {viewerStatusItems.length > 0 && (
                   <div className="edit-pdf-viewer-status" aria-label="Active page status">
