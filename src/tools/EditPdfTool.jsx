@@ -274,41 +274,39 @@ function getPlacedObjectHeightRatio(placedObject, asset, pageWidth, pageHeight) 
   return objectHeight / pageHeight;
 }
 
-async function buildFlattenedPdfWithFillObjects(bytes, pageStates, fillAssets, placedObjects, formFields = [], formFieldValues = {}) {
+async function buildFlattenedPdfWithFillObjects(bytes, pageStates, fillAssets, placedObjects, formFieldValues = {}) {
   const exportablePages = pageStates.filter((page) => !page.markedForDeletion);
   const sourcePdf = await PDFDocument.load(bytes);
 
-  if (formFields.length > 0) {
+  if (Object.keys(formFieldValues).length > 0) {
     try {
       const form = sourcePdf.getForm();
-      for (const fieldDescriptor of formFields) {
-        const value = formFieldValues[fieldDescriptor.name];
-        if (value === undefined) continue;
+      const fields = form.getFields();
+      for (const field of fields) {
+        const name = field.getName();
+        if (!(name in formFieldValues)) continue;
+        const val = formFieldValues[name];
         try {
-          const field = form.getField(fieldDescriptor.name);
-          if (fieldDescriptor.type === "text" && field instanceof PDFTextField) {
-            field.setText(String(value));
-          } else if (fieldDescriptor.type === "checkbox" && field instanceof PDFCheckBox) {
-            if (value) field.check();
+          if (field instanceof PDFTextField) {
+            field.setText(val || "");
+          } else if (field instanceof PDFCheckBox) {
+            if (val) field.check();
             else field.uncheck();
-          } else if (fieldDescriptor.type === "dropdown" && field instanceof PDFDropdown) {
-            if (value) field.select(String(value));
-          } else if (fieldDescriptor.type === "radio" && field instanceof PDFRadioGroup) {
-            if (value) field.select(String(value));
+          } else if (field instanceof PDFDropdown) {
+            if (val) field.select(val);
+          } else if (field instanceof PDFRadioGroup) {
+            if (val) field.select(val);
           }
         } catch {
-          // Skip fields that cannot be written (read-only, encoding issues, etc.)
+          // Skip individual field errors
         }
       }
-      try {
-        form.flatten();
-      } catch {
-        // If flatten fails, continue — overlay objects still applied
-      }
+      form.flatten();
     } catch {
-      // If form access fails entirely, continue without form filling
+      // If form writing fails entirely, continue with overlay-only export
     }
   }
+
   const nextPdf = await PDFDocument.create();
   const copiedPages = await nextPdf.copyPages(
     sourcePdf,
@@ -502,15 +500,15 @@ function editPdfEditorReducer(state, action) {
     case "initialize_form_fields":
       return {
         ...state,
-        formFields: action.formFields,
-        formFieldValues: action.formFieldValues,
+        formFields: action.fields,
+        formFieldValues: action.values,
       };
     case "update_form_field_value":
       return {
         ...state,
         formFieldValues: {
           ...state.formFieldValues,
-          [action.name]: action.value,
+          [action.fieldName]: action.value,
         },
       };
     case "clear_reorder_feedback":
@@ -1120,8 +1118,8 @@ export default function EditPdfTool() {
       });
       dispatchEditorState({
         type: "initialize_form_fields",
-        formFields: detectedFormFields,
-        formFieldValues: initialFormFieldValues,
+        fields: detectedFormFields,
+        values: initialFormFieldValues,
       });
       setMessage({
         type: "success",
@@ -1716,13 +1714,13 @@ export default function EditPdfTool() {
     }
 
     await runPdfExport(async (bytes) => {
-      const pdfBytes = (formFields.length > 0 || placedObjects.length > 0)
+      const hasFormOrOverlay = placedObjects.length > 0 || formFields.length > 0;
+      const pdfBytes = hasFormOrOverlay
         ? await buildFlattenedPdfWithFillObjects(
             bytes,
             pages,
             fillAssets,
             placedObjects,
-            formFields,
             formFieldValues,
           )
         : await editPdfPages(bytes, pages);
@@ -1755,13 +1753,13 @@ export default function EditPdfTool() {
 
     await runPdfExport(async (bytes) => {
       const selectedPageStates = pages.filter((page) => selectedPages.includes(page.pageNumber));
-      const pdfBytes = (formFields.length > 0 || placedObjects.length > 0)
+      const hasFormOrOverlay = placedObjects.length > 0 || formFields.length > 0;
+      const pdfBytes = hasFormOrOverlay
         ? await buildFlattenedPdfWithFillObjects(
             bytes,
             selectedPageStates,
             fillAssets,
             placedObjects,
-            formFields,
             formFieldValues,
           )
         : await extractEditedPdfPages(bytes, pages, selectedPages);
@@ -2412,108 +2410,105 @@ export default function EditPdfTool() {
                 {activeEditorTab === "fillSign" && (
                   <div className="edit-pdf-fill-sign-panel">
                     {formFields.length > 0 && (
-                      <div className="edit-pdf-form-fields">
-                        <div className="edit-pdf-form-fields-head">
-                          <strong>Form Fields</strong>
-                          <span className="edit-pdf-form-field-badge">
-                            {formFields.length} field{formFields.length === 1 ? "" : "s"} detected
-                          </span>
-                        </div>
-                        {formFields.map((field) => (
-                          <div key={field.id} className="edit-pdf-form-field-row">
-                            <label
-                              className="edit-pdf-form-field-label"
-                              htmlFor={`form-field-${field.id}`}
-                            >
-                              {field.name}
-                            </label>
-                            {field.type === "text" && (
-                              <input
-                                id={`form-field-${field.id}`}
-                                type="text"
-                                className="edit-pdf-form-field-input"
-                                value={formFieldValues[field.name] ?? ""}
-                                disabled={isProcessing}
-                                onChange={(event) =>
-                                  dispatchEditorState({
-                                    type: "update_form_field_value",
-                                    name: field.name,
-                                    value: event.target.value,
-                                  })
-                                }
-                              />
-                            )}
-                            {field.type === "checkbox" && (
-                              <input
-                                id={`form-field-${field.id}`}
-                                type="checkbox"
-                                checked={Boolean(formFieldValues[field.name])}
-                                disabled={isProcessing}
-                                onChange={(event) =>
-                                  dispatchEditorState({
-                                    type: "update_form_field_value",
-                                    name: field.name,
-                                    value: event.target.checked,
-                                  })
-                                }
-                              />
-                            )}
-                            {field.type === "dropdown" && (
-                              <select
-                                id={`form-field-${field.id}`}
-                                className="edit-pdf-form-field-input"
-                                value={formFieldValues[field.name] ?? ""}
-                                disabled={isProcessing}
-                                onChange={(event) =>
-                                  dispatchEditorState({
-                                    type: "update_form_field_value",
-                                    name: field.name,
-                                    value: event.target.value,
-                                  })
-                                }
-                              >
-                                {(field.options ?? []).map((option) => (
-                                  <option key={option} value={option}>
-                                    {option}
-                                  </option>
-                                ))}
-                              </select>
-                            )}
-                            {field.type === "radio" && (
-                              <div className="edit-pdf-form-field-radio-group">
-                                {(field.options ?? []).map((option) => (
-                                  <label
-                                    key={option}
-                                    className="edit-pdf-form-field-radio-label"
-                                  >
-                                    <input
-                                      type="radio"
-                                      name={`form-field-radio-${field.id}`}
-                                      value={option}
-                                      checked={formFieldValues[field.name] === option}
-                                      disabled={isProcessing}
-                                      onChange={() =>
-                                        dispatchEditorState({
-                                          type: "update_form_field_value",
-                                          name: field.name,
-                                          value: option,
-                                        })
-                                      }
-                                    />
-                                    {option}
-                                  </label>
-                                ))}
-                              </div>
-                            )}
+                      <>
+                        <div className="edit-pdf-form-fields">
+                          <div className="edit-pdf-form-fields-head">
+                            <strong>Form Fields</strong>
+                            <span className="edit-pdf-form-fields-badge">
+                              {formFields.length} fields detected
+                            </span>
                           </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {formFields.length > 0 && (
-                      <div className="edit-pdf-form-divider">
-                        <span>Overlay Items</span>
-                      </div>
+                          <div className="edit-pdf-form-fields-list">
+                            {formFields.map((field) => (
+                              <div key={field.id} className="edit-pdf-form-field-row">
+                                <label className="edit-pdf-form-field-label">
+                                  {field.name}
+                                </label>
+                                {field.type === "text" && (
+                                  <input
+                                    type="text"
+                                    className="edit-pdf-form-field-input"
+                                    value={formFieldValues[field.name] || ""}
+                                    disabled={isProcessing}
+                                    onChange={(event) =>
+                                      dispatchEditorState({
+                                        type: "update_form_field_value",
+                                        fieldName: field.name,
+                                        value: event.target.value,
+                                      })
+                                    }
+                                  />
+                                )}
+                                {field.type === "checkbox" && (
+                                  <input
+                                    type="checkbox"
+                                    className="edit-pdf-form-field-checkbox"
+                                    checked={!!formFieldValues[field.name]}
+                                    disabled={isProcessing}
+                                    onChange={(event) =>
+                                      dispatchEditorState({
+                                        type: "update_form_field_value",
+                                        fieldName: field.name,
+                                        value: event.target.checked,
+                                      })
+                                    }
+                                  />
+                                )}
+                                {field.type === "dropdown" && (
+                                  <select
+                                    className="edit-pdf-form-field-input"
+                                    value={formFieldValues[field.name] || ""}
+                                    disabled={isProcessing}
+                                    onChange={(event) =>
+                                      dispatchEditorState({
+                                        type: "update_form_field_value",
+                                        fieldName: field.name,
+                                        value: event.target.value,
+                                      })
+                                    }
+                                  >
+                                    <option value="">— Select —</option>
+                                    {(field.options ?? []).map((opt) => (
+                                      <option key={opt} value={opt}>
+                                        {opt}
+                                      </option>
+                                    ))}
+                                  </select>
+                                )}
+                                {field.type === "radio" && (
+                                  <div className="edit-pdf-form-field-radio-group">
+                                    {(field.options ?? []).map((opt) => (
+                                      <label
+                                        key={opt}
+                                        className="edit-pdf-form-field-radio-label"
+                                      >
+                                        <input
+                                          type="radio"
+                                          name={field.name}
+                                          value={opt}
+                                          checked={formFieldValues[field.name] === opt}
+                                          disabled={isProcessing}
+                                          onChange={() =>
+                                            dispatchEditorState({
+                                              type: "update_form_field_value",
+                                              fieldName: field.name,
+                                              value: opt,
+                                            })
+                                          }
+                                        />
+                                        <span>{opt}</span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="edit-pdf-form-divider">
+                          <span>Overlay Items</span>
+                        </div>
+                      </>
                     )}
 
                     <div className="edit-pdf-fill-sign-metrics">
