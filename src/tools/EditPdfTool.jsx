@@ -1062,53 +1062,58 @@ export default function EditPdfTool() {
         markedForDeletion: false,
       }));
 
-      let detectedFormFields = [];
-      let initialFormFieldValues = {};
+      // Form field detection uses a fresh arrayBuffer() call because buildPdfPagePreviews
+      // passes bytes to pdfjs-dist's Web Worker which transfers (detaches) the original buffer.
+      let detectedFields = [];
+      let detectedValues = {};
       try {
-        const pdfDoc = await PDFDocument.load(bytes);
+        const formBytes = await file.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(formBytes);
         const form = pdfDoc.getForm();
         const fields = form.getFields();
-        const mapped = fields.map((field) => {
-          try {
-            let type = "text";
-            let value = "";
-            let options = null;
-            const name = field.getName();
-            if (field instanceof PDFTextField) {
-              type = "text";
-              value = field.getText() ?? "";
-            } else if (field instanceof PDFCheckBox) {
-              type = "checkbox";
-              value = field.isChecked();
-            } else if (field instanceof PDFDropdown) {
-              type = "dropdown";
-              const selected = field.getSelected();
-              value = selected.length > 0 ? selected[0] : "";
-              options = field.getOptions();
-            } else if (field instanceof PDFRadioGroup) {
-              type = "radio";
-              value = field.getSelected() ?? "";
-              options = field.getOptions();
-            } else {
-              return null;
-            }
-            initialFormFieldValues[name] = value;
-            return {
+
+        console.log("Form detection: found", fields.length, "fields");
+        fields.forEach((f) => console.log("  Field:", f.getName(), f.constructor.name));
+
+        for (const field of fields) {
+          const name = field.getName();
+          let type = null;
+          let value = "";
+          let options = null;
+
+          if (field instanceof PDFTextField) {
+            type = "text";
+            value = field.getText() || "";
+          } else if (field instanceof PDFCheckBox) {
+            type = "checkbox";
+            value = field.isChecked();
+          } else if (field instanceof PDFDropdown) {
+            type = "dropdown";
+            value = field.getSelected()?.[0] || "";
+            options = field.getOptions();
+          } else if (field instanceof PDFRadioGroup) {
+            type = "radio";
+            value = field.getSelected() || "";
+            options = field.getOptions();
+          }
+
+          if (type) {
+            detectedFields.push({
               id: createEditorLocalId("form-field"),
               name,
               type,
-              value,
               options,
-            };
-          } catch {
-            return null;
+            });
+            detectedValues[name] = value;
           }
-        });
-        detectedFormFields = mapped.filter(Boolean);
-      } catch {
-        detectedFormFields = [];
-        initialFormFieldValues = {};
+        }
+      } catch (err) {
+        console.warn("Form detection failed:", err);
+        detectedFields = [];
+        detectedValues = {};
       }
+
+      console.log("Dispatching form fields:", detectedFields.length, detectedFields);
 
       dispatchEditorState({
         type: "initialize_document",
@@ -1118,8 +1123,8 @@ export default function EditPdfTool() {
       });
       dispatchEditorState({
         type: "initialize_form_fields",
-        fields: detectedFormFields,
-        values: initialFormFieldValues,
+        fields: detectedFields,
+        values: detectedValues,
       });
       setMessage({
         type: "success",
