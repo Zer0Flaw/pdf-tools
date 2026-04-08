@@ -1112,6 +1112,8 @@ export default function EditPdfTool() {
           let rect = null;
           let pageWidth = null;
           let pageHeight = null;
+          let originX = 0;
+          let originY = 0;
           try {
             const widgets = field.acroField.getWidgets();
             const widget = widgets[0];
@@ -1122,9 +1124,14 @@ export default function EditPdfTool() {
               }
               if (pageNumber) {
                 rect = widget.getRectangle();
-                const size = pdfDoc.getPage(pageNumber - 1).getSize();
-                pageWidth = size.width;
-                pageHeight = size.height;
+                // Use MediaBox for coordinate space — getRectangle() coords are
+                // relative to the MediaBox origin, and MediaBox width/height match
+                // the unrotated coordinate space the rect lives in.
+                const mediaBox = pdfDoc.getPage(pageNumber - 1).getMediaBox();
+                pageWidth = mediaBox.width;
+                pageHeight = mediaBox.height;
+                originX = mediaBox.x;
+                originY = mediaBox.y;
               }
             }
           } catch {
@@ -1142,6 +1149,8 @@ export default function EditPdfTool() {
             rect,
             pageWidth,
             pageHeight,
+            originX,
+            originY,
           });
           detectedValues[name] = value;
         }
@@ -2994,8 +3003,8 @@ export default function EditPdfTool() {
                             {activePageFormFields.length > 0 && (
                               <div className="edit-pdf-form-layer">
                                 {activePageFormFields.map((field) => {
-                                  const xPercent = (field.rect.x / field.pageWidth) * 100;
-                                  const yPercent = ((field.pageHeight - field.rect.y - field.rect.height) / field.pageHeight) * 100;
+                                  const xPercent = ((field.rect.x - field.originX) / field.pageWidth) * 100;
+                                  const yPercent = ((field.pageHeight - (field.rect.y - field.originY) - field.rect.height) / field.pageHeight) * 100;
                                   const widthPercent = (field.rect.width / field.pageWidth) * 100;
                                   const heightPercent = (field.rect.height / field.pageHeight) * 100;
                                   return (
