@@ -1763,232 +1763,68 @@ h1 {
   border: 1px solid #e5e7eb;
   border-radius: 18px;
   background: linear-gradient(180deg, #fbfbfc 0%, #f7f9fc 100%);
-  padding: 16px 18px;
-  display: grid;
-  grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
-  gap: 16px 18px;
-  align-items: stretch;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.72),
     0 10px 24px rgba(15, 23, 42, 0.04);
 }
 
 .edit-pdf-flow.loaded .edit-pdf-toolbar {
-  padding: 14px 16px;
+  padding: 12px 16px;
   border-color: #dbe3ef;
   background: rgba(255, 255, 255, 0.86);
 }
 
 .edit-pdf-toolbar-overview {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-  padding-right: 18px;
-  border-right: 1px solid rgba(203, 213, 225, 0.78);
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-pdf-toolbar-status-inline {
+  color: #4b5563;
+  font-size: 0.88rem;
+  line-height: 1;
+}
+
+.edit-pdf-toolbar-status-inline strong {
+  color: #111827;
+  font-weight: 700;
 }
 
 .edit-pdf-toolbar-command-bar {
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap: 12px;
-}
-
-.edit-pdf-batch-panel {
-  flex: 1 1 420px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid rgba(191, 219, 254, 0.86);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(248, 251, 255, 0.92) 0%, rgba(243, 248, 255, 0.96) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 10px 22px rgba(59, 130, 246, 0.05);
-}
-
-.edit-pdf-batch-panel-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.edit-pdf-batch-panel-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.edit-pdf-batch-panel-sub {
-  color: #475569;
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.edit-pdf-batch-panel-metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.edit-pdf-batch-panel-metric {
-  display: inline-flex;
   align-items: center;
-  min-height: 32px;
-  padding: 7px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(191, 219, 254, 0.92);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(239, 246, 255, 0.98) 100%);
-  color: #1e3a8a;
-  font-size: 0.79rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.edit-pdf-batch-panel-status {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(203, 213, 225, 0.92);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.98) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.86),
-    0 10px 22px rgba(15, 23, 42, 0.04);
-}
-
-.edit-pdf-batch-panel-status strong {
-  color: #111827;
-  font-size: 0.9rem;
-}
-
-.edit-pdf-batch-panel-status span {
-  color: #475569;
-  font-size: 0.82rem;
-  line-height: 1.4;
-}
-
-.edit-pdf-batch-panel-status.ready {
-  border-color: rgba(191, 219, 254, 0.95);
-  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98) 0%, rgba(239, 246, 255, 0.98) 100%);
-}
-
-.edit-pdf-batch-panel-status.warning {
-  border-color: rgba(253, 224, 71, 0.9);
-  background: linear-gradient(180deg, rgba(255, 251, 235, 0.98) 0%, rgba(254, 243, 199, 0.96) 100%);
-}
-
-.edit-pdf-batch-panel-status.mixed {
-  border-color: rgba(196, 181, 253, 0.88);
-  background: linear-gradient(180deg, rgba(250, 245, 255, 0.98) 0%, rgba(237, 233, 254, 0.98) 100%);
-}
-
-.edit-pdf-batch-panel-status.empty {
-  border-style: dashed;
-}
-
-.edit-pdf-toolbar-groups {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: 10px;
-}
-
-.edit-pdf-toolbar-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
   gap: 8px;
-  min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid rgba(219, 228, 239, 0.95);
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.95) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
-.edit-pdf-toolbar-group-head {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.edit-pdf-flow.loaded .edit-pdf-toolbar-group {
-  border-color: rgba(203, 213, 225, 0.9);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(246, 249, 253, 0.96) 100%);
+.edit-pdf-toolbar-divider {
+  display: inline-block;
+  width: 1px;
+  height: 20px;
+  background: #e2e8f0;
+  border-radius: 1px;
+  flex-shrink: 0;
 }
 
 .edit-pdf-toolbar-group-export {
-  flex: 0 0 auto;
-  min-width: 182px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
   margin-left: auto;
 }
 
-.edit-pdf-toolbar-export-note {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 10px;
-  padding: 10px 12px;
-  border: 1px solid rgba(203, 213, 225, 0.92);
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.98) 100%);
-}
-
-.edit-pdf-toolbar-export-note strong {
-  color: #0f172a;
-  font-size: 0.86rem;
-}
-
-.edit-pdf-toolbar-export-note span {
+.edit-pdf-toolbar-export-status-inline {
   color: #475569;
-  font-size: 0.79rem;
-  line-height: 1.35;
-}
-
-.edit-pdf-toolbar-export-note.ready {
-  border-color: rgba(191, 219, 254, 0.95);
-  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98) 0%, rgba(239, 246, 255, 0.98) 100%);
-}
-
-.edit-pdf-toolbar-export-note.mixed {
-  border-color: rgba(196, 181, 253, 0.92);
-  background: linear-gradient(180deg, rgba(250, 245, 255, 0.98) 0%, rgba(237, 233, 254, 0.98) 100%);
-}
-
-.edit-pdf-toolbar-export-note.warning {
-  border-color: rgba(253, 186, 116, 0.92);
-  background: linear-gradient(180deg, rgba(255, 251, 235, 0.98) 0%, rgba(255, 237, 213, 0.98) 100%);
-}
-
-.edit-pdf-toolbar-label {
-  flex: 0 0 auto;
-  color: #64748b;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.82rem;
+  font-weight: 600;
   white-space: nowrap;
-}
-
-.edit-pdf-toolbar-group-context {
-  color: #475569;
-  font-size: 0.79rem;
-  font-weight: 700;
-  line-height: 1.2;
 }
 
 .edit-pdf-toolbar-section {
@@ -1998,55 +1834,14 @@ h1 {
   gap: 8px;
 }
 
-.edit-pdf-toolbar-status {
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 0;
-  gap: 4px;
-}
-
-.edit-pdf-toolbar-status strong {
-  color: #111827;
-}
-
-.edit-pdf-toolbar-status span {
-  color: #4b5563;
-  font-size: 0.92rem;
-}
-
-.edit-pdf-toolbar-metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.edit-pdf-toolbar-metric {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(203, 213, 225, 0.88);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.98) 100%);
-  color: #475569;
-  font-size: 0.79rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.edit-pdf-toolbar-metric strong {
-  color: #0f172a;
-  font-size: 0.88rem;
-}
-
 .edit-pdf-toolbar-section-right {
   justify-content: flex-end;
 }
 
 .edit-pdf-export-btn {
   margin: 0;
-  width: 100%;
-  min-width: 140px;
+  width: auto;
+  min-width: 160px;
 }
 
 .edit-pdf-workspace {
@@ -3822,10 +3617,6 @@ h1 {
 
   .edit-pdf-toolbar-overview,
   .edit-pdf-toolbar-command-bar,
-  .edit-pdf-batch-panel,
-  .edit-pdf-batch-panel-head,
-  .edit-pdf-toolbar-groups,
-  .edit-pdf-toolbar-group,
   .edit-pdf-toolbar-section,
   .edit-pdf-sidebar-head-copy,
   .edit-pdf-sidebar-command-bar,
@@ -3837,12 +3628,6 @@ h1 {
   }
 
   .edit-pdf-toolbar,
-  .edit-pdf-toolbar-overview,
-  .edit-pdf-toolbar-command-bar,
-  .edit-pdf-batch-panel,
-  .edit-pdf-batch-panel-head,
-  .edit-pdf-toolbar-groups,
-  .edit-pdf-toolbar-group,
   .edit-pdf-toolbar-section,
   .edit-pdf-sidebar-head-copy,
   .edit-pdf-sidebar-command-bar,
@@ -3856,24 +3641,13 @@ h1 {
     flex-direction: column;
   }
 
-  .edit-pdf-toolbar {
-    grid-template-columns: 1fr;
-  }
-
-  .edit-pdf-toolbar-overview {
-    padding-right: 0;
-    padding-bottom: 12px;
-    border-right: 0;
-    border-bottom: 1px solid rgba(203, 213, 225, 0.82);
-  }
-
   .edit-pdf-doc-summary {
     align-items: flex-start;
   }
 
   .edit-pdf-toolbar-group-export {
     margin-left: 0;
-    min-width: 0;
+    flex-wrap: wrap;
   }
 
   .edit-pdf-toolbar-section-right {
