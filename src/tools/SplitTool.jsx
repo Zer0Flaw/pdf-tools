@@ -17,6 +17,7 @@ export default function SplitTool() {
   const [file, setFile] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false);
   const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
   const isPremium = false;
@@ -27,8 +28,7 @@ export default function SplitTool() {
     return () => clearTimeout(timer);
   }, [message]);
 
-  function handleFileSelect(e) {
-    const selected = e.target.files[0];
+  function handleSelectedFile(selected) {
     if (!selected) return;
     setShowExportAd(false);
 
@@ -61,6 +61,35 @@ export default function SplitTool() {
       file_count: 1,
       input_type: "pdf",
     });
+  }
+
+  function handleFileSelect(e) {
+    handleSelectedFile(e.target.files[0]);
+    e.target.value = "";
+  }
+
+  function handleDragOver(e) {
+    if (isProcessing) return;
+    e.preventDefault();
+    setIsDragOver(true);
+  }
+
+  function handleDragLeave(e) {
+    e.preventDefault();
+    setIsDragOver(false);
+  }
+
+  function handleDrop(e) {
+    if (isProcessing) return;
+    e.preventDefault();
+    setIsDragOver(false);
+    handleSelectedFile(e.dataTransfer.files?.[0]);
+  }
+
+  function clearSelectedFile() {
+    setFile(null);
+    setShowExportAd(false);
+    setMessage(null);
   }
 
   function getSplitFileName(selectedFile, pageNumber) {
@@ -156,14 +185,21 @@ export default function SplitTool() {
       />
 
       <div
-        className="drop-zone"
+        className={`drop-zone ${isDragOver ? "drag-over" : ""} ${isProcessing ? "disabled" : ""}`}
         role="button"
-        tabIndex={0}
+        tabIndex={isProcessing ? -1 : 0}
         aria-label={`Upload a PDF for Split PDF. Free plan includes one PDF up to ${FILE_SIZE_LIMIT_LABEL}.`}
-        onClick={() => fileInputRef.current?.click()}
-        onKeyDown={(event) =>
-          activateOnEnterOrSpace(event, () => fileInputRef.current?.click())
-        }
+        aria-disabled={isProcessing}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => {
+          if (!isProcessing) fileInputRef.current?.click();
+        }}
+        onKeyDown={(event) => {
+          if (isProcessing) return;
+          activateOnEnterOrSpace(event, () => fileInputRef.current?.click());
+        }}
       >
         <input
           ref={fileInputRef}
@@ -178,6 +214,19 @@ export default function SplitTool() {
           Free plan includes one PDF up to {FILE_SIZE_LIMIT_LABEL}
         </div>
       </div>
+
+      {file && (
+        <div className="file-selection-card">
+          <div className="file-meta">
+            <p className="file-name">{file.name}</p>
+            <p className="file-size">{formatBytes(file.size)}</p>
+          </div>
+
+          <button type="button" className="remove-btn" onClick={clearSelectedFile}>
+            Remove
+          </button>
+        </div>
+      )}
 
       {file && (
         <div className="usage-indicator">

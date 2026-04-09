@@ -49,7 +49,7 @@ function SortableCompressItem({
       <div className="file-item-main" {...attributes} {...listeners}>
         <div className="file-meta">
           <p className="file-name">{file.name}</p>
-          <p className="file-size">{(file.size / 1024).toFixed(1)} KB</p>
+          <p className="file-size">{formatBytes(file.size)}</p>
         </div>
       </div>
 
