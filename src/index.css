@@ -1829,6 +1829,7 @@ h1 {
   white-space: nowrap;
 }
 
+/* Removed in toolbar consolidation — .edit-pdf-toolbar-section no longer used in JSX
 .edit-pdf-toolbar-section {
   display: flex;
   flex-wrap: wrap;
@@ -1839,13 +1840,14 @@ h1 {
 .edit-pdf-toolbar-section-right {
   justify-content: flex-end;
 }
+*/
 
 .edit-pdf-tab-bar {
   display: flex;
   flex-direction: row;
   gap: 4px;
   border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
   margin-bottom: 4px;
 }
 
@@ -1919,6 +1921,7 @@ h1 {
 }
 
 .edit-pdf-flow.loaded .edit-pdf-sidebar {
+  max-height: 720px;
   background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.88),
@@ -2880,7 +2883,6 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 12px;
   padding: 10px 12px;
   border: 1px solid rgba(203, 213, 225, 0.9);
   border-radius: 14px;
@@ -2953,6 +2955,8 @@ h1 {
   gap: 14px;
 }
 
+/* Removed in tab system migration — .edit-pdf-fill-sign-head and .edit-pdf-fill-sign-copy
+   no longer used in JSX (header is now .edit-pdf-fill-sign-block-head inside each block)
 .edit-pdf-fill-sign-head {
   display: flex;
   flex-wrap: wrap;
@@ -2978,6 +2982,7 @@ h1 {
   font-size: 0.82rem;
   line-height: 1.4;
 }
+*/
 
 .edit-pdf-fill-sign-metrics {
   display: flex;
@@ -2999,6 +3004,8 @@ h1 {
   font-weight: 700;
 }
 
+/* Removed in tab system migration — .edit-pdf-fill-sign-status no longer used in JSX
+   (status messaging now uses .edit-pdf-fill-sign-block-head and .edit-pdf-fill-sign-empty)
 .edit-pdf-fill-sign-status {
   display: flex;
   flex-direction: column;
@@ -3028,6 +3035,7 @@ h1 {
 .edit-pdf-fill-sign-status.empty {
   border-style: dashed;
 }
+*/
 
 .edit-pdf-fill-sign-grid {
   display: grid;
@@ -3793,7 +3801,6 @@ h1 {
 
   .edit-pdf-toolbar-overview,
   .edit-pdf-toolbar-command-bar,
-  .edit-pdf-toolbar-section,
   .edit-pdf-sidebar-head-copy,
   .edit-pdf-sidebar-command-bar,
   .edit-pdf-viewer-action-group,
@@ -3803,7 +3810,6 @@ h1 {
   }
 
   .edit-pdf-toolbar,
-  .edit-pdf-toolbar-section,
   .edit-pdf-sidebar-head-copy,
   .edit-pdf-sidebar-command-bar,
   .edit-pdf-viewer-action-group,
@@ -3821,10 +3827,6 @@ h1 {
   .edit-pdf-toolbar-group-export {
     justify-content: flex-start;
     flex-wrap: wrap;
-  }
-
-  .edit-pdf-toolbar-section-right {
-    justify-content: flex-start;
   }
 
   .edit-pdf-viewer-stage {
