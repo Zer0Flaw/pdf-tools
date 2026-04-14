@@ -98,33 +98,16 @@ export default function UpgradeBanner({
             </div>
 
             <p className="upgrade-modal-sub">
-              ProjectStack Pro is designed to make repeat file work feel
-              faster, cleaner, and less constrained as your workflow grows.
+              Remove watermarks, increase file limits, and unlock premium features for $9.99/month.
             </p>
 
             <div className="upgrade-modal-section">
               <strong>Why upgrade</strong>
               <ul>
-                {features.length > 0 ? (
-                  features.map((feature, index) => (
-                    <li key={`${feature}-modal-${index}`}>{feature}</li>
-                  ))
-                ) : (
-                  <>
-                    <li>Higher file limits</li>
-                    <li>Watermark-free exports</li>
-                    <li>Access to future premium tools</li>
-                  </>
-                )}
-              </ul>
-            </div>
-
-            <div className="upgrade-modal-section">
-              <strong>What’s coming later</strong>
-              <ul>
-                <li>Less friction when you handle larger files and repeat tasks</li>
-                <li>More polished export workflows across the full toolset</li>
-                <li>Expanded utility features beyond today&apos;s core PDF tools</li>
+                <li>No watermarks on any exports</li>
+                <li>Upload files up to 50MB (10x the free limit)</li>
+                <li>Unlimited daily exports across all tools</li>
+                <li>Priority access to new features</li>
               </ul>
             </div>
 
@@ -132,6 +115,16 @@ export default function UpgradeBanner({
               <button
                 type="button"
                 className="upgrade-button"
+                onClick={() => {
+                  trackEvent("upgrade_cta_clicked", { source: "upgrade_modal" });
+                  window.open("https://buy.stripe.com/9B6dRb1mdg8me8s4j6ejK00", "_blank", "noopener");
+                }}
+              >
+                Upgrade to Pro — $9.99/mo
+              </button>
+              <button
+                type="button"
+                className="upgrade-button-dismiss"
                 onClick={() => setIsOpen(false)}
               >
                 Continue with free plan
