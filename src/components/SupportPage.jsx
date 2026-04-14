@@ -1,4 +1,5 @@
 import AdSlot from "./AdSlot";
+import UserAuthButton from "./UserAuthButton";
 
 export const SUPPORT_PAGES = {
   about: {
@@ -291,6 +292,8 @@ export default function SupportPage({
           />
           <div className="brand-title">ProjectStack</div>
         </div>
+
+        <UserAuthButton />
       </div>
 
       <div className="route-intro support-intro">

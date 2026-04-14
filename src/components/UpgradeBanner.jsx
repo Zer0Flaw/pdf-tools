@@ -1,7 +1,53 @@
 import { useEffect, useRef, useState } from "react";
+import { useUser, SignInButton } from "@clerk/clerk-react";
 import { trackUpgradeIntent } from "../utils/upgradeReasons";
 import AdSlot from "./AdSlot";
 import { trackEvent } from "../utils/analytics";
+
+const CLERK_AVAILABLE = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)
+
+// Rendered only when ClerkProvider is present — safe to call useUser() here
+function UpgradePrimaryButton() {
+  const { isSignedIn } = useUser()
+
+  if (!isSignedIn) {
+    return (
+      <SignInButton mode="modal">
+        <button type="button" className="upgrade-button">
+          Sign in to upgrade
+        </button>
+      </SignInButton>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      className="upgrade-button"
+      onClick={() => {
+        trackEvent("upgrade_cta_clicked", { source: "upgrade_modal" })
+        window.open("https://buy.stripe.com/9B6dRb1mdg8me8s4j6ejK00", "_blank", "noopener")
+      }}
+    >
+      Upgrade to Pro — $9.99/mo
+    </button>
+  )
+}
+
+function DefaultUpgradeButton() {
+  return (
+    <button
+      type="button"
+      className="upgrade-button"
+      onClick={() => {
+        trackEvent("upgrade_cta_clicked", { source: "upgrade_modal" })
+        window.open("https://buy.stripe.com/9B6dRb1mdg8me8s4j6ejK00", "_blank", "noopener")
+      }}
+    >
+      Upgrade to Pro — $9.99/mo
+    </button>
+  )
+}
 
 export default function UpgradeBanner({
   title = "Unlock Pro",
@@ -112,16 +158,7 @@ export default function UpgradeBanner({
             </div>
 
             <div className="upgrade-modal-actions">
-              <button
-                type="button"
-                className="upgrade-button"
-                onClick={() => {
-                  trackEvent("upgrade_cta_clicked", { source: "upgrade_modal" });
-                  window.open("https://buy.stripe.com/9B6dRb1mdg8me8s4j6ejK00", "_blank", "noopener");
-                }}
-              >
-                Upgrade to Pro — $9.99/mo
-              </button>
+              {CLERK_AVAILABLE ? <UpgradePrimaryButton /> : <DefaultUpgradeButton />}
               <button
                 type="button"
                 className="upgrade-button-dismiss"

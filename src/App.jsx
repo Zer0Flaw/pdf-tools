@@ -17,6 +17,7 @@ import ToolSeoContent from "./components/ToolSeoContent";
 import SiteFooter from "./components/SiteFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { trackEvent } from "./utils/analytics";
+import UserAuthButton from "./components/UserAuthButton";
 
 const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
@@ -346,7 +347,19 @@ export default function App() {
         <ScrollToTop pathname={currentPath} />
         <div className="app-shell">
           <div className="app-card app-card-home">
-            <LandingPage
+            <div className="app-top-bar">
+              <div className="brand-lockup">
+                <img
+                  className="brand-mark"
+                  src="/branding/projectstack-mark.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <div className="brand-title">ProjectStack</div>
+              </div>
+              <UserAuthButton />
+            </div>
+          <LandingPage
               onStart={() => openWorkspace("merge")}
               onOpenTool={openWorkspace}
             />
@@ -402,6 +415,8 @@ export default function App() {
               />
               <div className="brand-title">ProjectStack</div>
             </div>
+
+            <UserAuthButton />
           </div>
 
           <div className="route-intro">

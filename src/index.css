@@ -1034,6 +1034,40 @@ h1 {
   color: #374151;
 }
 
+/* ── Auth UI ────────────────────────────────────────── */
+
+.app-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+  background: rgba(255, 255, 255, 0.95);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.user-auth-button {
+  display: flex;
+  align-items: center;
+}
+
+.auth-sign-in-btn {
+  padding: 8px 18px;
+  border: 1px solid var(--brand-accent);
+  border-radius: var(--button-radius);
+  background: transparent;
+  color: var(--brand-accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-sign-in-btn:hover {
+  background: var(--brand-accent-soft);
+}
+
 .landing-page {
   display: flex;
   flex-direction: column;
