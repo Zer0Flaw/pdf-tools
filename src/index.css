@@ -1082,6 +1082,22 @@ h1 {
   text-transform: uppercase;
 }
 
+.manage-subscription-btn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.manage-subscription-btn:hover {
+  color: #374151;
+}
+
 .auth-sign-in-btn {
   padding: 8px 18px;
   border: 1px solid var(--brand-accent);
