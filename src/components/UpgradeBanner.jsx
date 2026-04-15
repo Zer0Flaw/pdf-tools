@@ -3,6 +3,7 @@ import { useUser, SignInButton } from "@clerk/clerk-react";
 import { trackUpgradeIntent } from "../utils/upgradeReasons";
 import AdSlot from "./AdSlot";
 import { trackEvent } from "../utils/analytics";
+import { useSubscription } from "../utils/subscription";
 
 const CLERK_AVAILABLE = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)
 
@@ -60,6 +61,7 @@ export default function UpgradeBanner({
   secondaryDisabled = false,
   secondaryHint = "",
 }) {
+  const { isPremium } = useSubscription();
   const [isOpen, setIsOpen] = useState(false);
   const hasTrackedViewRef = useRef(false);
 
@@ -71,6 +73,8 @@ export default function UpgradeBanner({
       gated_feature: upgradeReason || undefined,
     });
   }, [upgradeReason]);
+
+  if (isPremium) return null;
 
   function handleUpgradeClick() {
     trackUpgradeIntent(upgradeReason);

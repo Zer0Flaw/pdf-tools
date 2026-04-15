@@ -9,6 +9,7 @@ import { activateOnEnterOrSpace } from "../utils/accessibility";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
 import { rotatePdfPages } from "../utils/pdfPageOperations";
 import { validatePdfFile } from "../utils/pdfValidation";
+import { useSubscription } from "../utils/subscription";
 
 const ROTATE_FEATURE = getFeatureGate("rotate");
 const MAX_FILE_SIZE = ROTATE_FEATURE.maxFileSize;
@@ -30,7 +31,7 @@ export default function RotatePdfTool() {
   const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     previewUrlsRef.current = pages;

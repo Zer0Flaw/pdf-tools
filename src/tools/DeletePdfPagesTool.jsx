@@ -9,6 +9,7 @@ import { activateOnEnterOrSpace } from "../utils/accessibility";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
 import { deletePdfPages } from "../utils/pdfPageOperations";
 import { validatePdfFile } from "../utils/pdfValidation";
+import { useSubscription } from "../utils/subscription";
 
 const DELETE_FEATURE = getFeatureGate("delete");
 const MAX_FILE_SIZE = DELETE_FEATURE.maxFileSize;
@@ -25,7 +26,7 @@ export default function DeletePdfPagesTool() {
   const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     previewUrlsRef.current = pages;

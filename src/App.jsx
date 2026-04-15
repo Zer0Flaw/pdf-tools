@@ -18,6 +18,30 @@ import SiteFooter from "./components/SiteFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { trackEvent } from "./utils/analytics";
 import UserAuthButton from "./components/UserAuthButton";
+import { useUser } from "@clerk/clerk-react";
+import { SubscriptionProvider } from "./utils/subscription";
+
+const CLERK_AVAILABLE = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+
+// Rendered only when ClerkProvider is present — safe to call useUser() here
+function AppWithSubscription({ children }) {
+  const { user, isSignedIn } = useUser();
+  const userEmail = isSignedIn ? user?.primaryEmailAddress?.emailAddress : null;
+
+  return (
+    <SubscriptionProvider email={userEmail}>
+      {children}
+    </SubscriptionProvider>
+  );
+}
+
+function AppSubscriptionWrapper({ children }) {
+  if (!CLERK_AVAILABLE) {
+    return <SubscriptionProvider email={null}>{children}</SubscriptionProvider>;
+  }
+
+  return <AppWithSubscription>{children}</AppWithSubscription>;
+}
 
 const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
@@ -343,7 +367,7 @@ export default function App() {
 
   if (activeView === "home") {
     return (
-      <>
+      <AppSubscriptionWrapper>
         <ScrollToTop pathname={currentPath} />
         <div className="app-shell">
           <div className="app-card app-card-home">
@@ -366,13 +390,13 @@ export default function App() {
             <SiteFooter onOpenSupportPage={openSupportPage} />
           </div>
         </div>
-      </>
+      </AppSubscriptionWrapper>
     );
   }
 
   if (activeView === "support") {
     return (
-      <>
+      <AppSubscriptionWrapper>
         <ScrollToTop pathname={currentPath} />
         <div className="app-shell">
           <div className="app-card app-card-home">
@@ -385,7 +409,7 @@ export default function App() {
             <SiteFooter onOpenSupportPage={openSupportPage} />
           </div>
         </div>
-      </>
+      </AppSubscriptionWrapper>
     );
   }
 
@@ -393,7 +417,7 @@ export default function App() {
   const workspaceCardClassName = "app-card app-card-editor";
 
   return (
-    <>
+    <AppSubscriptionWrapper>
       <ScrollToTop pathname={currentPath} />
       <div className="app-shell">
         <div className={workspaceCardClassName}>
@@ -454,6 +478,6 @@ export default function App() {
           <SiteFooter onOpenSupportPage={openSupportPage} />
         </div>
       </div>
-    </>
+    </AppSubscriptionWrapper>
   );
 }

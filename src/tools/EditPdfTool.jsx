@@ -18,6 +18,7 @@ import { activateOnEnterOrSpace } from "../utils/accessibility";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
 import { editPdfPages, extractEditedPdfPages } from "../utils/pdfPageOperations";
 import { validatePdfFile } from "../utils/pdfValidation";
+import { useSubscription } from "../utils/subscription";
 
 const EDIT_FEATURE = getFeatureGate("edit");
 const MAX_FILE_SIZE = EDIT_FEATURE.maxFileSize;
@@ -698,7 +699,7 @@ export default function EditPdfTool() {
   const previewUrlsRef = useRef([]);
   const pageNumberIndexRef = useRef(new Map());
   const selectionAnchorPageRef = useRef(null);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
   const {
     pages,
     selectedPages,

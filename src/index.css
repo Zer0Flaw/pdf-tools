@@ -1053,6 +1053,25 @@ h1 {
   align-items: center;
 }
 
+.user-auth-signed-in {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pro-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--brand-accent);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .auth-sign-in-btn {
   padding: 8px 18px;
   border: 1px solid var(--brand-accent);

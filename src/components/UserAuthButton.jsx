@@ -1,9 +1,10 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
+import { useSubscription } from '../utils/subscription'
 
 const CLERK_AVAILABLE = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)
 
-export default function UserAuthButton() {
-  if (!CLERK_AVAILABLE) return null
+function UserAuthButtonInner() {
+  const { isPremium } = useSubscription()
 
   return (
     <div className="user-auth-button">
@@ -15,14 +16,23 @@ export default function UserAuthButton() {
         </SignInButton>
       </SignedOut>
       <SignedIn>
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox: { width: '32px', height: '32px' },
-            },
-          }}
-        />
+        <div className="user-auth-signed-in">
+          {isPremium && <span className="pro-badge">Pro</span>}
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: { width: '32px', height: '32px' },
+              },
+            }}
+          />
+        </div>
       </SignedIn>
     </div>
   )
+}
+
+export default function UserAuthButton() {
+  if (!CLERK_AVAILABLE) return null
+
+  return <UserAuthButtonInner />
 }

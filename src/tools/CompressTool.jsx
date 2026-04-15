@@ -14,6 +14,7 @@ import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import { activateOnEnterOrSpace } from "../utils/accessibility";
+import { useSubscription } from "../utils/subscription";
 
 const COMPRESS_FEATURE = getFeatureGate("compress");
 const MAX_FREE_IMAGES = COMPRESS_FEATURE.maxFiles;
@@ -89,7 +90,7 @@ export default function CompressTool() {
   const [quality, setQuality] = useState(0.7);
   const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     if (!message) return;

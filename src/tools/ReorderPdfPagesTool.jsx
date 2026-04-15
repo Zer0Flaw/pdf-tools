@@ -17,6 +17,7 @@ import { activateOnEnterOrSpace } from "../utils/accessibility";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
 import { reorderPdfPages } from "../utils/pdfPageOperations";
 import { validatePdfFile } from "../utils/pdfValidation";
+import { useSubscription } from "../utils/subscription";
 
 const REORDER_FEATURE = getFeatureGate("reorder");
 const MAX_FILE_SIZE = REORDER_FEATURE.maxFileSize;
@@ -86,7 +87,7 @@ export default function ReorderPdfPagesTool() {
   const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     previewUrlsRef.current = pages;

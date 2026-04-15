@@ -19,6 +19,7 @@ import {
   canUseDailyWatermarkRemoval,
   consumeDailyWatermarkRemoval,
 } from "../utils/freeTier";
+import { useSubscription } from "../utils/subscription";
 
 const IMAGES_FEATURE = getFeatureGate("images");
 const MAX_FREE_IMAGES = IMAGES_FEATURE.maxFiles;
@@ -95,7 +96,7 @@ export default function ImagesToPdfTool() {
   const [canRemoveWatermarkToday, setCanRemoveWatermarkToday] = useState(true);
   const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     setCanRemoveWatermarkToday(canUseDailyWatermarkRemoval());

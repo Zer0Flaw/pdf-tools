@@ -8,6 +8,7 @@ import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import { activateOnEnterOrSpace } from "../utils/accessibility";
+import { useSubscription } from "../utils/subscription";
 
 GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -44,7 +45,7 @@ export default function PdfToImageTool() {
   const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
   const imageUrlsRef = useRef([]);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
   const hasImages = images.length > 0;
   const totalImageBytes = useMemo(
     () => images.reduce((sum, image) => sum + image.size, 0),

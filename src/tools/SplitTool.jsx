@@ -7,6 +7,7 @@ import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import AdSlot from "../components/AdSlot";
 import { trackEvent } from "../utils/analytics";
 import { activateOnEnterOrSpace } from "../utils/accessibility";
+import { useSubscription } from "../utils/subscription";
 
 const SPLIT_FEATURE = getFeatureGate("split");
 const MAX_FILE_SIZE = SPLIT_FEATURE.maxFileSize;
@@ -20,7 +21,7 @@ export default function SplitTool() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [showExportAd, setShowExportAd] = useState(false);
   const fileInputRef = useRef(null);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     if (!message) return;
