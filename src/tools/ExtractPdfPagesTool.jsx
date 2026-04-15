@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import AdSlot from "../components/AdSlot";
 import { getBaseFileName } from "../utils/fileNaming";
@@ -9,6 +10,13 @@ import { activateOnEnterOrSpace } from "../utils/accessibility";
 import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreviews";
 import { extractPdfPages } from "../utils/pdfPageOperations";
 import { validatePdfFile } from "../utils/pdfValidation";
+import { useSubscription } from "../utils/subscription";
+import {
+  getDailyExportCount,
+  hasReachedDailyExportLimit,
+  incrementDailyExportCount,
+  getRemainingDailyExports,
+} from "../utils/freeTier";
 
 const EXTRACT_FEATURE = getFeatureGate("extract");
 const MAX_FILE_SIZE = EXTRACT_FEATURE.maxFileSize;
@@ -23,9 +31,10 @@ export default function ExtractPdfPagesTool() {
   const [message, setMessage] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [showExportAd, setShowExportAd] = useState(false);
+  const [exportCount, setExportCount] = useState(() => getDailyExportCount());
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     previewUrlsRef.current = pages;
@@ -177,6 +186,14 @@ export default function ExtractPdfPagesTool() {
   async function exportExtractedPdf() {
     if (!file || !selectedPages.length || isProcessing) return;
 
+    if (!isPremium && hasReachedDailyExportLimit()) {
+      setMessage({
+        type: "error",
+        text: "You've reached your daily export limit (5/day). Upgrade to Pro for unlimited exports.",
+      });
+      return;
+    }
+
     trackEvent("process_started", {
       tool: "extract",
       file_count: 1,
@@ -189,7 +206,24 @@ export default function ExtractPdfPagesTool() {
 
     try {
       const bytes = await file.arrayBuffer();
-      const pdfBytes = await extractPdfPages(bytes, selectedPages);
+      let pdfBytes = await extractPdfPages(bytes, selectedPages);
+
+      if (!isPremium) {
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const firstPage = pdfDoc.getPage(0);
+        const { width } = firstPage.getSize();
+        firstPage.drawText("ProjectStack Free", {
+          x: width - 160,
+          y: 14,
+          size: 10,
+          font,
+          color: rgb(0.7, 0.7, 0.7),
+          opacity: 0.5,
+        });
+        pdfBytes = await pdfDoc.save();
+      }
+
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -198,6 +232,11 @@ export default function ExtractPdfPagesTool() {
       link.download = `${getBaseFileName(file.name)}-extracted.pdf`;
       link.click();
       URL.revokeObjectURL(url);
+
+      if (!isPremium) {
+        incrementDailyExportCount();
+        setExportCount(getDailyExportCount());
+      }
 
       setShowExportAd(true);
       trackEvent("process_completed", {
@@ -305,6 +344,12 @@ export default function ExtractPdfPagesTool() {
       <div className="usage-indicator trust-indicator">
         {EXTRACT_FEATURE.privacyMessage}
       </div>
+
+      {!isPremium && (
+        <div className={`usage-indicator export-limit-indicator${getRemainingDailyExports() <= 2 ? " export-limit-warning" : ""}`}>
+          {getRemainingDailyExports()} of 5 free exports remaining today
+        </div>
+      )}
 
       {isProcessing && (
         <div className="usage-indicator processing-indicator">

@@ -8,6 +8,13 @@ import { formatBytes } from "../utils/formatting";
 import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import { activateOnEnterOrSpace } from "../utils/accessibility";
+import { useSubscription } from "../utils/subscription";
+import {
+  getDailyExportCount,
+  hasReachedDailyExportLimit,
+  incrementDailyExportCount,
+  getRemainingDailyExports,
+} from "../utils/freeTier";
 
 GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -42,9 +49,10 @@ export default function PdfToImageTool() {
   const [message, setMessage] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [showExportAd, setShowExportAd] = useState(false);
+  const [exportCount, setExportCount] = useState(() => getDailyExportCount());
   const fileInputRef = useRef(null);
   const imageUrlsRef = useRef([]);
-  const isPremium = false;
+  const { isPremium } = useSubscription();
   const hasImages = images.length > 0;
   const totalImageBytes = useMemo(
     () => images.reduce((sum, image) => sum + image.size, 0),
@@ -170,6 +178,14 @@ export default function PdfToImageTool() {
   async function convertPdfToImages() {
     if (!file || isProcessing) return;
 
+    if (!isPremium && hasReachedDailyExportLimit()) {
+      setMessage({
+        type: "error",
+        text: "You've reached your daily export limit (5/day). Upgrade to Pro for unlimited exports.",
+      });
+      return;
+    }
+
     trackEvent("process_started", {
       tool: "pdfToImage",
       file_count: 1,
@@ -222,6 +238,12 @@ export default function PdfToImageTool() {
       }
 
       setImages(nextImages);
+
+      if (!isPremium) {
+        incrementDailyExportCount();
+        setExportCount(getDailyExportCount());
+      }
+
       setShowExportAd(true);
       const totalBytes = nextImages.reduce((sum, image) => sum + image.size, 0);
 
@@ -359,6 +381,12 @@ export default function PdfToImageTool() {
           <div className="usage-indicator trust-indicator">
             {PDF_TO_IMAGE_FEATURE.privacyMessage}
           </div>
+
+          {!isPremium && (
+            <div className={`usage-indicator export-limit-indicator${getRemainingDailyExports() <= 2 ? " export-limit-warning" : ""}`}>
+              {getRemainingDailyExports()} of 5 free exports remaining today
+            </div>
+          )}
 
           {isProcessing && (
             <div className="usage-indicator processing-indicator">

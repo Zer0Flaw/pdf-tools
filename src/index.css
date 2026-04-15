@@ -486,6 +486,16 @@ h1 {
   background: #f9fafb;
 }
 
+.export-limit-indicator {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.export-limit-warning {
+  color: #dc2626;
+  font-weight: 700;
+}
+
 .compress-slider-block {
   margin-top: -10px;
   margin-bottom: 20px;
@@ -1012,8 +1022,79 @@ h1 {
 
 .upgrade-modal-actions {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
   margin-top: 20px;
+}
+
+.upgrade-button-dismiss {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.upgrade-button-dismiss:hover {
+  color: #374151;
+}
+
+/* ── Auth UI ────────────────────────────────────────── */
+
+.app-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+  background: rgba(255, 255, 255, 0.95);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.user-auth-button {
+  display: flex;
+  align-items: center;
+}
+
+.user-auth-signed-in {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pro-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--brand-accent);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.auth-sign-in-btn {
+  padding: 8px 18px;
+  border: 1px solid var(--brand-accent);
+  border-radius: var(--button-radius);
+  background: transparent;
+  color: var(--brand-accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-sign-in-btn:hover {
+  background: var(--brand-accent-soft);
 }
 
 .landing-page {
