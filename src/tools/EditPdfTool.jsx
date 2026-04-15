@@ -7,7 +7,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { degrees, PDFDocument, PDFTextField, PDFCheckBox, PDFDropdown, PDFRadioGroup } from "pdf-lib";
+import { degrees, PDFDocument, PDFTextField, PDFCheckBox, PDFDropdown, PDFRadioGroup, StandardFonts, rgb } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import AdSlot from "../components/AdSlot";
 import { getBaseFileName } from "../utils/fileNaming";
@@ -19,6 +19,12 @@ import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreview
 import { editPdfPages, extractEditedPdfPages } from "../utils/pdfPageOperations";
 import { validatePdfFile } from "../utils/pdfValidation";
 import { useSubscription } from "../utils/subscription";
+import {
+  getDailyExportCount,
+  hasReachedDailyExportLimit,
+  incrementDailyExportCount,
+  getRemainingDailyExports,
+} from "../utils/freeTier";
 
 const EDIT_FEATURE = getFeatureGate("edit");
 const MAX_FILE_SIZE = EDIT_FEATURE.maxFileSize;
@@ -694,6 +700,7 @@ export default function EditPdfTool() {
   const [message, setMessage] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [showExportAd, setShowExportAd] = useState(false);
+  const [exportCount, setExportCount] = useState(() => getDailyExportCount());
   const [activeEditorTab, setActiveEditorTab] = useState("pages");
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
@@ -1697,7 +1704,25 @@ export default function EditPdfTool() {
     successText,
     metadata = {},
   ) {
-    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    let finalBytes = pdfBytes;
+
+    if (!isPremium) {
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const firstPage = pdfDoc.getPage(0);
+      const { width } = firstPage.getSize();
+      firstPage.drawText("ProjectStack Free", {
+        x: width - 160,
+        y: 14,
+        size: 10,
+        font,
+        color: rgb(0.7, 0.7, 0.7),
+        opacity: 0.5,
+      });
+      finalBytes = await pdfDoc.save();
+    }
+
+    const blob = new Blob([finalBytes], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
@@ -1705,6 +1730,11 @@ export default function EditPdfTool() {
     link.download = downloadName;
     link.click();
     URL.revokeObjectURL(url);
+
+    if (!isPremium) {
+      incrementDailyExportCount();
+      setExportCount(getDailyExportCount());
+    }
 
     setShowExportAd(true);
     trackEvent("process_completed", {
@@ -1755,6 +1785,14 @@ export default function EditPdfTool() {
   async function exportEditedDocument() {
     if (!file || !pages.length || isProcessing) return;
 
+    if (!isPremium && hasReachedDailyExportLimit()) {
+      setMessage({
+        type: "error",
+        text: "You've reached your daily export limit (5/day). Upgrade to Pro for unlimited exports.",
+      });
+      return;
+    }
+
     if (!includedPages.length) {
       setMessage({
         type: "error",
@@ -1792,6 +1830,14 @@ export default function EditPdfTool() {
 
   async function exportSelectedPages() {
     if (!file || !selectedPages.length || isProcessing) return;
+
+    if (!isPremium && hasReachedDailyExportLimit()) {
+      setMessage({
+        type: "error",
+        text: "You've reached your daily export limit (5/day). Upgrade to Pro for unlimited exports.",
+      });
+      return;
+    }
 
     if (!selectedIncludedPages.length) {
       setMessage({
@@ -2255,6 +2301,12 @@ export default function EditPdfTool() {
           <div className="usage-indicator trust-indicator">
             {EDIT_FEATURE.privacyMessage}
           </div>
+
+          {!isPremium && (
+            <div className={`usage-indicator export-limit-indicator${getRemainingDailyExports() <= 2 ? " export-limit-warning" : ""}`}>
+              {getRemainingDailyExports()} of 5 free exports remaining today
+            </div>
+          )}
 
           {isProcessing && (
             <div className="usage-indicator processing-indicator">

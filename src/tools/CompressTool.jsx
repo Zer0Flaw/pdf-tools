@@ -15,6 +15,12 @@ import { formatFeatureFileSize, getFeatureGate } from "../utils/features";
 import { trackEvent } from "../utils/analytics";
 import { activateOnEnterOrSpace } from "../utils/accessibility";
 import { useSubscription } from "../utils/subscription";
+import {
+  getDailyExportCount,
+  hasReachedDailyExportLimit,
+  incrementDailyExportCount,
+  getRemainingDailyExports,
+} from "../utils/freeTier";
 
 const COMPRESS_FEATURE = getFeatureGate("compress");
 const MAX_FREE_IMAGES = COMPRESS_FEATURE.maxFiles;
@@ -89,6 +95,7 @@ export default function CompressTool() {
   const [message, setMessage] = useState(null);
   const [quality, setQuality] = useState(0.7);
   const [showExportAd, setShowExportAd] = useState(false);
+  const [exportCount, setExportCount] = useState(() => getDailyExportCount());
   const fileInputRef = useRef(null);
   const { isPremium } = useSubscription();
 
@@ -380,6 +387,14 @@ export default function CompressTool() {
   async function compressImages() {
     if (!files.length || isCompressing) return;
 
+    if (!isPremium && hasReachedDailyExportLimit()) {
+      setMessage({
+        type: "error",
+        text: "You've reached your daily export limit (5/day). Upgrade to Pro for unlimited exports.",
+      });
+      return;
+    }
+
     trackEvent("process_started", {
       tool: "compress",
       file_count: files.length,
@@ -413,6 +428,11 @@ export default function CompressTool() {
               Math.round(((originalBytes - compressedBytes) / originalBytes) * 100),
             )
           : 0;
+
+      if (!isPremium) {
+        incrementDailyExportCount();
+        setExportCount(getDailyExportCount());
+      }
 
       setShowExportAd(true);
       trackEvent("process_completed", {
@@ -516,6 +536,12 @@ export default function CompressTool() {
       <div className="usage-indicator trust-indicator">
         {COMPRESS_FEATURE.privacyMessage}
       </div>
+
+      {!isPremium && (
+        <div className={`usage-indicator export-limit-indicator${getRemainingDailyExports() <= 2 ? " export-limit-warning" : ""}`}>
+          {getRemainingDailyExports()} of 5 free exports remaining today
+        </div>
+      )}
 
       <div className="compress-slider-block">
         <div className="usage-indicator compress-slider-label">

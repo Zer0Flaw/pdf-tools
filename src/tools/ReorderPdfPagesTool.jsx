@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -18,6 +19,12 @@ import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreview
 import { reorderPdfPages } from "../utils/pdfPageOperations";
 import { validatePdfFile } from "../utils/pdfValidation";
 import { useSubscription } from "../utils/subscription";
+import {
+  getDailyExportCount,
+  hasReachedDailyExportLimit,
+  incrementDailyExportCount,
+  getRemainingDailyExports,
+} from "../utils/freeTier";
 
 const REORDER_FEATURE = getFeatureGate("reorder");
 const MAX_FILE_SIZE = REORDER_FEATURE.maxFileSize;
@@ -85,6 +92,7 @@ export default function ReorderPdfPagesTool() {
   const [message, setMessage] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [showExportAd, setShowExportAd] = useState(false);
+  const [exportCount, setExportCount] = useState(() => getDailyExportCount());
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
   const { isPremium } = useSubscription();
@@ -239,6 +247,14 @@ export default function ReorderPdfPagesTool() {
   async function exportReorderedPdf() {
     if (!file || !pages.length || isProcessing) return;
 
+    if (!isPremium && hasReachedDailyExportLimit()) {
+      setMessage({
+        type: "error",
+        text: "You've reached your daily export limit (5/day). Upgrade to Pro for unlimited exports.",
+      });
+      return;
+    }
+
     trackEvent("process_started", {
       tool: "reorder",
       file_count: 1,
@@ -251,10 +267,27 @@ export default function ReorderPdfPagesTool() {
 
     try {
       const bytes = await file.arrayBuffer();
-      const pdfBytes = await reorderPdfPages(
+      let pdfBytes = await reorderPdfPages(
         bytes,
         pages.map((page) => page.pageNumber),
       );
+
+      if (!isPremium) {
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const firstPage = pdfDoc.getPage(0);
+        const { width } = firstPage.getSize();
+        firstPage.drawText("ProjectStack Free", {
+          x: width - 160,
+          y: 14,
+          size: 10,
+          font,
+          color: rgb(0.7, 0.7, 0.7),
+          opacity: 0.5,
+        });
+        pdfBytes = await pdfDoc.save();
+      }
+
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -263,6 +296,11 @@ export default function ReorderPdfPagesTool() {
       link.download = `${getBaseFileName(file.name)}-reordered.pdf`;
       link.click();
       URL.revokeObjectURL(url);
+
+      if (!isPremium) {
+        incrementDailyExportCount();
+        setExportCount(getDailyExportCount());
+      }
 
       setShowExportAd(true);
       trackEvent("process_completed", {
@@ -370,6 +408,12 @@ export default function ReorderPdfPagesTool() {
       <div className="usage-indicator trust-indicator">
         {REORDER_FEATURE.privacyMessage}
       </div>
+
+      {!isPremium && (
+        <div className={`usage-indicator export-limit-indicator${getRemainingDailyExports() <= 2 ? " export-limit-warning" : ""}`}>
+          {getRemainingDailyExports()} of 5 free exports remaining today
+        </div>
+      )}
 
       {isProcessing && (
         <div className="usage-indicator processing-indicator">

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import UpgradeBanner from "../components/UpgradeBanner";
 import AdSlot from "../components/AdSlot";
 import { getBaseFileName } from "../utils/fileNaming";
@@ -10,6 +11,12 @@ import { buildPdfPagePreviews, revokePreviewUrls } from "../utils/pdfPagePreview
 import { deletePdfPages } from "../utils/pdfPageOperations";
 import { validatePdfFile } from "../utils/pdfValidation";
 import { useSubscription } from "../utils/subscription";
+import {
+  getDailyExportCount,
+  hasReachedDailyExportLimit,
+  incrementDailyExportCount,
+  getRemainingDailyExports,
+} from "../utils/freeTier";
 
 const DELETE_FEATURE = getFeatureGate("delete");
 const MAX_FILE_SIZE = DELETE_FEATURE.maxFileSize;
@@ -24,6 +31,7 @@ export default function DeletePdfPagesTool() {
   const [message, setMessage] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [showExportAd, setShowExportAd] = useState(false);
+  const [exportCount, setExportCount] = useState(() => getDailyExportCount());
   const fileInputRef = useRef(null);
   const previewUrlsRef = useRef([]);
   const { isPremium } = useSubscription();
@@ -228,6 +236,14 @@ export default function DeletePdfPagesTool() {
       return;
     }
 
+    if (!isPremium && hasReachedDailyExportLimit()) {
+      setMessage({
+        type: "error",
+        text: "You've reached your daily export limit (5/day). Upgrade to Pro for unlimited exports.",
+      });
+      return;
+    }
+
     trackEvent("process_started", {
       tool: "delete",
       file_count: 1,
@@ -240,10 +256,27 @@ export default function DeletePdfPagesTool() {
 
     try {
       const bytes = await file.arrayBuffer();
-      const pdfBytes = await deletePdfPages(
+      let pdfBytes = await deletePdfPages(
         bytes,
         keptPages.map((page) => page.pageNumber),
       );
+
+      if (!isPremium) {
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const firstPage = pdfDoc.getPage(0);
+        const { width } = firstPage.getSize();
+        firstPage.drawText("ProjectStack Free", {
+          x: width - 160,
+          y: 14,
+          size: 10,
+          font,
+          color: rgb(0.7, 0.7, 0.7),
+          opacity: 0.5,
+        });
+        pdfBytes = await pdfDoc.save();
+      }
+
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -252,6 +285,11 @@ export default function DeletePdfPagesTool() {
       link.download = `${getBaseFileName(file.name)}-trimmed.pdf`;
       link.click();
       URL.revokeObjectURL(url);
+
+      if (!isPremium) {
+        incrementDailyExportCount();
+        setExportCount(getDailyExportCount());
+      }
 
       setShowExportAd(true);
       trackEvent("process_completed", {
@@ -362,6 +400,12 @@ export default function DeletePdfPagesTool() {
       <div className="usage-indicator trust-indicator">
         {DELETE_FEATURE.privacyMessage}
       </div>
+
+      {!isPremium && (
+        <div className={`usage-indicator export-limit-indicator${getRemainingDailyExports() <= 2 ? " export-limit-warning" : ""}`}>
+          {getRemainingDailyExports()} of 5 free exports remaining today
+        </div>
+      )}
 
       {isProcessing && (
         <div className="usage-indicator processing-indicator">

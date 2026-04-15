@@ -8,6 +8,12 @@ import AdSlot from "../components/AdSlot";
 import { trackEvent } from "../utils/analytics";
 import { activateOnEnterOrSpace } from "../utils/accessibility";
 import { useSubscription } from "../utils/subscription";
+import {
+  getDailyExportCount,
+  hasReachedDailyExportLimit,
+  incrementDailyExportCount,
+  getRemainingDailyExports,
+} from "../utils/freeTier";
 
 const SPLIT_FEATURE = getFeatureGate("split");
 const MAX_FILE_SIZE = SPLIT_FEATURE.maxFileSize;
@@ -20,6 +26,7 @@ export default function SplitTool() {
   const [message, setMessage] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [showExportAd, setShowExportAd] = useState(false);
+  const [exportCount, setExportCount] = useState(() => getDailyExportCount());
   const fileInputRef = useRef(null);
   const { isPremium } = useSubscription();
 
@@ -100,6 +107,14 @@ export default function SplitTool() {
   async function splitPdf() {
     if (!file || isProcessing) return;
 
+    if (!isPremium && hasReachedDailyExportLimit()) {
+      setMessage({
+        type: "error",
+        text: "You've reached your daily export limit (5/day). Upgrade to Pro for unlimited exports.",
+      });
+      return;
+    }
+
     trackEvent("process_started", {
       tool: "split",
       file_count: 1,
@@ -132,6 +147,11 @@ export default function SplitTool() {
         a.download = getSplitFileName(file, i + 1);
         a.click();
         URL.revokeObjectURL(url);
+      }
+
+      if (!isPremium) {
+        incrementDailyExportCount();
+        setExportCount(getDailyExportCount());
       }
 
       setShowExportAd(true);
@@ -238,6 +258,12 @@ export default function SplitTool() {
       <div className="usage-indicator trust-indicator">
         {SPLIT_FEATURE.privacyMessage}
       </div>
+
+      {!isPremium && (
+        <div className={`usage-indicator export-limit-indicator${getRemainingDailyExports() <= 2 ? " export-limit-warning" : ""}`}>
+          {getRemainingDailyExports()} of 5 free exports remaining today
+        </div>
+      )}
 
       {isProcessing && (
         <div className="usage-indicator processing-indicator">

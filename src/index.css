@@ -486,6 +486,16 @@ h1 {
   background: #f9fafb;
 }
 
+.export-limit-indicator {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.export-limit-warning {
+  color: #dc2626;
+  font-weight: 700;
+}
+
 .compress-slider-block {
   margin-top: -10px;
   margin-bottom: 20px;

@@ -156,7 +156,7 @@ export default function UpgradeBanner({
               <ul>
                 <li>No watermarks on any exports</li>
                 <li>Upload files up to 50MB (10x the free limit)</li>
-                <li>Unlimited daily exports across all tools</li>
+                <li>Unlimited exports (free plan: 5/day)</li>
                 <li>Priority access to new features</li>
               </ul>
             </div>

@@ -18,6 +18,10 @@ import { activateOnEnterOrSpace } from "../utils/accessibility";
 import {
   canUseDailyWatermarkRemoval,
   consumeDailyWatermarkRemoval,
+  getDailyExportCount,
+  hasReachedDailyExportLimit,
+  incrementDailyExportCount,
+  getRemainingDailyExports,
 } from "../utils/freeTier";
 import { useSubscription } from "../utils/subscription";
 
@@ -95,6 +99,7 @@ export default function MergeTool() {
   const [useFreeWatermarkRemoval, setUseFreeWatermarkRemoval] = useState(false);
   const [canRemoveWatermarkToday, setCanRemoveWatermarkToday] = useState(true);
   const [showExportAd, setShowExportAd] = useState(false);
+  const [exportCount, setExportCount] = useState(() => getDailyExportCount());
   const fileInputRef = useRef(null);
   const { isPremium } = useSubscription();
 
@@ -331,6 +336,14 @@ export default function MergeTool() {
   async function mergePdfs() {
     if (!files.length || isMerging) return;
 
+    if (!isPremium && hasReachedDailyExportLimit()) {
+      setMessage({
+        type: "error",
+        text: "You've reached your daily export limit (5/day). Upgrade to Pro for unlimited exports.",
+      });
+      return;
+    }
+
     trackEvent("process_started", {
       tool: "merge",
       file_count: files.length,
@@ -373,6 +386,11 @@ export default function MergeTool() {
       a.download = `merged-${getDateStamp()}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+
+      if (!isPremium) {
+        incrementDailyExportCount();
+        setExportCount(getDailyExportCount());
+      }
 
       if (skipWatermark) {
         consumeDailyWatermarkRemoval();
@@ -505,6 +523,12 @@ export default function MergeTool() {
       <div className="usage-indicator trust-indicator">
         {MERGE_FEATURE.privacyMessage}
       </div>
+
+      {!isPremium && (
+        <div className={`usage-indicator export-limit-indicator${getRemainingDailyExports() <= 2 ? " export-limit-warning" : ""}`}>
+          {getRemainingDailyExports()} of 5 free exports remaining today
+        </div>
+      )}
 
       {(useFreeWatermarkRemoval || !canRemoveWatermarkToday) && (
         <div
