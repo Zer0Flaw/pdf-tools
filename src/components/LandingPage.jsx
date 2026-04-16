@@ -72,6 +72,13 @@ const TOOL_PREVIEWS = [
     description: "Reduce file size for easier sharing and storage.",
     cta: "Open Compress Images",
   },
+  {
+    id: "errorExplain",
+    route: "/error-explain",
+    title: "Error Translator",
+    description: "Paste an error message and get a clear explanation with fixes.",
+    cta: "Open Error Translator",
+  },
 ];
 
 export default function LandingPage({ onStart, onOpenTool }) {
