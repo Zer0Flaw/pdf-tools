@@ -27,6 +27,11 @@ const TOOL_GROUPS = [
     label: "Compress",
     tools: [{ id: "compress", label: "Compress Images" }],
   },
+  {
+    id: "developer",
+    label: "Developer",
+    tools: [{ id: "errorExplain", label: "Error Translator" }],
+  },
 ];
 
 function findGroupByTool(toolId) {

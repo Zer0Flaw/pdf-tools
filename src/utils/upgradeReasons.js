@@ -14,6 +14,7 @@ export const UPGRADE_REASONS = {
   PDF_TO_IMAGE_LIMITS: "pdf-to-image-limits",
   SPLIT_LIMITS: "split-limits",
   COMPRESS_LIMITS: "compress-limits",
+  ERROR_EXPLAIN_LIMITS: "error-explain-limits",
 };
 
 export function trackUpgradeIntent(reason, source = "upgrade-banner") {

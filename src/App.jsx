@@ -11,12 +11,15 @@ import SplitTool from "./tools/SplitTool";
 import CompressTool from "./tools/CompressTool";
 import ImagesToPdfTool from "./tools/ImagesToPdfTool";
 import PdfToImageTool from "./tools/PdfToImageTool";
+import ErrorTranslatorTool from "./tools/ErrorTranslatorTool";
+import ErrorDetailPage from "./components/ErrorDetailPage";
 import LandingPage from "./components/LandingPage";
 import SupportPage, { SUPPORT_PAGES } from "./components/SupportPage";
 import ToolSeoContent from "./components/ToolSeoContent";
 import SiteFooter from "./components/SiteFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { trackEvent } from "./utils/analytics";
+import { getErrorBySlug } from "./utils/errorMatcher";
 import UserAuthButton from "./components/UserAuthButton";
 import { useUser } from "@clerk/clerk-react";
 import { SubscriptionProvider } from "./utils/subscription";
@@ -46,7 +49,7 @@ function AppSubscriptionWrapper({ children }) {
 const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
 const VALID_VIEWS = ["home", "workspace", "support"];
-const VALID_TOOLS = ["edit", "merge", "rotate", "delete", "reorder", "extract", "split", "compress", "images", "pdfToImage"];
+const VALID_TOOLS = ["edit", "merge", "rotate", "delete", "reorder", "extract", "split", "compress", "images", "pdfToImage", "errorExplain"];
 const HOME_TITLE = "ProjectStack | Browser-Based PDF and Image Tools";
 const HOME_DESCRIPTION =
   "Use browser-based PDF and image tools with ProjectStack. Edit PDFs, merge files, rotate pages, delete pages, reorder pages, extract pages, split files, convert images to PDF, convert PDFs to images, and compress images in one clean workspace.";
@@ -61,6 +64,7 @@ const TOOL_ROUTES = {
   images: "/images-to-pdf",
   pdfToImage: "/pdf-to-image",
   compress: "/compress-images",
+  errorExplain: "/error-explain",
 };
 
 const TOOL_METADATA = {
@@ -164,6 +168,16 @@ const TOOL_METADATA = {
     contextNote:
       "Upload a PDF and ProjectStack converts each page into a clean PNG image file. The conversion runs locally in your browser using built-in rendering, so your document never leaves your device. Each page downloads as a separate image file ready to use anywhere.",
   },
+  errorExplain: {
+    title: "Git Error Translator | ProjectStack",
+    description:
+      "Paste a Git error message and instantly get a plain-English explanation with common causes and step-by-step fixes. Free, browser-based, no sign-in needed.",
+    heading: "Git Error Translator",
+    intro:
+      "Paste a Git error message and get a clear explanation with causes and fix commands — no searching Stack Overflow required.",
+    contextNote:
+      "Paste the error text from your terminal and ProjectStack matches it against a curated database of common Git errors. Everything runs in your browser — your error text is never sent to a server.",
+  },
 };
 
 function getToolFromPath(pathname) {
@@ -171,6 +185,11 @@ function getToolFromPath(pathname) {
     Object.entries(TOOL_ROUTES).find(([, route]) => route === pathname)?.[0] ||
     null
   );
+}
+
+function getErrorSlugFromPath(pathname) {
+  const match = pathname.match(/^\/errors\/(.+)$/);
+  return match ? match[1] : null;
 }
 
 function getSupportPageFromPath(pathname) {
@@ -224,9 +243,17 @@ export default function App() {
       if (toolFromPath) return "workspace";
       const supportPageFromPath = getSupportPageFromPath(window.location.pathname);
       if (supportPageFromPath) return "support";
+      const errorSlugFromPath = getErrorSlugFromPath(window.location.pathname);
+      if (errorSlugFromPath) return "errorPage";
     }
 
     return readStoredValue(APP_VIEW_KEY, VALID_VIEWS, "home");
+  });
+  const [activeErrorSlug, setActiveErrorSlug] = useState(() => {
+    if (typeof window !== "undefined") {
+      return getErrorSlugFromPath(window.location.pathname) || "";
+    }
+    return "";
   });
   const [activeSupportPage, setActiveSupportPage] = useState(() => {
     if (typeof window !== "undefined") {
@@ -243,6 +270,7 @@ export default function App() {
     const handlePopState = () => {
       const toolFromPath = getToolFromPath(window.location.pathname);
       const supportPageFromPath = getSupportPageFromPath(window.location.pathname);
+      const errorSlugFromPath = getErrorSlugFromPath(window.location.pathname);
 
       if (toolFromPath) {
         setActiveTool(toolFromPath);
@@ -253,6 +281,12 @@ export default function App() {
       if (supportPageFromPath) {
         setActiveSupportPage(supportPageFromPath);
         setActiveView("support");
+        return;
+      }
+
+      if (errorSlugFromPath) {
+        setActiveErrorSlug(errorSlugFromPath);
+        setActiveView("errorPage");
         return;
       }
 
@@ -284,18 +318,33 @@ export default function App() {
       updateBrowserPath(TOOL_ROUTES[activeTool]);
     } else if (activeView === "support") {
       updateBrowserPath(SUPPORT_PAGES[activeSupportPage].route);
+    } else if (activeView === "errorPage") {
+      updateBrowserPath(`/errors/${activeErrorSlug}`);
     } else {
       updateBrowserPath("/");
     }
-  }, [activeSupportPage, activeTool, activeView]);
+  }, [activeSupportPage, activeTool, activeView, activeErrorSlug]);
 
   useEffect(() => {
-    const metadata =
-      activeView === "home"
-        ? { title: HOME_TITLE, description: HOME_DESCRIPTION }
-        : activeView === "support"
-          ? SUPPORT_PAGES[activeSupportPage]
-          : TOOL_METADATA[activeTool];
+    let metadata;
+    if (activeView === "home") {
+      metadata = { title: HOME_TITLE, description: HOME_DESCRIPTION };
+    } else if (activeView === "support") {
+      metadata = SUPPORT_PAGES[activeSupportPage];
+    } else if (activeView === "errorPage") {
+      const error = getErrorBySlug(activeErrorSlug);
+      metadata = error
+        ? {
+            title: `${error.shortTitle} | Git Errors | ProjectStack`,
+            description: error.explanation,
+          }
+        : {
+            title: "Error Not Found | ProjectStack",
+            description: "This Git error page could not be found.",
+          };
+    } else {
+      metadata = TOOL_METADATA[activeTool];
+    }
 
     document.title = metadata.title;
     updateMetaTag("name", "description", metadata.description);
@@ -303,7 +352,7 @@ export default function App() {
     updateMetaTag("property", "og:description", metadata.description);
     updateMetaTag("name", "twitter:title", metadata.title);
     updateMetaTag("name", "twitter:description", metadata.description);
-  }, [activeSupportPage, activeTool, activeView]);
+  }, [activeSupportPage, activeTool, activeView, activeErrorSlug]);
 
   useEffect(() => {
     if (activeView !== "workspace") return;
@@ -321,6 +370,11 @@ export default function App() {
   function openSupportPage(pageId) {
     setActiveSupportPage(pageId);
     setActiveView("support");
+  }
+
+  function openErrorPage(slug) {
+    setActiveErrorSlug(slug);
+    setActiveView("errorPage");
   }
 
   function scrollToToolWorkspace() {
@@ -352,6 +406,8 @@ export default function App() {
         return <ImagesToPdfTool />;
       case "pdfToImage":
         return <PdfToImageTool />;
+      case "errorExplain":
+        return <ErrorTranslatorTool onNavigateToError={openErrorPage} />;
       case "merge":
       default:
         return <MergeTool />;
@@ -363,7 +419,9 @@ export default function App() {
       ? TOOL_ROUTES[activeTool]
       : activeView === "support"
         ? SUPPORT_PAGES[activeSupportPage].route
-        : "/";
+        : activeView === "errorPage"
+          ? `/errors/${activeErrorSlug}`
+          : "/";
 
   if (activeView === "home") {
     return (
@@ -386,6 +444,25 @@ export default function App() {
           <LandingPage
               onStart={() => openWorkspace("merge")}
               onOpenTool={openWorkspace}
+            />
+            <SiteFooter onOpenSupportPage={openSupportPage} />
+          </div>
+        </div>
+      </AppSubscriptionWrapper>
+    );
+  }
+
+  if (activeView === "errorPage") {
+    return (
+      <AppSubscriptionWrapper>
+        <ScrollToTop pathname={currentPath} />
+        <div className="app-shell">
+          <div className="app-card app-card-home">
+            <ErrorDetailPage
+              slug={activeErrorSlug}
+              onBackHome={() => setActiveView("home")}
+              onOpenErrorTool={() => openWorkspace("errorExplain")}
+              onOpenSupportPage={openSupportPage}
             />
             <SiteFooter onOpenSupportPage={openSupportPage} />
           </div>

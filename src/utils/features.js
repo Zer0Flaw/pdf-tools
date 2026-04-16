@@ -155,6 +155,21 @@ export const FEATURE_GATES = {
     adPlacement: "postExport",
     upgradeReason: UPGRADE_REASONS.COMPRESS_LIMITS,
   },
+  errorExplain: {
+    id: "errorExplain",
+    maxFiles: 0,
+    maxFileSize: 0,
+    premiumFlags: {
+      unlimitedMerges: false,
+      unlimitedImages: false,
+      watermarkFree: false,
+      largerFiles: false,
+    },
+    privacyMessage: "Error text is matched locally in your browser — nothing is sent to a server.",
+    processingMessage: "Matching error...",
+    adPlacement: "postExport",
+    upgradeReason: UPGRADE_REASONS.ERROR_EXPLAIN_LIMITS,
+  },
 };
 
 export function getFeatureGate(toolId) {

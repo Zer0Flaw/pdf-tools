@@ -401,6 +401,46 @@ const TOOL_SEO_CONTENT = {
     bottomCtaCopy:
       "Open the compression tool and create lighter image downloads without adding extra workflow friction.",
   },
+  errorExplain: {
+    benefits: [
+      "Stop guessing what a Git error means — get a plain-English explanation in seconds without leaving the browser.",
+      "Each matched error includes the most common causes so you can diagnose the root problem, not just patch the symptom.",
+      "Step-by-step fix commands are copied directly from real Git workflows so you can paste them into your terminal.",
+      "Works for the most common Git errors that show up in daily development — from merge conflicts to push rejections.",
+      "Everything runs locally in your browser — your error text is matched against a built-in database, nothing is sent to a server.",
+    ],
+    steps: [
+      "Copy the error message from your terminal.",
+      "Paste it into the Error Translator input box.",
+      "Read the explanation, causes, and fix commands.",
+    ],
+    faqs: [
+      {
+        question: "What kinds of errors does this tool cover?",
+        answer:
+          "The current database covers 30 common Git errors including push failures, authentication issues, merge conflicts, branch problems, and repository corruption.",
+      },
+      {
+        question: "Does my error text get sent to a server?",
+        answer:
+          "No. The error matching runs entirely in your browser against a local database — your error text never leaves your device.",
+      },
+      {
+        question: "What if my error isn't in the database?",
+        answer:
+          "The tool will tell you it couldn't find a match and suggest pasting just the core error line without surrounding log output.",
+      },
+      {
+        question: "Can I use this for npm, Python, or other tools?",
+        answer:
+          "The current database focuses on Git. Support for additional ecosystems is planned for a future update.",
+      },
+    ],
+    relatedTools: ["merge", "split", "edit"],
+    bottomCtaTitle: "Stuck on a Git error?",
+    bottomCtaCopy:
+      "Paste your error message and get a clear explanation with fix commands in seconds.",
+  },
 };
 
 const TOOL_LABELS = {
@@ -414,6 +454,7 @@ const TOOL_LABELS = {
   images: "Images to PDF",
   pdfToImage: "PDF to Image",
   compress: "Compress Images",
+  errorExplain: "Error Translator",
 };
 
 const TOOL_HELPERS = {
@@ -427,6 +468,7 @@ const TOOL_HELPERS = {
   images: "Turn JPG and PNG files into one PDF.",
   pdfToImage: "Export each PDF page as a PNG image.",
   compress: "Reduce image size for easier uploads and sharing.",
+  errorExplain: "Paste a Git error and get causes and fix commands.",
 };
 
 export default function ToolSeoContent({

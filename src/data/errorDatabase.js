@@ -1,0 +1,898 @@
+export const ERROR_DATABASE = [
+  {
+    id: "git-not-a-git-repository",
+    slug: "git-not-a-git-repository",
+    ecosystem: "git",
+    pattern: /fatal: not a git repository/i,
+    title: "fatal: not a git repository",
+    shortTitle: "Not a git repository",
+    explanation:
+      "You ran a Git command in a directory that hasn't been initialized as a Git repository. Git needs a .git folder to track changes, and this directory doesn't have one.",
+    causes: [
+      "You're in the wrong directory — navigate to your project folder first",
+      "The repository was never initialized with git init",
+      "The .git folder was accidentally deleted",
+      "You cloned a project but are in a parent or sibling directory",
+    ],
+    fixes: [
+      "cd into your project directory: cd /path/to/your/project",
+      "Initialize a new repo if needed: git init",
+      "Check your current directory: pwd (Mac/Linux) or cd (Windows)",
+      "If the .git folder was deleted, clone the repo again: git clone <url>",
+    ],
+    example: {
+      input: "fatal: not a git repository (or any of the parent directories): .git",
+      context: "Running git status from a directory that isn't a Git repo",
+    },
+    tags: ["git", "fatal", "repository", "init"],
+    searchTerms: ["not a git repository", "fatal not a git repo", "git init"],
+  },
+  {
+    id: "git-remote-origin-already-exists",
+    slug: "git-remote-origin-already-exists",
+    ecosystem: "git",
+    pattern: /fatal: remote origin already exists/i,
+    title: "fatal: remote origin already exists",
+    shortTitle: "Remote origin already exists",
+    explanation:
+      "You tried to add a remote named 'origin' but one is already configured. Each remote name must be unique within a repository.",
+    causes: [
+      "You ran git remote add origin twice",
+      "The remote was set when you cloned the repo and you're trying to add it again",
+      "You're trying to point origin to a different URL than the one already set",
+      "A previous setup script already configured the remote",
+    ],
+    fixes: [
+      "Check what remotes are already set: git remote -v",
+      "Update the existing origin URL instead: git remote set-url origin <new-url>",
+      "Remove the old remote first then re-add: git remote remove origin && git remote add origin <url>",
+      "Use a different name if you need a second remote: git remote add upstream <url>",
+    ],
+    example: {
+      input: "fatal: remote origin already exists.",
+      context: "Running git remote add origin after the remote was already set",
+    },
+    tags: ["git", "fatal", "remote", "origin"],
+    searchTerms: ["remote origin already exists", "remote already exists"],
+  },
+  {
+    id: "git-failed-to-push-refs",
+    slug: "git-failed-to-push-refs",
+    ecosystem: "git",
+    pattern: /error: failed to push some refs.*\n.*\[rejected\]|error: failed to push some refs(?!.*non-fast-forward)/i,
+    title: "error: failed to push some refs",
+    shortTitle: "Failed to push refs",
+    explanation:
+      "Git couldn't push your local commits to the remote because the remote has commits your local branch doesn't have. You need to integrate those changes before pushing.",
+    causes: [
+      "Someone else pushed to the same branch after you last pulled",
+      "You force-pushed from another machine and your local history diverged",
+      "The remote branch was reset or rebased",
+      "You created a branch locally but the remote has a different commit history under the same name",
+    ],
+    fixes: [
+      "Pull the latest changes first: git pull origin <branch-name>",
+      "If you want to rebase instead of merging: git pull --rebase origin <branch-name>",
+      "Resolve any merge conflicts, then push again: git push origin <branch-name>",
+      "Only force-push if you're sure you want to overwrite remote history: git push --force-with-lease origin <branch-name>",
+    ],
+    example: {
+      input:
+        "error: failed to push some refs to 'https://github.com/user/repo.git'\nhint: Updates were rejected because the remote contains work that you do not have locally.",
+      context: "Pushing after the remote branch received new commits from another source",
+    },
+    tags: ["git", "error", "push", "rejected", "refs"],
+    searchTerms: ["failed to push some refs", "updates were rejected", "push rejected"],
+  },
+  {
+    id: "git-refusing-to-merge-unrelated-histories",
+    slug: "git-refusing-to-merge-unrelated-histories",
+    ecosystem: "git",
+    pattern: /fatal: refusing to merge unrelated histories/i,
+    title: "fatal: refusing to merge unrelated histories",
+    shortTitle: "Refusing to merge unrelated histories",
+    explanation:
+      "Git refuses to merge two branches that don't share a common commit history. This usually happens when you initialize a local repo and try to pull from a remote that was separately initialized.",
+    causes: [
+      "You ran git init locally and the remote repo was initialized independently (e.g. with a README on GitHub)",
+      "You're trying to merge two completely separate Git repositories",
+      "A force-push wiped the shared history on the remote",
+      "You're pulling from a different repository than the one you branched from",
+    ],
+    fixes: [
+      "Allow the merge explicitly with the flag: git pull origin main --allow-unrelated-histories",
+      "Resolve any merge conflicts that appear, then commit",
+      "If starting fresh, clone the remote instead of initializing locally: git clone <url>",
+      "If you meant to use a different remote, check your remote URL: git remote -v",
+    ],
+    example: {
+      input: "fatal: refusing to merge unrelated histories",
+      context:
+        "Running git pull after git init locally and creating a repo on GitHub with an initial README",
+    },
+    tags: ["git", "fatal", "merge", "unrelated", "histories"],
+    searchTerms: [
+      "refusing to merge unrelated histories",
+      "unrelated histories",
+      "allow-unrelated-histories",
+    ],
+  },
+  {
+    id: "git-local-changes-overwritten-by-merge",
+    slug: "git-local-changes-overwritten-by-merge",
+    ecosystem: "git",
+    pattern: /error: Your local changes to the following files would be overwritten by merge/i,
+    title: "error: Your local changes to the following files would be overwritten by merge",
+    shortTitle: "Local changes would be overwritten",
+    explanation:
+      "Git is stopping you from merging or pulling because the incoming changes conflict with uncommitted local changes in your working directory. Git won't proceed to avoid data loss.",
+    causes: [
+      "You edited files locally but didn't commit or stash before pulling",
+      "The same files were changed on the remote and locally",
+      "You're trying to switch branches or merge with a dirty working tree",
+      "An automated pull ran while you had unsaved work",
+    ],
+    fixes: [
+      "Commit your local changes first: git add . && git commit -m 'WIP'",
+      "Or stash them temporarily: git stash, then git pull, then git stash pop",
+      "To discard local changes entirely (data loss): git checkout -- <file>",
+      "Review what's modified before deciding: git status && git diff",
+    ],
+    example: {
+      input:
+        "error: Your local changes to the following files would be overwritten by merge:\n\tsrc/App.js\nPlease commit your changes or stash them before you merge.",
+      context: "Running git pull with uncommitted changes to files that the remote also modified",
+    },
+    tags: ["git", "error", "local", "changes", "overwritten", "merge"],
+    searchTerms: [
+      "local changes would be overwritten by merge",
+      "commit your changes or stash",
+      "overwritten by merge",
+    ],
+  },
+  {
+    id: "git-could-not-resolve-host",
+    slug: "git-could-not-resolve-host",
+    ecosystem: "git",
+    pattern: /fatal: unable to access.*Could not resolve host/i,
+    title: "fatal: unable to access — Could not resolve host",
+    shortTitle: "Could not resolve host",
+    explanation:
+      "Git couldn't connect to the remote server because the hostname couldn't be resolved. This is a network or DNS issue, not a Git configuration problem.",
+    causes: [
+      "You're offline or the network connection dropped",
+      "The remote URL contains a typo in the hostname",
+      "A VPN or proxy is blocking or rerouting DNS",
+      "Corporate network firewall is blocking outbound Git traffic",
+    ],
+    fixes: [
+      "Check your internet connection: ping github.com",
+      "Verify the remote URL is correct: git remote -v",
+      "Fix the remote URL if it's wrong: git remote set-url origin <correct-url>",
+      "If on a VPN, try disconnecting it and retrying: git push / git pull",
+    ],
+    example: {
+      input:
+        "fatal: unable to access 'https://github.com/user/repo.git/': Could not resolve host: github.com",
+      context: "Running git push or git pull with no network connection",
+    },
+    tags: ["git", "fatal", "network", "host", "dns", "access"],
+    searchTerms: ["could not resolve host", "unable to access", "resolve host"],
+  },
+  {
+    id: "git-src-refspec-does-not-match",
+    slug: "git-src-refspec-does-not-match",
+    ecosystem: "git",
+    pattern: /error: src refspec .+ does not match any/i,
+    title: "error: src refspec does not match any",
+    shortTitle: "Refspec does not match any branch",
+    explanation:
+      "Git can't find the branch you're trying to push because it doesn't exist locally. Usually the local branch name doesn't match what you typed in the push command.",
+    causes: [
+      "The branch is named 'main' locally but you typed 'master' (or vice versa)",
+      "You haven't made any commits yet, so the branch doesn't exist as a ref",
+      "There's a typo in the branch name you specified",
+      "You're pushing before making the first commit on a new repo",
+    ],
+    fixes: [
+      "Check what local branches exist: git branch",
+      "Push using the correct branch name: git push origin main",
+      "If no commits yet, make the first commit before pushing: git add . && git commit -m 'Initial commit'",
+      "Rename your branch if needed: git branch -m old-name new-name",
+    ],
+    example: {
+      input: "error: src refspec main does not match any\nerror: failed to push some refs to 'origin'",
+      context:
+        "Running git push origin main on a new repo that has commits on 'master' instead of 'main'",
+    },
+    tags: ["git", "error", "refspec", "branch", "push"],
+    searchTerms: ["src refspec does not match any", "refspec does not match", "does not match any"],
+  },
+  {
+    id: "git-destination-path-already-exists",
+    slug: "git-destination-path-already-exists",
+    ecosystem: "git",
+    pattern: /fatal: destination path .+ already exists and is not an empty directory/i,
+    title: "fatal: destination path already exists and is not an empty directory",
+    shortTitle: "Clone destination already exists",
+    explanation:
+      "Git can't clone into a directory that already exists and contains files. Git requires the target directory to be empty or non-existent.",
+    causes: [
+      "You already cloned the repo and are trying to clone it again",
+      "A directory with the same name as the repo exists in the current folder",
+      "A previous interrupted clone left a partial directory behind",
+      "You're running the clone command from inside the project directory",
+    ],
+    fixes: [
+      "cd into the existing directory instead of cloning again: cd <repo-name>",
+      "Delete the existing directory if it's safe to do so: rm -rf <repo-name>, then clone",
+      "Clone into a different directory name: git clone <url> <new-name>",
+      "If it was a partial clone, remove it and retry: rm -rf <repo-name> && git clone <url>",
+    ],
+    example: {
+      input: "fatal: destination path 'my-project' already exists and is not an empty directory.",
+      context: "Running git clone when you've already cloned the repository into the same directory",
+    },
+    tags: ["git", "fatal", "clone", "destination", "exists"],
+    searchTerms: [
+      "destination path already exists",
+      "not an empty directory",
+      "destination already exists",
+    ],
+  },
+  {
+    id: "git-pathspec-did-not-match",
+    slug: "git-pathspec-did-not-match",
+    ecosystem: "git",
+    pattern: /error: pathspec .+ did not match any file\(s\) known to git/i,
+    title: "error: pathspec did not match any file(s) known to git",
+    shortTitle: "Pathspec did not match any files or branch",
+    explanation:
+      "Git couldn't find the branch, tag, or file you referenced. The name you provided doesn't match anything in the repository's history or working tree.",
+    causes: [
+      "Trying to checkout a branch that doesn't exist locally — you need to fetch it first",
+      "The branch name has a typo or uses the wrong case",
+      "The remote branch exists but you haven't run git fetch yet",
+      "Trying to checkout a file path that Git doesn't track",
+    ],
+    fixes: [
+      "Fetch all remote branches first: git fetch --all",
+      "List available branches: git branch -a",
+      "Checkout with the correct remote tracking name: git checkout -b <branch> origin/<branch>",
+      "If the file doesn't exist yet, it can't be checked out — verify the path",
+    ],
+    example: {
+      input: "error: pathspec 'feature/login' did not match any file(s) known to git",
+      context: "Running git checkout feature/login without fetching from remote first",
+    },
+    tags: ["git", "error", "pathspec", "branch", "checkout"],
+    searchTerms: [
+      "pathspec did not match any file",
+      "did not match any file known to git",
+      "pathspec did not match",
+    ],
+  },
+  {
+    id: "git-no-upstream-branch",
+    slug: "git-no-upstream-branch",
+    ecosystem: "git",
+    pattern: /fatal: The current branch .+ has no upstream branch/i,
+    title: "fatal: The current branch has no upstream branch",
+    shortTitle: "No upstream branch set",
+    explanation:
+      "Your local branch isn't linked to any remote branch. Git doesn't know where to push or pull, so you need to set the upstream tracking relationship.",
+    causes: [
+      "You created a new local branch but never pushed it to the remote",
+      "The upstream tracking was removed or never set",
+      "You renamed the branch locally but the remote branch still has the old name",
+      "You're pushing for the first time on this branch",
+    ],
+    fixes: [
+      "Push and set the upstream at the same time: git push -u origin <branch-name>",
+      "Set the upstream without pushing: git branch --set-upstream-to=origin/<branch-name>",
+      "Check current tracking info: git branch -vv",
+      "After setting upstream, plain git push and git pull will work normally",
+    ],
+    example: {
+      input:
+        "fatal: The current branch feature/auth has no upstream branch.\nTo push the current branch and set the remote as upstream, use:\n\n    git push --set-upstream origin feature/auth",
+      context: "Running git push on a newly created local branch for the first time",
+    },
+    tags: ["git", "fatal", "upstream", "branch", "tracking"],
+    searchTerms: ["no upstream branch", "has no upstream branch", "set-upstream"],
+  },
+  {
+    id: "git-merge-conflict",
+    slug: "git-merge-conflict",
+    ecosystem: "git",
+    pattern: /CONFLICT \(content\): Merge conflict in/i,
+    title: "CONFLICT (content): Merge conflict in [file]",
+    shortTitle: "Merge conflict",
+    explanation:
+      "Git found changes in the same part of a file from two different branches and can't automatically decide which version to keep. You need to manually resolve the conflict.",
+    causes: [
+      "Two branches edited the same lines in the same file",
+      "One branch deleted a file that the other branch modified",
+      "A rebase introduced changes that conflict with local work",
+      "Merging a long-lived branch that diverged significantly from main",
+    ],
+    fixes: [
+      "Open the conflicted file and look for conflict markers: <<<<<<< HEAD, =======, >>>>>>> branch",
+      "Edit the file to keep the version you want, removing all conflict markers",
+      "Stage the resolved file: git add <filename>",
+      "Complete the merge: git commit (or git rebase --continue if rebasing)",
+    ],
+    example: {
+      input: "CONFLICT (content): Merge conflict in src/App.js\nAutomatic merge failed; fix conflicts and then commit the result.",
+      context: "Running git merge or git pull when both branches changed the same lines",
+    },
+    tags: ["git", "conflict", "merge", "CONFLICT"],
+    searchTerms: ["merge conflict", "CONFLICT content", "automatic merge failed"],
+  },
+  {
+    id: "git-cannot-lock-ref",
+    slug: "git-cannot-lock-ref",
+    ecosystem: "git",
+    pattern: /error: cannot lock ref/i,
+    title: "error: cannot lock ref — reference broken",
+    shortTitle: "Cannot lock ref",
+    explanation:
+      "Git can't update a reference (branch pointer) because it's in a broken or locked state. This often means the ref store has inconsistent or corrupt entries.",
+    causes: [
+      "A previous Git operation was interrupted and left a stale lock file",
+      "The refs directory has inconsistent entries (e.g. both packed and loose refs conflict)",
+      "Disk I/O errors caused a partial write to the ref store",
+      "Running concurrent Git operations from multiple processes",
+    ],
+    fixes: [
+      "Run Git's built-in repair: git gc --prune=now",
+      "Remove stale lock files manually: find .git/refs -name '*.lock' -delete",
+      "Try pruning and fetching: git fetch --prune",
+      "If a specific ref is corrupt: git update-ref -d refs/heads/<branch-name>",
+    ],
+    example: {
+      input:
+        "error: cannot lock ref 'refs/remotes/origin/feature/test': is at abc123 but expected def456",
+      context: "Running git fetch or git pull after an interrupted previous Git operation",
+    },
+    tags: ["git", "error", "lock", "ref", "reference"],
+    searchTerms: ["cannot lock ref", "lock ref", "reference broken"],
+  },
+  {
+    id: "git-bad-object-head",
+    slug: "git-bad-object-head",
+    ecosystem: "git",
+    pattern: /fatal: bad object HEAD/i,
+    title: "fatal: bad object HEAD",
+    shortTitle: "Bad object HEAD",
+    explanation:
+      "Git can't resolve HEAD to a valid commit object. The HEAD pointer is either pointing to nothing (new repo with no commits) or the object store is corrupt.",
+    causes: [
+      "You initialized a new repository but haven't made the first commit yet",
+      "The .git/objects directory has corrupt or missing files",
+      "You deleted commits with git reset and the repo is now in an inconsistent state",
+      "A filesystem issue or interrupted write corrupted the object store",
+    ],
+    fixes: [
+      "If no commits yet, make the first one: git add . && git commit -m 'Initial commit'",
+      "Check if HEAD is pointing somewhere valid: cat .git/HEAD",
+      "Verify the object store: git fsck --full",
+      "If the repo is badly corrupt, clone a fresh copy from the remote: git clone <url>",
+    ],
+    example: {
+      input: "fatal: bad object HEAD",
+      context: "Running git log or git show on a new repo before the first commit",
+    },
+    tags: ["git", "fatal", "bad", "object", "HEAD"],
+    searchTerms: ["bad object HEAD", "bad object", "fatal bad object"],
+  },
+  {
+    id: "git-resolve-index-first",
+    slug: "git-resolve-index-first",
+    ecosystem: "git",
+    pattern: /error: you need to resolve your current index first/i,
+    title: "error: you need to resolve your current index first",
+    shortTitle: "Resolve index conflicts first",
+    explanation:
+      "You're trying to do something (like checkout or merge) while your index still contains unresolved merge conflicts. You must finish resolving before Git will let you proceed.",
+    causes: [
+      "A previous merge or pull left conflicts unresolved",
+      "You ran git merge or git rebase and didn't finish resolving all conflicts",
+      "Trying to switch branches in the middle of a conflicted merge",
+      "Trying to stash while merge conflicts are present in the index",
+    ],
+    fixes: [
+      "Check which files still have conflicts: git status",
+      "Open each conflicted file, resolve the markers, then: git add <file>",
+      "Complete the merge after resolving all files: git commit",
+      "To abort the entire merge and go back: git merge --abort",
+    ],
+    example: {
+      input: "error: you need to resolve your current index first",
+      context: "Running git checkout or another command while in the middle of a conflicted merge",
+    },
+    tags: ["git", "error", "index", "resolve", "conflict"],
+    searchTerms: ["resolve your current index", "need to resolve", "current index first"],
+  },
+  {
+    id: "git-lf-replaced-by-crlf",
+    slug: "git-lf-replaced-by-crlf",
+    ecosystem: "git",
+    pattern: /warning: LF will be replaced by CRLF/i,
+    title: "warning: LF will be replaced by CRLF",
+    shortTitle: "LF will be replaced by CRLF",
+    explanation:
+      "Git is warning you that it will convert Unix-style line endings (LF) to Windows-style (CRLF) when checking out files. This is controlled by the core.autocrlf setting and usually harmless but can cause noise in diffs.",
+    causes: [
+      "core.autocrlf is set to true on Windows, which converts line endings on checkout",
+      "The repository has files with LF line endings and you're on a Windows system",
+      "A .gitattributes file is missing or doesn't specify line ending rules",
+      "Mixing contributors on Windows and Unix/Mac systems without a shared line ending policy",
+    ],
+    fixes: [
+      "For cross-platform repos, set: git config --global core.autocrlf input (Mac/Linux) or git config --global core.autocrlf true (Windows)",
+      "To suppress just this warning: git config --global core.safecrlf false",
+      "Add a .gitattributes file to enforce consistent line endings: * text=auto",
+      "This is usually just a warning — your files will work correctly",
+    ],
+    example: {
+      input: "warning: LF will be replaced by CRLF in src/index.js.\nThe file will have its original line endings in your working directory.",
+      context: "Running git add on a Windows machine with core.autocrlf=true",
+    },
+    tags: ["git", "warning", "LF", "CRLF", "line-endings"],
+    searchTerms: ["LF will be replaced by CRLF", "line endings", "CRLF LF"],
+  },
+  {
+    id: "git-authentication-failed",
+    slug: "git-authentication-failed",
+    ecosystem: "git",
+    pattern: /fatal: Authentication failed/i,
+    title: "fatal: Authentication failed",
+    shortTitle: "Authentication failed",
+    explanation:
+      "Git couldn't authenticate with the remote server. Either your credentials are wrong, expired, or the authentication method you're using is no longer accepted.",
+    causes: [
+      "GitHub removed password authentication — you need a Personal Access Token (PAT) instead",
+      "Your PAT has expired or been revoked",
+      "The username or token in your credential helper is stale",
+      "You're pushing to a repo you don't have write access to",
+    ],
+    fixes: [
+      "Generate a new Personal Access Token on GitHub: Settings → Developer settings → Personal access tokens",
+      "Use the token as your password when prompted, not your account password",
+      "Clear cached credentials: git credential reject (then re-enter when prompted)",
+      "On Mac, clear Keychain: git credential-osxkeychain erase, then provide host and protocol",
+    ],
+    example: {
+      input:
+        "remote: Support for password authentication was removed on August 13, 2021.\nfatal: Authentication failed for 'https://github.com/user/repo.git/'",
+      context: "Pushing to GitHub using a username/password after PAT enforcement",
+    },
+    tags: ["git", "fatal", "authentication", "failed", "credentials"],
+    searchTerms: [
+      "authentication failed",
+      "fatal authentication failed",
+      "password authentication removed",
+    ],
+  },
+  {
+    id: "git-permission-denied-publickey",
+    slug: "git-permission-denied-publickey",
+    ecosystem: "git",
+    pattern: /Permission denied \(publickey\)/i,
+    title: "Permission denied (publickey)",
+    shortTitle: "Permission denied (publickey)",
+    explanation:
+      "SSH authentication failed because Git couldn't find a valid SSH key accepted by the remote server. Either no key is configured, the wrong key is being used, or the key isn't added to your GitHub/GitLab account.",
+    causes: [
+      "Your SSH key isn't added to GitHub/GitLab under Settings → SSH Keys",
+      "The ssh-agent isn't running or doesn't have your key loaded",
+      "You have multiple SSH keys and the wrong one is being used",
+      "The key was deleted from the remote service but still exists locally",
+    ],
+    fixes: [
+      "Check if your key is loaded: ssh-add -l",
+      "Add your key to the agent: ssh-add ~/.ssh/id_ed25519",
+      "Test SSH connection: ssh -T git@github.com",
+      "Add your public key to GitHub: cat ~/.ssh/id_ed25519.pub and paste into Settings → SSH Keys",
+    ],
+    example: {
+      input:
+        "git@github.com: Permission denied (publickey).\nfatal: Could not read from remote repository.",
+      context: "Using SSH remote URL without an SSH key registered on GitHub",
+    },
+    tags: ["git", "SSH", "permission", "publickey", "denied"],
+    searchTerms: ["permission denied publickey", "publickey", "ssh permission denied"],
+  },
+  {
+    id: "git-could-not-read-from-remote",
+    slug: "git-could-not-read-from-remote",
+    ecosystem: "git",
+    pattern: /fatal: Could not read from remote repository/i,
+    title: "fatal: Could not read from remote repository",
+    shortTitle: "Could not read from remote repository",
+    explanation:
+      "Git can't access the remote repository at all. This is usually an authentication problem (wrong SSH key or HTTPS credentials) or the repository URL is incorrect.",
+    causes: [
+      "SSH key not added to GitHub/GitLab account",
+      "The repository was deleted, renamed, or moved",
+      "Wrong remote URL — the repo may have changed ownership",
+      "HTTPS credentials are incorrect or expired",
+    ],
+    fixes: [
+      "Verify the remote URL is correct: git remote -v",
+      "For SSH: test connectivity: ssh -T git@github.com",
+      "For HTTPS: try cloning with a fresh token",
+      "Check if the repository still exists and you have access to it on GitHub/GitLab",
+    ],
+    example: {
+      input:
+        "fatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.",
+      context: "Running git push when the remote URL points to a deleted or inaccessible repo",
+    },
+    tags: ["git", "fatal", "remote", "read", "access"],
+    searchTerms: [
+      "could not read from remote repository",
+      "correct access rights",
+      "repository exists",
+    ],
+  },
+  {
+    id: "git-failed-to-push-non-fast-forward",
+    slug: "git-failed-to-push-non-fast-forward",
+    ecosystem: "git",
+    pattern: /error: failed to push some refs[\s\S]*non-fast-forward|Updates were rejected because the tip of your current branch is behind/i,
+    title: "error: failed to push some refs (non-fast-forward)",
+    shortTitle: "Non-fast-forward push rejected",
+    explanation:
+      "Your local branch is behind the remote branch — the remote has commits that your local branch doesn't include. Git won't overwrite those remote commits with a normal push.",
+    causes: [
+      "Another developer pushed to the same branch after you last pulled",
+      "You rebased locally and your history diverged from the remote",
+      "CI or a bot made a commit to the branch on the remote",
+      "You're pushing from a different machine that doesn't have the latest commits",
+    ],
+    fixes: [
+      "Pull the latest changes and integrate: git pull --rebase origin <branch>",
+      "Or merge: git pull origin <branch>, then push again",
+      "Use --force-with-lease as a safer force push (won't overwrite others' work): git push --force-with-lease",
+      "Never use --force on shared branches like main — it will overwrite others' work",
+    ],
+    example: {
+      input:
+        "error: failed to push some refs to 'origin'\nhint: Updates were rejected because the tip of your current branch is behind its remote counterpart.",
+      context: "Pushing after another team member committed to the same branch",
+    },
+    tags: ["git", "error", "push", "non-fast-forward", "rejected"],
+    searchTerms: [
+      "non-fast-forward",
+      "tip of your current branch is behind",
+      "updates were rejected behind",
+    ],
+  },
+  {
+    id: "git-branch-already-exists",
+    slug: "git-branch-already-exists",
+    ecosystem: "git",
+    pattern: /fatal: A branch named .+ already exists|fatal: branch .+ already exists/i,
+    title: "fatal: A branch named ... already exists",
+    shortTitle: "Branch name already exists",
+    explanation:
+      "You're trying to create a branch with a name that's already taken in this repository. Git doesn't allow duplicate branch names.",
+    causes: [
+      "You already created this branch previously",
+      "You're trying to create a branch from a different starting point but the name is taken",
+      "A teammate's branch was fetched and shows up as a remote tracking ref with the same name",
+      "A script or automation created the branch before you ran the command",
+    ],
+    fixes: [
+      "Switch to the existing branch: git checkout <branch-name>",
+      "List all branches to see what exists: git branch -a",
+      "Delete the old branch if it's safe: git branch -d <branch-name>, then create a new one",
+      "Use a different name: git checkout -b <new-unique-name>",
+    ],
+    example: {
+      input: "fatal: A branch named 'feature/login' already exists.",
+      context: "Running git checkout -b feature/login when that branch was already created",
+    },
+    tags: ["git", "fatal", "branch", "exists"],
+    searchTerms: ["branch already exists", "branch named already exists", "a branch named"],
+  },
+  {
+    id: "git-cannot-rebase-unstaged",
+    slug: "git-cannot-rebase-unstaged",
+    ecosystem: "git",
+    pattern: /error: cannot rebase: you have unstaged changes/i,
+    title: "error: cannot rebase: you have unstaged changes",
+    shortTitle: "Cannot rebase with unstaged changes",
+    explanation:
+      "Git won't start a rebase because you have modified files that haven't been staged or committed. Rebase needs a clean working tree to apply commits safely.",
+    causes: [
+      "You edited files and didn't commit or stash before rebasing",
+      "An editor or IDE auto-saved changes that show up as modifications",
+      "Files were modified by a previous command and left uncommitted",
+      "You're trying to rebase in the middle of other in-progress work",
+    ],
+    fixes: [
+      "Commit your work first: git add . && git commit -m 'WIP'",
+      "Or stash and unstash: git stash, then git rebase <target>, then git stash pop",
+      "Check what's modified: git status",
+      "To discard changes if they don't matter: git checkout -- .",
+    ],
+    example: {
+      input: "error: cannot rebase: you have unstaged changes\nerror: Please commit or stash them.",
+      context: "Running git rebase main with unsaved edits in the working tree",
+    },
+    tags: ["git", "error", "rebase", "unstaged", "changes"],
+    searchTerms: ["cannot rebase unstaged", "cannot rebase you have unstaged", "rebase unstaged"],
+  },
+  {
+    id: "git-bad-default-revision-head",
+    slug: "git-bad-default-revision-head",
+    ecosystem: "git",
+    pattern: /fatal: bad default revision 'HEAD'/i,
+    title: "fatal: bad default revision 'HEAD'",
+    shortTitle: "Bad default revision HEAD",
+    explanation:
+      "Git can't resolve HEAD because there are no commits in the repository yet. HEAD can't point to a commit that doesn't exist.",
+    causes: [
+      "The repository was just initialized with git init and has no commits",
+      "All commits were removed with a hard reset to an empty state",
+      "The .git/HEAD file is corrupt or points to a non-existent ref",
+      "Running git log, git diff HEAD, or similar commands before the first commit",
+    ],
+    fixes: [
+      "Create the first commit: git add . && git commit -m 'Initial commit'",
+      "If you just want to stage files first: git add -A",
+      "Check the current HEAD state: cat .git/HEAD",
+      "If HEAD is corrupt, re-init is usually faster than trying to repair: back up files, rm -rf .git, git init",
+    ],
+    example: {
+      input: "fatal: bad default revision 'HEAD'",
+      context: "Running git log on a freshly initialized repository with no commits",
+    },
+    tags: ["git", "fatal", "HEAD", "revision", "empty"],
+    searchTerms: ["bad default revision HEAD", "bad default revision", "HEAD revision"],
+  },
+  {
+    id: "git-untracked-files-overwritten",
+    slug: "git-untracked-files-overwritten",
+    ecosystem: "git",
+    pattern: /error: The following untracked working tree files would be overwritten/i,
+    title: "error: The following untracked working tree files would be overwritten",
+    shortTitle: "Untracked files would be overwritten",
+    explanation:
+      "Git is stopping you from checking out or merging because the incoming branch has files that also exist as untracked files in your working directory. Proceeding would silently overwrite them.",
+    causes: [
+      "You created files locally that aren't tracked by Git but exist in the target branch",
+      "You ran git clean to remove tracked files but the untracked replacements remain",
+      "A previously generated artifact shares a name with a tracked file in the other branch",
+      "Files were moved to .gitignore but still exist on disk",
+    ],
+    fixes: [
+      "Check what untracked files are present: git status",
+      "Remove the conflicting untracked files if they're safe to delete: rm <filename>",
+      "Or move them somewhere else temporarily before switching branches",
+      "To force-overwrite (will lose the local untracked files): git checkout -f <branch>",
+    ],
+    example: {
+      input:
+        "error: The following untracked working tree files would be overwritten by checkout:\n\tdist/bundle.js\nPlease move or remove them before you switch branches.",
+      context: "Switching to a branch that includes a file you also have as an untracked local file",
+    },
+    tags: ["git", "error", "untracked", "overwritten", "checkout"],
+    searchTerms: [
+      "untracked working tree files would be overwritten",
+      "untracked files would be overwritten",
+      "move or remove them",
+    ],
+  },
+  {
+    id: "git-not-a-valid-object-name",
+    slug: "git-not-a-valid-object-name",
+    ecosystem: "git",
+    pattern: /fatal: Not a valid object name[:\s]/i,
+    title: "fatal: Not a valid object name",
+    shortTitle: "Not a valid object name",
+    explanation:
+      "Git can't find a commit, branch, or tag matching the name you provided. The reference doesn't exist in this repository's history.",
+    causes: [
+      "Typo in a branch name, tag, or commit hash",
+      "Referencing a branch from another repo that hasn't been fetched",
+      "The branch or tag was deleted after you copied its name",
+      "Using a short commit hash that's ambiguous or doesn't exist locally",
+    ],
+    fixes: [
+      "Fetch all refs from remote: git fetch --all",
+      "List local branches: git branch -a",
+      "List all tags: git tag",
+      "If using a commit hash, double-check it with git log --oneline",
+    ],
+    example: {
+      input: "fatal: Not a valid object name: 'feature/missing-branch'",
+      context: "Running git show or git checkout with a branch name that was deleted or never fetched",
+    },
+    tags: ["git", "fatal", "object", "name", "invalid"],
+    searchTerms: ["not a valid object name", "valid object name", "invalid object"],
+  },
+  {
+    id: "git-commit-or-stash-before-switch",
+    slug: "git-commit-or-stash-before-switch",
+    ecosystem: "git",
+    pattern: /error: Your local changes to the following files would be overwritten by checkout|Please commit your changes or stash them before you switch branches/i,
+    title: "error: please commit or stash your changes before you switch branches",
+    shortTitle: "Commit or stash before switching branches",
+    explanation:
+      "You're trying to switch branches but have uncommitted changes to files that differ between the two branches. Git won't let you switch because it would lose or overwrite your local edits.",
+    causes: [
+      "You edited files that exist differently on the target branch",
+      "You forgot to commit work-in-progress before switching context",
+      "A save or auto-format tool modified tracked files",
+      "You modified a file that was deleted or renamed in the target branch",
+    ],
+    fixes: [
+      "Commit the changes: git add . && git commit -m 'WIP'",
+      "Or stash them: git stash, switch branches, then git stash pop when you return",
+      "Discard the changes if they don't matter: git checkout -- <file> or git restore <file>",
+      "Use git status to review exactly which files are affected before deciding",
+    ],
+    example: {
+      input:
+        "error: Your local changes to the following files would be overwritten by checkout:\n\tsrc/config.js\nPlease commit your changes or stash them before you switch branches.",
+      context: "Running git checkout <other-branch> with uncommitted changes",
+    },
+    tags: ["git", "error", "checkout", "stash", "switch", "branches"],
+    searchTerms: [
+      "commit or stash before switch",
+      "stash them before you switch branches",
+      "changes would be overwritten by checkout",
+    ],
+  },
+  {
+    id: "git-ambiguous-argument",
+    slug: "git-ambiguous-argument",
+    ecosystem: "git",
+    pattern: /fatal: ambiguous argument/i,
+    title: "fatal: ambiguous argument",
+    shortTitle: "Ambiguous argument",
+    explanation:
+      "The argument you passed to Git could refer to multiple things — a branch, a tag, a file path, or a commit — and Git doesn't know which one you mean.",
+    causes: [
+      "A branch and a file have the same name and Git can't determine which one you mean",
+      "Using a short commit hash that matches more than one object",
+      "Referencing HEAD or a branch name in a repo with no commits",
+      "Using -- to separate paths but in the wrong position",
+    ],
+    fixes: [
+      "Use -- to explicitly separate a branch/commit from a file path: git checkout HEAD -- <file>",
+      "Specify the full ref: git show refs/heads/<branch-name>",
+      "Use a full commit hash instead of a short one: git show <full-40-char-hash>",
+      "Check what the ambiguous name matches: git rev-parse <name>",
+    ],
+    example: {
+      input: "fatal: ambiguous argument 'main': both revision and filename\nUse '--' to separate paths from revisions",
+      context: "Running git diff main when a file named 'main' also exists in the working tree",
+    },
+    tags: ["git", "fatal", "ambiguous", "argument"],
+    searchTerms: ["ambiguous argument", "fatal ambiguous", "both revision and filename"],
+  },
+  {
+    id: "git-rpc-failed-http-400",
+    slug: "git-rpc-failed-http-400",
+    ecosystem: "git",
+    pattern: /error: RPC failed.*HTTP [45]\d\d curl/i,
+    title: "error: RPC failed; HTTP 400 curl",
+    shortTitle: "RPC failed (HTTP error)",
+    explanation:
+      "The HTTP request Git made to the remote server was rejected or failed mid-transfer. This often happens with large pushes or pulls when a buffer size or timeout limit is exceeded.",
+    causes: [
+      "The repository is too large for the default HTTP buffer size",
+      "A proxy, firewall, or CDN is truncating or rejecting the request",
+      "The server returned a 413 (request too large) or 400 (bad request)",
+      "Slow or intermittent network dropping large transfers",
+    ],
+    fixes: [
+      "Increase the Git HTTP buffer: git config --global http.postBuffer 524288000",
+      "Try using SSH instead of HTTPS: git remote set-url origin git@github.com:user/repo.git",
+      "Split a large initial push by pushing a shallow history first",
+      "Check if a proxy or VPN is interfering and try disabling it",
+    ],
+    example: {
+      input:
+        "error: RPC failed; HTTP 400 curl 22 The requested URL returned error: 400\nfatal: the remote end hung up unexpectedly",
+      context: "Pushing a large initial commit or a repo with large binary files over HTTPS",
+    },
+    tags: ["git", "error", "RPC", "HTTP", "curl", "push"],
+    searchTerms: ["RPC failed", "HTTP 400 curl", "remote end hung up", "RPC failed HTTP"],
+  },
+  {
+    id: "git-loose-object-corrupt",
+    slug: "git-loose-object-corrupt",
+    ecosystem: "git",
+    pattern: /fatal: loose object .+ \(stored in .+\) is corrupt/i,
+    title: "fatal: loose object is corrupt",
+    shortTitle: "Loose object is corrupt",
+    explanation:
+      "A Git object file on disk is corrupt — its content doesn't match its stored hash. This is usually caused by a filesystem issue, interrupted write, or disk error.",
+    causes: [
+      "Power loss or system crash during a Git operation",
+      "Disk errors or bad sectors on the drive",
+      "Filesystem issues caused by force-quit or hard reboot",
+      "Network filesystem (NFS) or cloud sync (Dropbox, iCloud) corrupting the .git folder",
+    ],
+    fixes: [
+      "Run a full integrity check: git fsck --full",
+      "Try to recover using the reflog: git reflog show",
+      "If you have a remote backup, re-clone: git clone <url> (keep local changes aside first)",
+      "Remove the corrupt object and let Git re-fetch it: git fetch --all (if remote is intact)",
+    ],
+    example: {
+      input:
+        "fatal: loose object 1a2b3c4d (stored in .git/objects/1a/2b3c4d...) is corrupt",
+      context: "Running any Git command after a system crash or disk issue",
+    },
+    tags: ["git", "fatal", "corrupt", "loose", "object"],
+    searchTerms: ["loose object is corrupt", "loose object corrupt", "stored in is corrupt"],
+  },
+  {
+    id: "git-reflog-broken-commit",
+    slug: "git-reflog-broken-commit",
+    ecosystem: "git",
+    pattern: /warning: reflog of 'HEAD' references a broken commit/i,
+    title: "warning: reflog of 'HEAD' references a broken commit",
+    shortTitle: "Reflog references a broken commit",
+    explanation:
+      "The reflog (the history of where HEAD has pointed) references a commit object that no longer exists or is corrupt in the object store. This usually means some history was lost.",
+    causes: [
+      "A git gc or git prune removed objects that the reflog still references",
+      "Repo was transferred or cloned in a way that didn't include all objects",
+      "Object store corruption from a disk or filesystem issue",
+      "A shallow clone missing full history",
+    ],
+    fixes: [
+      "This is often just a warning — run git fsck to see if there are real errors: git fsck --full",
+      "Clean up dangling refs: git gc --prune=now",
+      "Expire old reflog entries: git reflog expire --all --expire=now",
+      "If critical history is missing, check if the remote still has it: git fetch --all",
+    ],
+    example: {
+      input: "warning: reflog of 'HEAD' references a broken commit.\nwarning: reflog of 'refs/heads/main' references a broken commit.",
+      context: "Running git gc or git fsck after object store corruption",
+    },
+    tags: ["git", "warning", "reflog", "HEAD", "broken", "commit"],
+    searchTerms: ["reflog references a broken commit", "broken commit reflog", "reflog broken"],
+  },
+  {
+    id: "git-cannot-pull-rebase-unstaged",
+    slug: "git-cannot-pull-rebase-unstaged",
+    ecosystem: "git",
+    pattern: /error: cannot pull with rebase: you have unstaged changes/i,
+    title: "error: cannot pull with rebase: you have unstaged changes",
+    shortTitle: "Cannot pull with rebase, unstaged changes",
+    explanation:
+      "You're running git pull --rebase (or have rebase as the default pull strategy) but your working tree has uncommitted changes. Rebase needs a clean starting point.",
+    causes: [
+      "You edited files and haven't committed or stashed before pulling",
+      "Your git config has pull.rebase=true globally or for this branch",
+      "An editor or build tool modified tracked files",
+      "You ran git pull in the middle of active development work",
+    ],
+    fixes: [
+      "Stash your changes: git stash, then git pull --rebase, then git stash pop",
+      "Or commit first: git add . && git commit -m 'WIP', then pull",
+      "Pull without rebase: git pull --no-rebase origin <branch>",
+      "Check what's modified: git status",
+    ],
+    example: {
+      input:
+        "error: cannot pull with rebase: you have unstaged changes\nerror: please commit or stash them.",
+      context: "Running git pull --rebase with uncommitted edits in the working tree",
+    },
+    tags: ["git", "error", "pull", "rebase", "unstaged"],
+    searchTerms: [
+      "cannot pull with rebase unstaged",
+      "cannot pull with rebase you have unstaged",
+      "pull with rebase unstaged",
+    ],
+  },
+];
