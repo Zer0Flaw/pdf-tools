@@ -38,7 +38,7 @@ export default function ErrorDetailPage({ slug, onBackHome, onOpenErrorTool, onO
       ) : (
         <>
           <div className="route-intro error-detail-intro">
-            <span className="error-ecosystem-badge">{error.ecosystem}</span>
+            <span className="error-ecosystem-badge" data-ecosystem={error.ecosystem}>{error.ecosystem}</span>
             <h1>{error.title}</h1>
             <p>{error.explanation}</p>
           </div>

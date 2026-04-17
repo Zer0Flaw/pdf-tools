@@ -105,7 +105,7 @@ export default function ErrorTranslatorTool({ onNavigateToError }) {
       {result && (
         <div className="error-result">
           <div className="error-result-header">
-            <span className="error-ecosystem-badge">{result.ecosystem}</span>
+            <span className="error-ecosystem-badge" data-ecosystem={result.ecosystem}>{result.ecosystem}</span>
             <h3>{result.title}</h3>
           </div>
 
@@ -173,6 +173,40 @@ export default function ErrorTranslatorTool({ onNavigateToError }) {
         <h3>Common Git Errors</h3>
         <div className="error-directory-list">
           {getErrorsByEcosystem("git").map((error) => (
+            <a
+              key={error.slug}
+              className="error-directory-item"
+              href={`/errors/${error.slug}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateToError?.(error.slug);
+              }}
+            >
+              {error.shortTitle}
+            </a>
+          ))}
+        </div>
+
+        <h3>Common npm &amp; Node.js Errors</h3>
+        <div className="error-directory-list">
+          {getErrorsByEcosystem("npm").map((error) => (
+            <a
+              key={error.slug}
+              className="error-directory-item"
+              href={`/errors/${error.slug}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateToError?.(error.slug);
+              }}
+            >
+              {error.shortTitle}
+            </a>
+          ))}
+        </div>
+
+        <h3>Common Python Errors</h3>
+        <div className="error-directory-list">
+          {getErrorsByEcosystem("python").map((error) => (
             <a
               key={error.slug}
               className="error-directory-item"
