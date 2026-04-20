@@ -280,7 +280,7 @@ export default function SupportPage({
     <div className="support-page">
       <div className="brand-bar workspace-brand-bar">
         <button type="button" className="back-home-btn" onClick={onBackHome}>
-          Back to Home
+          ← Home
         </button>
 
         <div className="brand-lockup">
@@ -299,10 +299,6 @@ export default function SupportPage({
       <div className="route-intro support-intro">
         <h1>{page.heading}</h1>
         <p>{page.intro}</p>
-        <p className="route-trust-note">
-          Files are processed locally in your browser for the core ProjectStack
-          tools.
-        </p>
       </div>
 
       <div className="support-sections">
@@ -317,31 +313,27 @@ export default function SupportPage({
       </div>
 
       {page.relatedLinks?.length > 0 && (
-        <section className="landing-section support-links-section">
-          <div className="section-heading">
-            <p className="section-eyebrow">Helpful pages</p>
-            <h2>Keep exploring ProjectStack</h2>
+        <section className="lp-section">
+          <div className="lp-section-head">
+            <h2 className="lp-section-title">Helpful pages</h2>
           </div>
-
-          <div className="tool-preview-grid">
+          <div className="lp-tool-grid">
             {page.relatedLinks.map((link) => (
-              <div key={`${pageId}-${link.type}-${link.id}`} className="tool-preview-card">
-                <h3>{link.label}</h3>
-                <button
-                  type="button"
-                  className="hero-secondary-btn tool-preview-btn"
-                  onClick={() => {
-                    if (link.type === "tool") {
-                      onOpenTool?.(link.id);
-                      return;
-                    }
-
-                    onOpenSupportPage?.(link.id);
-                  }}
-                >
-                  Open {link.label}
-                </button>
-              </div>
+              <button
+                key={`${pageId}-${link.type}-${link.id}`}
+                type="button"
+                className="lp-tool-card"
+                onClick={() => {
+                  if (link.type === "tool") {
+                    onOpenTool?.(link.id);
+                    return;
+                  }
+                  onOpenSupportPage?.(link.id);
+                }}
+              >
+                <span className="lp-tool-name">{link.label}</span>
+                <span className="lp-tool-cta">Open →</span>
+              </button>
             ))}
           </div>
         </section>
