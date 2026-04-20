@@ -50,9 +50,9 @@ const APP_VIEW_KEY = "projectstack-active-view";
 const APP_TOOL_KEY = "projectstack-active-tool";
 const VALID_VIEWS = ["home", "workspace", "support"];
 const VALID_TOOLS = ["edit", "merge", "rotate", "delete", "reorder", "extract", "split", "compress", "images", "pdfToImage", "errorExplain"];
-const HOME_TITLE = "ProjectStack | Browser-Based PDF and Image Tools";
+const HOME_TITLE = "ProjectStack | File Tools & Developer Utilities";
 const HOME_DESCRIPTION =
-  "Use browser-based PDF and image tools with ProjectStack. Edit PDFs, merge files, rotate pages, delete pages, reorder pages, extract pages, split files, convert images to PDF, convert PDFs to images, and compress images in one clean workspace.";
+  "Browser-based file tools and developer utilities. Edit PDFs, merge documents, compress images, translate error messages, and more — all processed locally in your browser.";
 const TOOL_ROUTES = {
   edit: "/edit-pdf",
   merge: "/merge-pdf",
@@ -504,7 +504,7 @@ export default function App() {
               className="back-home-btn"
               onClick={() => setActiveView("home")}
             >
-              Back to Home
+              ← Home
             </button>
 
             <div className="brand-lockup">
@@ -523,19 +523,6 @@ export default function App() {
           <div className="route-intro">
             <h1>{activeToolMetadata.heading}</h1>
             <p>{activeToolMetadata.intro}</p>
-            <p className="route-trust-note">
-              Files are processed locally in your browser, so they never need to
-              leave your device.
-            </p>
-            <div className="tool-hero-actions">
-              <button
-                type="button"
-                className="hero-primary-btn"
-                onClick={scrollToToolWorkspace}
-              >
-                Use {activeToolMetadata.heading.replace(" Online", "")}
-              </button>
-            </div>
           </div>
 
           <div className="tool-context-bar">
