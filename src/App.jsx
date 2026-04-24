@@ -228,6 +228,20 @@ function updateMetaTag(attributeName, attributeValue, content) {
   }
 }
 
+function updateCanonicalTag(href) {
+  if (typeof document === "undefined") return;
+
+  let link = document.querySelector('link[rel="canonical"]');
+  if (!link) {
+    link = document.createElement("link");
+    link.setAttribute("rel", "canonical");
+    document.head.appendChild(link);
+  }
+  link.setAttribute("href", href);
+}
+
+const BASE_URL = "https://projectstack.cc";
+
 export default function App() {
   const [activeTool, setActiveTool] = useState(() => {
     if (typeof window !== "undefined") {
@@ -352,6 +366,22 @@ export default function App() {
     updateMetaTag("property", "og:description", metadata.description);
     updateMetaTag("name", "twitter:title", metadata.title);
     updateMetaTag("name", "twitter:description", metadata.description);
+
+    let canonicalPath;
+    if (activeView === "home") {
+      canonicalPath = "/";
+    } else if (activeView === "workspace") {
+      canonicalPath = TOOL_ROUTES[activeTool] + "/";
+    } else if (activeView === "support") {
+      canonicalPath = SUPPORT_PAGES[activeSupportPage].route + "/";
+    } else if (activeView === "errorPage") {
+      canonicalPath = `/errors/${activeErrorSlug}/`;
+    } else {
+      canonicalPath = "/";
+    }
+    const canonicalUrl = BASE_URL + canonicalPath;
+    updateCanonicalTag(canonicalUrl);
+    updateMetaTag("property", "og:url", canonicalUrl);
   }, [activeSupportPage, activeTool, activeView, activeErrorSlug]);
 
   useEffect(() => {

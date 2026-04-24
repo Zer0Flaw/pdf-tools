@@ -1,91 +1,110 @@
 # ProjectStack Backlog
 
 ## Completed
+
+### Core Tools
 - Edit PDF tool with reducer-based editor, thumbnail rail, drag reorder
 - Fill & Sign system (signatures, text, date, initials, placed objects, export flattening)
-- Full 10-tool suite (Edit, Merge, Split, Rotate, Delete, Reorder, Extract, Images→PDF, PDF→Image, Compress)
-- Landing page with tool grid, benefit sections, CTA
-- Branding (logo, mark, color theme with indigo accent)
-- ToolSeoContent for all 10 tools (benefits, steps, FAQs, related tools)
-- Support pages (About, Privacy, Terms, Contact, FAQ)
-- AdSense scaffolding with env-driven placement system
-- UpgradeBanner with modal (UI only)
+- Full 10-tool file suite (Edit, Merge, Split, Rotate, Delete, Reorder, Extract, Images→PDF, PDF→Image, Compress)
+- ToolSeoContent for all 10 file tools (benefits, steps, FAQs, related tools)
+
+### Developer Tools
+- Error Translator tool (text-input, no file processing)
+- Error database with 90+ errors: Git (30), npm/Node.js (30), Python (30)
+- Individual prerendered error pages at /errors/[slug] for SEO
+
+### Auth & Subscriptions
+- Clerk authentication with Google OAuth + email/password sign-in
+- ClerkProvider conditionally applied — safe when key is absent
+- Stripe subscription at $9.99/month via Payment Link
+- Cloudflare Worker handling Stripe webhooks and subscription status API
+- Subscription status checking (useSubscription hook) and premium feature gating
+- Stripe Customer Portal integration (Manage Subscription button for premium users)
+- Pro badge shown in header for premium users
+
+### Free Tier & Monetization
 - Free tier gating (file count, file size limits per tool)
-- Watermark system for Merge and Images→PDF
-- Daily watermark-free export (1x per day via localStorage)
+- Daily export limit: 5 exports/day across all tools (localStorage, resets daily)
+- Watermark system extended to: Edit, Merge, Rotate, Delete, Reorder, Extract, Images→PDF
+- Daily watermark-free export (1x/day, localStorage)
+- Upgrade modal: signed-out → "Sign in to upgrade"; signed-in → Stripe checkout link
+- AdSense scaffolding with env-driven placement system (application submitted)
+
+### Site & Infrastructure
+- Landing page redesign with File Tools + Developer Tools sections
+- App shell and workspace visual refresh
+- Prerendering for all 107+ routes via Puppeteer postbuild script
+- Branding (logo, mark, color theme with indigo accent)
+- Support pages (About, Privacy, Terms, Contact, FAQ)
 - Analytics event tracking
 - Meta tags and SEO metadata per tool route
 - Sitemap and robots.txt
+- Manual deploy process: `npm run build` → `wrangler pages deploy dist`
 
 
-## Now — Monetization Blockers
+## Now
 
-### AdSense Approval
-- Add richer informational content to homepage and tool workspace pages
-- Google flagged "screens without publisher content"
-- Existing ToolSeoContent and support pages are not enough
-- Need visible educational/explainer content on ad-serving pages
+### SEO & Discoverability
+- AdSense approval (application submitted — waiting for Google review)
+- Google Search Console indexing (sitemap submitted, pages being crawled)
+- Schema markup (JSON-LD) on error detail pages for rich search snippets
 
-### Free Tier Tightening
-- Most tools have no friction beyond 5MB cap (which most users never hit)
-- Consider daily usage caps or session-based limits
-- Consider extending watermark to more export paths
-- Strengthen the free→premium pressure without degrading UX
+### Error Database Expansion
+- Add Docker error ecosystem (30 target entries)
+- Add React/JSX error ecosystem
+- Add TypeScript error ecosystem
 
-### Upgrade Path
-- Upgrade modal currently closes with no action
-- Add Stripe Payment Links or Checkout (client-side, no backend needed)
-- Wire upgrade modal CTA to real payment flow
+### Marketing
+- Product Hunt launch
+- Reddit posts in relevant subreddits (r/webdev, r/git, r/learnprogramming)
+- Hacker News Show HN post
 
 
-## Next — Polish and Consistency
+## Next
 
-### Cross-Tool UI Consistency Pass
-- Merge PDF
-- Split PDF
-- Images → PDF
-- PDF → Image
-- Ensure identical spacing, drop zone behavior, message patterns
+### SEO Content
+- Blog / guides section for long-tail keyword content (e.g. "how to fix git merge conflicts")
+- Informational articles linked from error detail pages
 
-### Editor QA and Polish
-- Interaction clarity refinements
-- Selection state visual clarity
-- Viewer hierarchy polish
-- Fill & Sign placement edge cases
+### New Developer Tools
+- Additional tools from the product roadmap (TBD based on search demand and usage data)
 
-### Context File Maintenance
-- Keep AGENTS.md and BACKLOG.md current after each development phase
-- Update Project_Context.md if architecture changes
+### Phase 2 Project (Deferred — requires revenue)
+- Video → Instruction Manual Generator (needs LLM API costs — defer until AdSense or Stripe revenue covers it)
+
+### Polish
+- Cross-tool UI consistency pass (Merge, Split, Images→PDF, PDF→Image spacing/behavior)
+- Editor QA: selection state clarity, viewer hierarchy, Fill & Sign edge cases
+- Context file maintenance (keep AGENTS.md and BACKLOG.md current after each dev phase)
 
 
-## Future — Features
+## Future
 
-### Document Features
+### Error Translator
+- AI-powered analysis for unrecognized errors (premium feature — requires LLM API, deferred until revenue)
+- Watch-ad-to-unlock for unmatched errors (rewarded ad flow)
+
+### File Tools
 - Annotation system
 - Watermark tool (add watermarks to PDFs)
 - Page numbering
 - Form field expansion
-- Template-based document workflows
-
-### Signature Improvements
-- Drawn signature (canvas-based freehand)
+- Drawn signature (canvas freehand)
 - Signature management (delete saved signatures)
+- True PDF compression (beyond canvas image compression)
+- Expand to Word, Excel, image editing
 
 ### Platform
-- Stripe subscription integration
-- Premium feature gating (runtime, not just UI)
 - Desktop app (Electron or Tauri)
-- Expand beyond PDF (Word, Excel, image editing)
+- Multi-language support
 
 ### Marketing
 - Social media pages
-- Google Search Console optimization
-- Content marketing / blog
 - Backlink strategy
+- Carbon Ads as AdSense alternative
 
 
 ## Icebox
-- Watch ad to remove watermark (rewarded ad flow)
-- True PDF compression (beyond image compression)
-- Carbon Ads integration as AdSense alternative
+- Template-based document workflows
 - Multi-language support
+- Carbon Ads integration

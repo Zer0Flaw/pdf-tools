@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://projectstack.cc/</loc>
@@ -6,532 +6,532 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/edit-pdf</loc>
+    <loc>https://projectstack.cc/edit-pdf/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/merge-pdf</loc>
+    <loc>https://projectstack.cc/merge-pdf/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/rotate-pdf-pages</loc>
+    <loc>https://projectstack.cc/rotate-pdf-pages/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/delete-pdf-pages</loc>
+    <loc>https://projectstack.cc/delete-pdf-pages/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/reorder-pdf-pages</loc>
+    <loc>https://projectstack.cc/reorder-pdf-pages/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/extract-pdf-pages</loc>
+    <loc>https://projectstack.cc/extract-pdf-pages/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/split-pdf</loc>
+    <loc>https://projectstack.cc/split-pdf/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/images-to-pdf</loc>
+    <loc>https://projectstack.cc/images-to-pdf/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/pdf-to-image</loc>
+    <loc>https://projectstack.cc/pdf-to-image/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/compress-images</loc>
+    <loc>https://projectstack.cc/compress-images/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/error-explain</loc>
+    <loc>https://projectstack.cc/error-explain/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-not-a-git-repository</loc>
+    <loc>https://projectstack.cc/errors/git-not-a-git-repository/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-remote-origin-already-exists</loc>
+    <loc>https://projectstack.cc/errors/git-remote-origin-already-exists/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-failed-to-push-refs</loc>
+    <loc>https://projectstack.cc/errors/git-failed-to-push-refs/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-refusing-to-merge-unrelated-histories</loc>
+    <loc>https://projectstack.cc/errors/git-refusing-to-merge-unrelated-histories/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-local-changes-overwritten-by-merge</loc>
+    <loc>https://projectstack.cc/errors/git-local-changes-overwritten-by-merge/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-could-not-resolve-host</loc>
+    <loc>https://projectstack.cc/errors/git-could-not-resolve-host/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-src-refspec-does-not-match</loc>
+    <loc>https://projectstack.cc/errors/git-src-refspec-does-not-match/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-destination-path-already-exists</loc>
+    <loc>https://projectstack.cc/errors/git-destination-path-already-exists/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-pathspec-did-not-match</loc>
+    <loc>https://projectstack.cc/errors/git-pathspec-did-not-match/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-no-upstream-branch</loc>
+    <loc>https://projectstack.cc/errors/git-no-upstream-branch/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-merge-conflict</loc>
+    <loc>https://projectstack.cc/errors/git-merge-conflict/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-cannot-lock-ref</loc>
+    <loc>https://projectstack.cc/errors/git-cannot-lock-ref/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-bad-object-head</loc>
+    <loc>https://projectstack.cc/errors/git-bad-object-head/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-resolve-index-first</loc>
+    <loc>https://projectstack.cc/errors/git-resolve-index-first/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-lf-replaced-by-crlf</loc>
+    <loc>https://projectstack.cc/errors/git-lf-replaced-by-crlf/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-authentication-failed</loc>
+    <loc>https://projectstack.cc/errors/git-authentication-failed/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-permission-denied-publickey</loc>
+    <loc>https://projectstack.cc/errors/git-permission-denied-publickey/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-could-not-read-from-remote</loc>
+    <loc>https://projectstack.cc/errors/git-could-not-read-from-remote/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-failed-to-push-non-fast-forward</loc>
+    <loc>https://projectstack.cc/errors/git-failed-to-push-non-fast-forward/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-branch-already-exists</loc>
+    <loc>https://projectstack.cc/errors/git-branch-already-exists/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-cannot-rebase-unstaged</loc>
+    <loc>https://projectstack.cc/errors/git-cannot-rebase-unstaged/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-bad-default-revision-head</loc>
+    <loc>https://projectstack.cc/errors/git-bad-default-revision-head/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-untracked-files-overwritten</loc>
+    <loc>https://projectstack.cc/errors/git-untracked-files-overwritten/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-not-a-valid-object-name</loc>
+    <loc>https://projectstack.cc/errors/git-not-a-valid-object-name/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-commit-or-stash-before-switch</loc>
+    <loc>https://projectstack.cc/errors/git-commit-or-stash-before-switch/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-ambiguous-argument</loc>
+    <loc>https://projectstack.cc/errors/git-ambiguous-argument/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-rpc-failed-http-400</loc>
+    <loc>https://projectstack.cc/errors/git-rpc-failed-http-400/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-loose-object-corrupt</loc>
+    <loc>https://projectstack.cc/errors/git-loose-object-corrupt/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-reflog-broken-commit</loc>
+    <loc>https://projectstack.cc/errors/git-reflog-broken-commit/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/git-cannot-pull-rebase-unstaged</loc>
+    <loc>https://projectstack.cc/errors/git-cannot-pull-rebase-unstaged/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-missing-script-start</loc>
+    <loc>https://projectstack.cc/errors/npm-missing-script-start/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-enoent-no-such-file</loc>
+    <loc>https://projectstack.cc/errors/npm-enoent-no-such-file/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-eacces-permission-denied</loc>
+    <loc>https://projectstack.cc/errors/npm-eacces-permission-denied/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-eresolve-dependency-tree</loc>
+    <loc>https://projectstack.cc/errors/npm-eresolve-dependency-tree/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-peer-dep-missing</loc>
+    <loc>https://projectstack.cc/errors/npm-peer-dep-missing/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-e404-not-found</loc>
+    <loc>https://projectstack.cc/errors/npm-e404-not-found/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-elifecycle-exit-status</loc>
+    <loc>https://projectstack.cc/errors/npm-elifecycle-exit-status/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-eintegrity-checksum-failed</loc>
+    <loc>https://projectstack.cc/errors/npm-eintegrity-checksum-failed/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-warn-deprecated</loc>
+    <loc>https://projectstack.cc/errors/npm-warn-deprecated/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-eperm-operation-not-permitted</loc>
+    <loc>https://projectstack.cc/errors/npm-eperm-operation-not-permitted/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-cannot-find-module</loc>
+    <loc>https://projectstack.cc/errors/node-cannot-find-module/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-syntax-error-unexpected-token</loc>
+    <loc>https://projectstack.cc/errors/node-syntax-error-unexpected-token/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-syntax-error-import-outside-module</loc>
+    <loc>https://projectstack.cc/errors/node-syntax-error-import-outside-module/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-type-error-cannot-read-undefined</loc>
+    <loc>https://projectstack.cc/errors/node-type-error-cannot-read-undefined/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-type-error-cannot-read-null</loc>
+    <loc>https://projectstack.cc/errors/node-type-error-cannot-read-null/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-range-error-max-call-stack</loc>
+    <loc>https://projectstack.cc/errors/node-range-error-max-call-stack/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-eaddrinuse-address-already-in-use</loc>
+    <loc>https://projectstack.cc/errors/node-eaddrinuse-address-already-in-use/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-enospc-no-space-left</loc>
+    <loc>https://projectstack.cc/errors/node-enospc-no-space-left/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-unhandled-promise-rejection</loc>
+    <loc>https://projectstack.cc/errors/node-unhandled-promise-rejection/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-err-module-not-found</loc>
+    <loc>https://projectstack.cc/errors/node-err-module-not-found/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-err-require-esm</loc>
+    <loc>https://projectstack.cc/errors/node-err-require-esm/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-heap-out-of-memory</loc>
+    <loc>https://projectstack.cc/errors/node-heap-out-of-memory/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-eperm-unlink</loc>
+    <loc>https://projectstack.cc/errors/npm-eperm-unlink/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-ejsonparse-failed-to-parse</loc>
+    <loc>https://projectstack.cc/errors/npm-ejsonparse-failed-to-parse/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-self-signed-certificate</loc>
+    <loc>https://projectstack.cc/errors/node-self-signed-certificate/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-enotempty-directory-not-empty</loc>
+    <loc>https://projectstack.cc/errors/npm-enotempty-directory-not-empty/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-econnrefused</loc>
+    <loc>https://projectstack.cc/errors/node-econnrefused/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-etarget-no-matching-version</loc>
+    <loc>https://projectstack.cc/errors/npm-etarget-no-matching-version/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/node-spawn-enoent</loc>
+    <loc>https://projectstack.cc/errors/node-spawn-enoent/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/npm-warn-optional-dependency</loc>
+    <loc>https://projectstack.cc/errors/npm-warn-optional-dependency/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-syntax-error-invalid-syntax</loc>
+    <loc>https://projectstack.cc/errors/python-syntax-error-invalid-syntax/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-indentation-error-unexpected-indent</loc>
+    <loc>https://projectstack.cc/errors/python-indentation-error-unexpected-indent/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-indentation-error-expected-block</loc>
+    <loc>https://projectstack.cc/errors/python-indentation-error-expected-block/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-name-error-not-defined</loc>
+    <loc>https://projectstack.cc/errors/python-name-error-not-defined/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-type-error-nonetype-not-subscriptable</loc>
+    <loc>https://projectstack.cc/errors/python-type-error-nonetype-not-subscriptable/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-type-error-nonetype-not-iterable</loc>
+    <loc>https://projectstack.cc/errors/python-type-error-nonetype-not-iterable/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-type-error-str-concatenation</loc>
+    <loc>https://projectstack.cc/errors/python-type-error-str-concatenation/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-type-error-unsupported-operand</loc>
+    <loc>https://projectstack.cc/errors/python-type-error-unsupported-operand/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-type-error-missing-positional-argument</loc>
+    <loc>https://projectstack.cc/errors/python-type-error-missing-positional-argument/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-attribute-error-nonetype</loc>
+    <loc>https://projectstack.cc/errors/python-attribute-error-nonetype/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-attribute-error-module</loc>
+    <loc>https://projectstack.cc/errors/python-attribute-error-module/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-import-error-no-module</loc>
+    <loc>https://projectstack.cc/errors/python-import-error-no-module/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-module-not-found-error</loc>
+    <loc>https://projectstack.cc/errors/python-module-not-found-error/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-file-not-found-error</loc>
+    <loc>https://projectstack.cc/errors/python-file-not-found-error/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-key-error</loc>
+    <loc>https://projectstack.cc/errors/python-key-error/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-index-error-list-out-of-range</loc>
+    <loc>https://projectstack.cc/errors/python-index-error-list-out-of-range/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-value-error-invalid-literal-int</loc>
+    <loc>https://projectstack.cc/errors/python-value-error-invalid-literal-int/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-value-error-too-many-values</loc>
+    <loc>https://projectstack.cc/errors/python-value-error-too-many-values/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-zero-division-error</loc>
+    <loc>https://projectstack.cc/errors/python-zero-division-error/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-recursion-error-max-depth</loc>
+    <loc>https://projectstack.cc/errors/python-recursion-error-max-depth/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-permission-error</loc>
+    <loc>https://projectstack.cc/errors/python-permission-error/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-os-error-no-space</loc>
+    <loc>https://projectstack.cc/errors/python-os-error-no-space/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-connection-refused-error</loc>
+    <loc>https://projectstack.cc/errors/python-connection-refused-error/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-unicode-decode-error</loc>
+    <loc>https://projectstack.cc/errors/python-unicode-decode-error/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-json-decode-error</loc>
+    <loc>https://projectstack.cc/errors/python-json-decode-error/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-stop-iteration</loc>
+    <loc>https://projectstack.cc/errors/python-stop-iteration/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-runtime-error-dict-changed-size</loc>
+    <loc>https://projectstack.cc/errors/python-runtime-error-dict-changed-size/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-overflow-error-int-too-large</loc>
+    <loc>https://projectstack.cc/errors/python-overflow-error-int-too-large/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-memory-error</loc>
+    <loc>https://projectstack.cc/errors/python-memory-error/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/errors/python-pip-no-matching-distribution</loc>
+    <loc>https://projectstack.cc/errors/python-pip-no-matching-distribution/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/about</loc>
+    <loc>https://projectstack.cc/about/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/privacy</loc>
+    <loc>https://projectstack.cc/privacy/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/terms</loc>
+    <loc>https://projectstack.cc/terms/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/contact</loc>
+    <loc>https://projectstack.cc/contact/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://projectstack.cc/faq</loc>
+    <loc>https://projectstack.cc/faq/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
