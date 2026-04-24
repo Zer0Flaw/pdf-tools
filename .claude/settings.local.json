@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push:*)",
+      "Bash(npm run:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(npm install:*)",
+      "Bash(npm list:*)",
+      "Bash(node:*)",
+      "Bash(git commit:*)",
+      "Bash(git mv:*)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(curl -s \"http://localhost:5174/src/App.jsx\")",
+      "Bash(curl -s \"http://localhost:5174/src/utils/subscription.jsx\")",
+      "Bash(curl -s \"http://localhost:5174/src/components/UpgradeBanner.jsx\")",
+      "Bash(npx playwright:*)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(pkill -f \"vite\" sleep 2)",
+      "Bash(grep -l \"hasReachedDailyExportLimit\\\\|getRemainingDailyExports\" C:/Users/scook/dev/pdf-tools/src/tools/*.jsx)",
+      "Bash(grep -l \"ProjectStack Free\" C:/Users/scook/dev/pdf-tools/src/tools/*.jsx)"
+    ]
+  }
+}
