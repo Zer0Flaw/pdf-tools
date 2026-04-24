@@ -30,7 +30,6 @@ export default function AdSlot({
   minHeight,
   hideForPremium = false,
   isPremium = false,
-  showPlaceholderWhenDisabled,
 }) {
   const adRef = useRef(null);
   const hasTrackedViewRef = useRef(false);
@@ -39,10 +38,6 @@ export default function AdSlot({
   const providerName = placementConfig?.provider || AD_CONFIG.defaultProvider;
   const provider = getAdProviderConfig(providerName);
   const resolvedMinHeight = minHeight || placementConfig?.minHeight;
-  const shouldShowPlaceholder =
-    typeof showPlaceholderWhenDisabled === "boolean"
-      ? showPlaceholderWhenDisabled
-      : placementConfig?.renderPlaceholderWhenDisabled;
   const shouldRender =
     Boolean(isVisible) &&
     !(hideForPremium && isPremium) &&
@@ -84,13 +79,7 @@ export default function AdSlot({
   const slotStyle = resolvedMinHeight ? { minHeight: resolvedMinHeight } : undefined;
 
   if (!canRenderLiveAd) {
-    if (!shouldShowPlaceholder) return null;
-
-    return (
-      <div className={slotClassName} style={slotStyle}>
-        {renderPlaceholder(placement, providerName, provider)}
-      </div>
-    );
+    return null;
   }
 
   if (providerName === "adsense") {
