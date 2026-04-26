@@ -269,6 +269,7 @@ export default function App() {
     }
     return "";
   });
+  const [developerHubEcosystem, setDeveloperHubEcosystem] = useState(null);
   const [activeSupportPage, setActiveSupportPage] = useState(() => {
     if (typeof window !== "undefined") {
       const supportPageFromPath = getSupportPageFromPath(window.location.pathname);
@@ -347,14 +348,15 @@ export default function App() {
       metadata = SUPPORT_PAGES[activeSupportPage];
     } else if (activeView === "errorPage") {
       const error = getErrorBySlug(activeErrorSlug);
+      const ecosystemLabel = error?.ecosystem === "npm" ? "npm & Node.js" : error?.ecosystem === "python" ? "Python" : "Git";
       metadata = error
         ? {
-            title: `${error.shortTitle} | Git Errors | ProjectStack`,
+            title: `${error.shortTitle} | ${ecosystemLabel} Errors | ProjectStack`,
             description: error.explanation,
           }
         : {
             title: "Error Not Found | ProjectStack",
-            description: "This Git error page could not be found.",
+            description: "This error page could not be found.",
           };
     } else {
       metadata = TOOL_METADATA[activeTool];
@@ -437,7 +439,12 @@ export default function App() {
       case "pdfToImage":
         return <PdfToImageTool />;
       case "errorExplain":
-        return <ErrorTranslatorTool onNavigateToError={openErrorPage} />;
+        return (
+          <ErrorTranslatorTool
+            onNavigateToError={openErrorPage}
+            initialDirectoryEcosystem={developerHubEcosystem}
+          />
+        );
       case "merge":
       default:
         return <MergeTool />;
@@ -492,6 +499,11 @@ export default function App() {
               slug={activeErrorSlug}
               onBackHome={() => setActiveView("home")}
               onOpenErrorTool={() => openWorkspace("errorExplain")}
+              onNavigateToDeveloperHub={(ecosystem) => {
+                setDeveloperHubEcosystem(ecosystem);
+                openWorkspace("errorExplain");
+              }}
+              onNavigateToError={openErrorPage}
               onOpenSupportPage={openSupportPage}
             />
             <SiteFooter onOpenSupportPage={openSupportPage} />

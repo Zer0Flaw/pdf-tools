@@ -30,7 +30,12 @@ const TOOL_GROUPS = [
   {
     id: "developer",
     label: "Developer",
-    tools: [{ id: "errorExplain", label: "Error Translator" }],
+    tools: [
+      { id: "errorExplain", label: "Developer Hub" },
+      { id: "errorExplain", label: "Git Errors", ecosystemAnchor: "git" },
+      { id: "errorExplain", label: "npm & Node.js Errors", ecosystemAnchor: "npm" },
+      { id: "errorExplain", label: "Python Errors", ecosystemAnchor: "python" },
+    ],
   },
 ];
 
@@ -48,9 +53,16 @@ export default function ToolNav({ activeTool, onChange }) {
     setOpenGroup((current) => (current === groupId ? null : groupId));
   }
 
-  function handleToolSelect(toolId) {
+  function handleToolSelect(toolId, ecosystemAnchor) {
     onChange(toolId);
     setOpenGroup(null);
+    if (ecosystemAnchor) {
+      requestAnimationFrame(() => {
+        const tabEl = document.getElementById(ecosystemAnchor);
+        tabEl?.click();
+        tabEl?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    }
   }
 
   return (
@@ -99,10 +111,10 @@ export default function ToolNav({ activeTool, onChange }) {
                 >
                   {group.tools.map((tool) => (
                     <button
-                      key={tool.id}
+                      key={tool.label}
                       type="button"
-                      className={`tool-nav-item ${activeTool === tool.id ? "active" : ""}`}
-                      onClick={() => handleToolSelect(tool.id)}
+                      className={`tool-nav-item ${activeTool === tool.id && !tool.ecosystemAnchor ? "active" : ""}`}
+                      onClick={() => handleToolSelect(tool.id, tool.ecosystemAnchor)}
                       role="menuitem"
                     >
                       {tool.label}
