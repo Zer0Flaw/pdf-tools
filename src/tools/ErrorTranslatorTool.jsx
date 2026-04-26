@@ -4,16 +4,33 @@ import { trackEvent } from "../utils/analytics";
 import { matchError, getErrorsByEcosystem } from "../utils/errorMatcher";
 import { useSubscription } from "../utils/subscription";
 
-export default function ErrorTranslatorTool({ onNavigateToError }) {
+const DIRECTORY_TABS = [
+  { id: "git", label: "Git" },
+  { id: "npm", label: "npm & Node.js" },
+  { id: "python", label: "Python" },
+];
+
+export default function ErrorTranslatorTool({ onNavigateToError, initialDirectoryEcosystem }) {
   const [inputText, setInputText] = useState("");
   const [result, setResult] = useState(null);
   const [searched, setSearched] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState(initialDirectoryEcosystem || "git");
   const { isPremium } = useSubscription();
 
   useEffect(() => {
     setCopied(false);
   }, [result]);
+
+  useEffect(() => {
+    if (initialDirectoryEcosystem) {
+      setActiveTab(initialDirectoryEcosystem);
+      const el = document.getElementById(initialDirectoryEcosystem);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [initialDirectoryEcosystem]);
 
   function handleTranslate() {
     if (!inputText.trim()) return;
@@ -56,10 +73,17 @@ export default function ErrorTranslatorTool({ onNavigateToError }) {
 
   return (
     <div className="error-translator-tool">
+      <div className="developer-hub-hero">
+        <div className="developer-hub-hero-text">
+          <h2>Developer Hub</h2>
+          <p>Browse 90+ error explanations across Git, npm, Node.js, and Python, or paste an error message below for an instant match.</p>
+        </div>
+      </div>
+
       <div className="tool-header">
         <h2>Error Translator</h2>
         <p className="tool-sub">
-          Paste a Git error message and get a plain-English explanation with causes and fixes.
+          Paste a Git, npm, Node.js, or Python error message and get a plain-English explanation with causes and fixes.
         </p>
         <span className="free-badge">Free</span>
       </div>
@@ -170,56 +194,54 @@ export default function ErrorTranslatorTool({ onNavigateToError }) {
       )}
 
       <section className="error-directory">
-        <h3>Common Git Errors</h3>
-        <div className="error-directory-list">
-          {getErrorsByEcosystem("git").map((error) => (
-            <a
-              key={error.slug}
-              className="error-directory-item"
-              href={`/errors/${error.slug}`}
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigateToError?.(error.slug);
-              }}
+        <div className="error-directory-header">
+          <h3>Error Reference Library</h3>
+          <p className="error-directory-subtitle">Browse by ecosystem</p>
+        </div>
+
+        <div className="error-directory-tabs" role="tablist" aria-label="Error ecosystems">
+          {DIRECTORY_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              id={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`error-tab-panel-${tab.id}`}
+              className={`error-directory-tab ${activeTab === tab.id ? "active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
             >
-              {error.shortTitle}
-            </a>
+              {tab.label}
+            </button>
           ))}
         </div>
 
-        <h3>Common npm &amp; Node.js Errors</h3>
-        <div className="error-directory-list">
-          {getErrorsByEcosystem("npm").map((error) => (
-            <a
-              key={error.slug}
-              className="error-directory-item"
-              href={`/errors/${error.slug}`}
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigateToError?.(error.slug);
-              }}
-            >
-              {error.shortTitle}
-            </a>
-          ))}
-        </div>
-
-        <h3>Common Python Errors</h3>
-        <div className="error-directory-list">
-          {getErrorsByEcosystem("python").map((error) => (
-            <a
-              key={error.slug}
-              className="error-directory-item"
-              href={`/errors/${error.slug}`}
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigateToError?.(error.slug);
-              }}
-            >
-              {error.shortTitle}
-            </a>
-          ))}
-        </div>
+        {DIRECTORY_TABS.map((tab) => (
+          <div
+            key={tab.id}
+            id={`error-tab-panel-${tab.id}`}
+            role="tabpanel"
+            aria-labelledby={tab.id}
+            className="error-directory-panel"
+            hidden={activeTab !== tab.id}
+          >
+            <div className="error-directory-list">
+              {getErrorsByEcosystem(tab.id).map((error) => (
+                <a
+                  key={error.slug}
+                  className="error-directory-item"
+                  href={`/errors/${error.slug}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigateToError?.(error.slug);
+                  }}
+                >
+                  {error.shortTitle}
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
     </div>
   );

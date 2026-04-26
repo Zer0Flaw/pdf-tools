@@ -85,9 +85,9 @@ export default function LandingPage({ onStart, onOpenTool }) {
 
       <section className="lp-section lp-section--dev">
         <div className="lp-section-head">
-          <h2 className="lp-section-title">Developer Tools</h2>
+          <h2 className="lp-section-title">Developer Hub</h2>
           <p className="lp-section-desc">
-            Practical utilities for developers. Paste an error, get an answer.
+            90+ error explanations across Git, npm, Node.js, and Python. Paste an error, get an answer.
           </p>
         </div>
         <div className="lp-dev-grid">
