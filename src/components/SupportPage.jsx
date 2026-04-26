@@ -254,7 +254,7 @@ export const SUPPORT_PAGES = {
       {
         title: "Will ProjectStack add more tools in the future?",
         paragraphs: [
-          "Yes. ProjectStack is built as an expanding platform rather than a fixed set of tools. The current tool set covers common PDF and image tasks, and the architecture is designed so new tools can be added without disrupting the existing workspace. Future additions may include new file formats, additional editing capabilities, and tools that go beyond PDF and image workflows.",
+          "Yes. ProjectStack is built as an expanding platform rather than a fixed set of tools. The current set includes 10 PDF and image tools plus the Developer Hub — a reference library of 90+ error explanations across Git, npm, Node.js, and Python, with an Error Translator for instant lookups. The architecture is designed so new tools can be added without disrupting the existing workspace. Future additions may include new file formats, additional editing capabilities, and more developer utilities.",
         ],
       },
     ],

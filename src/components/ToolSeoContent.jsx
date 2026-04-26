@@ -403,10 +403,10 @@ const TOOL_SEO_CONTENT = {
   },
   errorExplain: {
     benefits: [
-      "Stop guessing what a Git error means — get a plain-English explanation in seconds without leaving the browser.",
+      "Covers 90+ errors across Git, npm, Node.js, and Python — all explained in plain English without digging through documentation.",
       "Each matched error includes the most common causes so you can diagnose the root problem, not just patch the symptom.",
-      "Step-by-step fix commands are copied directly from real Git workflows so you can paste them into your terminal.",
-      "Works for the most common Git errors that show up in daily development — from merge conflicts to push rejections.",
+      "Step-by-step fix commands are taken from real workflows so you can paste them directly into your terminal.",
+      "Works for the most common errors developers hit day-to-day — from Git merge conflicts to npm install failures to Python exceptions.",
       "Everything runs locally in your browser — your error text is matched against a built-in database, nothing is sent to a server.",
     ],
     steps: [
@@ -418,7 +418,7 @@ const TOOL_SEO_CONTENT = {
       {
         question: "What kinds of errors does this tool cover?",
         answer:
-          "The current database covers 30 common Git errors including push failures, authentication issues, merge conflicts, branch problems, and repository corruption.",
+          "The database covers 90+ errors across four ecosystems: 30 Git errors (push failures, auth issues, merge conflicts, branch problems), 15 npm errors, 15 Node.js errors, and 30 Python errors (syntax, type, import, runtime, and more).",
       },
       {
         question: "Does my error text get sent to a server?",
@@ -431,13 +431,13 @@ const TOOL_SEO_CONTENT = {
           "The tool will tell you it couldn't find a match and suggest pasting just the core error line without surrounding log output.",
       },
       {
-        question: "Can I use this for npm, Python, or other tools?",
+        question: "What ecosystems are covered?",
         answer:
-          "The current database focuses on Git. Support for additional ecosystems is planned for a future update.",
+          "Git, npm, Node.js, and Python are all supported. Each ecosystem has its own section in the error reference library, and more ecosystems are planned as the database grows.",
       },
     ],
     relatedTools: ["merge", "split", "edit"],
-    bottomCtaTitle: "Stuck on a Git error?",
+    bottomCtaTitle: "Stuck on a Git, npm, Node.js, or Python error?",
     bottomCtaCopy:
       "Paste your error message and get a clear explanation with fix commands in seconds.",
   },
@@ -468,7 +468,7 @@ const TOOL_HELPERS = {
   images: "Turn JPG and PNG files into one PDF.",
   pdfToImage: "Export each PDF page as a PNG image.",
   compress: "Reduce image size for easier uploads and sharing.",
-  errorExplain: "Paste a Git error and get causes and fix commands.",
+  errorExplain: "Paste any error and get a plain-English explanation with causes and fix commands.",
 };
 
 export default function ToolSeoContent({

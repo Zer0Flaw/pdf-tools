@@ -169,12 +169,12 @@ const TOOL_METADATA = {
       "Upload a PDF and ProjectStack converts each page into a clean PNG image file. The conversion runs locally in your browser using built-in rendering, so your document never leaves your device. Each page downloads as a separate image file ready to use anywhere.",
   },
   errorExplain: {
-    title: "Git & npm Error Translator | ProjectStack",
+    title: "Git, npm, Node.js & Python Error Translator | ProjectStack",
     description:
-      "Paste any error message from Git, npm, or Node.js and instantly get a plain-English explanation with common causes and step-by-step fixes. Free, browser-based, no sign-in needed.",
+      "Paste any error message from Git, npm, Node.js, or Python and instantly get a plain-English explanation with common causes and step-by-step fixes. Free, browser-based, no sign-in needed.",
     heading: "Error Translator",
     intro:
-      "Paste an error message from Git, npm, or Node.js and get a clear explanation with causes and fix commands — no searching Stack Overflow required.",
+      "Paste an error message from Git, npm, Node.js, or Python and get a clear explanation with causes and fix commands — no searching Stack Overflow required.",
     contextNote:
       "Paste any error message from Git, npm, Node.js, or Python and get an instant explanation with common causes and step-by-step fixes. The database covers 90+ errors across multiple ecosystems, with more being added regularly. Everything runs in your browser — your error text is never sent to a server.",
   },
