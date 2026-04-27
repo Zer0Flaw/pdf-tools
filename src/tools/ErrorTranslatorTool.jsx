@@ -8,6 +8,7 @@ const DIRECTORY_TABS = [
   { id: "git", label: "Git" },
   { id: "npm", label: "npm & Node.js" },
   { id: "python", label: "Python" },
+  { id: "typescript", label: "TypeScript" },
 ];
 
 export default function ErrorTranslatorTool({ onNavigateToError, initialDirectoryEcosystem }) {

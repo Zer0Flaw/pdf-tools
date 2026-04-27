@@ -5,6 +5,7 @@ const ECOSYSTEM_LABELS = {
   git: "Git Errors",
   npm: "npm & Node.js Errors",
   python: "Python Errors",
+  typescript: "TypeScript Errors",
 };
 
 function getRelatedErrors(error) {

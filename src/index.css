@@ -1192,6 +1192,12 @@ h1 {
   color: #1e40af;
 }
 
+.error-ecosystem-badge[data-ecosystem="typescript"] {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  color: #0369a1;
+}
+
 .error-result-section {
   display: flex;
   flex-direction: column;

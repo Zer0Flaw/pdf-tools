@@ -348,7 +348,7 @@ export default function App() {
       metadata = SUPPORT_PAGES[activeSupportPage];
     } else if (activeView === "errorPage") {
       const error = getErrorBySlug(activeErrorSlug);
-      const ecosystemLabel = error?.ecosystem === "npm" ? "npm & Node.js" : error?.ecosystem === "python" ? "Python" : "Git";
+      const ecosystemLabel = error?.ecosystem === "npm" ? "npm & Node.js" : error?.ecosystem === "python" ? "Python" : error?.ecosystem === "typescript" ? "TypeScript" : "Git";
       metadata = error
         ? {
             title: `${error.shortTitle} | ${ecosystemLabel} Errors | ProjectStack`,
