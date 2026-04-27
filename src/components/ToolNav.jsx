@@ -35,6 +35,8 @@ const TOOL_GROUPS = [
       { id: "errorExplain", label: "Git Errors", ecosystemAnchor: "git" },
       { id: "errorExplain", label: "npm & Node.js Errors", ecosystemAnchor: "npm" },
       { id: "errorExplain", label: "Python Errors", ecosystemAnchor: "python" },
+      { id: "errorExplain", label: "TypeScript Errors", ecosystemAnchor: "typescript" },
+      { id: "errorExplain", label: "Docker Errors", ecosystemAnchor: "docker" },
     ],
   },
 ];

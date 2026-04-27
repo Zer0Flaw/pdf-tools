@@ -1192,6 +1192,18 @@ h1 {
   color: #1e40af;
 }
 
+.error-ecosystem-badge[data-ecosystem="typescript"] {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  color: #0369a1;
+}
+
+.error-ecosystem-badge[data-ecosystem="docker"] {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #15803d;
+}
+
 .error-result-section {
   display: flex;
   flex-direction: column;

@@ -169,14 +169,14 @@ const TOOL_METADATA = {
       "Upload a PDF and ProjectStack converts each page into a clean PNG image file. The conversion runs locally in your browser using built-in rendering, so your document never leaves your device. Each page downloads as a separate image file ready to use anywhere.",
   },
   errorExplain: {
-    title: "Git, npm, Node.js & Python Error Translator | ProjectStack",
+    title: "Developer Hub — Error Reference for Git, npm, Python, TypeScript & Docker | ProjectStack",
     description:
-      "Paste any error message from Git, npm, Node.js, or Python and instantly get a plain-English explanation with common causes and step-by-step fixes. Free, browser-based, no sign-in needed.",
+      "Paste any error message from Git, npm, Node.js, Python, TypeScript, or Docker and instantly get a plain-English explanation with common causes and step-by-step fixes. Free, browser-based, no sign-in needed.",
     heading: "Error Translator",
     intro:
-      "Paste an error message from Git, npm, Node.js, or Python and get a clear explanation with causes and fix commands — no searching Stack Overflow required.",
+      "Paste an error message from Git, npm, Node.js, Python, TypeScript, or Docker and get a clear explanation with causes and fix commands — no searching Stack Overflow required.",
     contextNote:
-      "Paste any error message from Git, npm, Node.js, or Python and get an instant explanation with common causes and step-by-step fixes. The database covers 90+ errors across multiple ecosystems, with more being added regularly. Everything runs in your browser — your error text is never sent to a server.",
+      "Paste any error message from Git, npm, Node.js, Python, TypeScript, or Docker and get an instant explanation with common causes and step-by-step fixes. The database covers 150+ errors across six ecosystems, with more being added regularly. Everything runs in your browser — your error text is never sent to a server.",
   },
 };
 
@@ -348,7 +348,7 @@ export default function App() {
       metadata = SUPPORT_PAGES[activeSupportPage];
     } else if (activeView === "errorPage") {
       const error = getErrorBySlug(activeErrorSlug);
-      const ecosystemLabel = error?.ecosystem === "npm" ? "npm & Node.js" : error?.ecosystem === "python" ? "Python" : "Git";
+      const ecosystemLabel = error?.ecosystem === "npm" ? "npm & Node.js" : error?.ecosystem === "python" ? "Python" : error?.ecosystem === "typescript" ? "TypeScript" : error?.ecosystem === "docker" ? "Docker" : "Git";
       metadata = error
         ? {
             title: `${error.shortTitle} | ${ecosystemLabel} Errors | ProjectStack`,

@@ -8,6 +8,8 @@ const DIRECTORY_TABS = [
   { id: "git", label: "Git" },
   { id: "npm", label: "npm & Node.js" },
   { id: "python", label: "Python" },
+  { id: "typescript", label: "TypeScript" },
+  { id: "docker", label: "Docker" },
 ];
 
 export default function ErrorTranslatorTool({ onNavigateToError, initialDirectoryEcosystem }) {
@@ -76,14 +78,14 @@ export default function ErrorTranslatorTool({ onNavigateToError, initialDirector
       <div className="developer-hub-hero">
         <div className="developer-hub-hero-text">
           <h2>Developer Hub</h2>
-          <p>Browse 90+ error explanations across Git, npm, Node.js, and Python, or paste an error message below for an instant match.</p>
+          <p>Browse 150+ error explanations across Git, npm, Node.js, Python, TypeScript, and Docker, or paste an error message below for an instant match.</p>
         </div>
       </div>
 
       <div className="tool-header">
         <h2>Error Translator</h2>
         <p className="tool-sub">
-          Paste a Git, npm, Node.js, or Python error message and get a plain-English explanation with causes and fixes.
+          Paste any error message and get a plain-English explanation with causes and fixes.
         </p>
         <span className="free-badge">Free</span>
       </div>

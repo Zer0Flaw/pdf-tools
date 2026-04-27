@@ -5,6 +5,8 @@ const ECOSYSTEM_LABELS = {
   git: "Git Errors",
   npm: "npm & Node.js Errors",
   python: "Python Errors",
+  typescript: "TypeScript Errors",
+  docker: "Docker Errors",
 };
 
 function getRelatedErrors(error) {
@@ -144,7 +146,7 @@ export default function ErrorDetailPage({
             <section className="error-detail-section error-detail-cta">
               <h2>Browse more errors</h2>
               <p>
-                The Developer Hub covers 90+ errors across Git, npm, Node.js, and Python — with plain-English explanations and fix steps.
+                The Developer Hub covers 150+ errors across Git, npm, Node.js, Python, TypeScript, and Docker — with plain-English explanations and fix steps.
               </p>
               <button
                 type="button"
