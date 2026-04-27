@@ -403,7 +403,7 @@ const TOOL_SEO_CONTENT = {
   },
   errorExplain: {
     benefits: [
-      "Covers 90+ errors across Git, npm, Node.js, and Python — all explained in plain English without digging through documentation.",
+      "Covers 150+ errors across Git, npm, Node.js, Python, TypeScript, and Docker — all explained in plain English without digging through documentation.",
       "Each matched error includes the most common causes so you can diagnose the root problem, not just patch the symptom.",
       "Step-by-step fix commands are taken from real workflows so you can paste them directly into your terminal.",
       "Works for the most common errors developers hit day-to-day — from Git merge conflicts to npm install failures to Python exceptions.",
@@ -418,7 +418,7 @@ const TOOL_SEO_CONTENT = {
       {
         question: "What kinds of errors does this tool cover?",
         answer:
-          "The database covers 90+ errors across four ecosystems: 30 Git errors (push failures, auth issues, merge conflicts, branch problems), 15 npm errors, 15 Node.js errors, and 30 Python errors (syntax, type, import, runtime, and more).",
+          "The database covers 150+ errors across six ecosystems: 30 Git errors (push failures, auth issues, merge conflicts, branch problems), 15 npm errors, 15 Node.js errors, 30 Python errors (syntax, type, import, runtime, and more), 30 TypeScript errors (type assignments, generics, module resolution), and 30 Docker errors (daemon, build, runtime, networking, and Compose).",
       },
       {
         question: "Does my error text get sent to a server?",
@@ -433,11 +433,11 @@ const TOOL_SEO_CONTENT = {
       {
         question: "What ecosystems are covered?",
         answer:
-          "Git, npm, Node.js, and Python are all supported. Each ecosystem has its own section in the error reference library, and more ecosystems are planned as the database grows.",
+          "Git, npm, Node.js, Python, TypeScript, and Docker are all supported. Each ecosystem has its own tab in the Developer Hub reference library, and more ecosystems are planned as the database grows.",
       },
     ],
     relatedTools: ["merge", "split", "edit"],
-    bottomCtaTitle: "Stuck on a Git, npm, Node.js, or Python error?",
+    bottomCtaTitle: "Stuck on an error from Git, npm, Python, TypeScript, or Docker?",
     bottomCtaCopy:
       "Paste your error message and get a clear explanation with fix commands in seconds.",
   },
